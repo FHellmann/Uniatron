@@ -2,6 +2,7 @@ package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -19,8 +20,8 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 import java.util.List;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtils.extractMaxDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtils.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -39,7 +40,9 @@ public class AppUsageDaoTest {
     @Before
     public void setUp() {
         final Context context = InstrumentationRegistry.getTargetContext();
-        mDb = AppDatabase.buildInMemory(context);
+        mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
+                .allowMainThreadQueries()
+                .build();
         mDao = mDb.appUsageDao();
     }
 
@@ -72,7 +75,7 @@ public class AppUsageDaoTest {
         mDao.add(create(appName2, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsageTime(extractMinTimeOfDate(date), extractMaxDate(date));
+                .loadAppUsageTime(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -80,9 +83,9 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName2)));
         assertThat(liveDataValue.get(2).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getUsageTimeInSeconds(), is(30));
-        assertThat(liveDataValue.get(1).getUsageTimeInSeconds(), is(20));
-        assertThat(liveDataValue.get(2).getUsageTimeInSeconds(), is(10));
+        assertThat(liveDataValue.get(0).getTime(), is(30));
+        assertThat(liveDataValue.get(1).getTime(), is(20));
+        assertThat(liveDataValue.get(2).getTime(), is(10));
     }
 
     @Test
@@ -97,22 +100,22 @@ public class AppUsageDaoTest {
         mDao.add(create(appName1, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsagePercent(extractMinTimeOfDate(date), extractMaxDate(date));
+                .loadAppUsagePercent(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue.isEmpty(), is(false));
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getUsageTimeInSeconds(), is(75));
-        assertThat(liveDataValue.get(1).getUsageTimeInSeconds(), is(25));
+        assertThat(liveDataValue.get(0).getTime(), is(75));
+        assertThat(liveDataValue.get(1).getTime(), is(25));
     }
 
     private AppUsageEntity create(String name, Date date) {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
         appUsageEntity.setAppName(name);
         appUsageEntity.setTimestamp(date);
-        appUsageEntity.setUsageTimeInSeconds(10);
+        appUsageEntity.setTime(10);
         return appUsageEntity;
     }
 }

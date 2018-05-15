@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
@@ -13,8 +14,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtils.extractMaxDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtils.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.is;
@@ -28,7 +29,9 @@ public class TimeCreditDaoTest {
     @Before
     public void setUp() {
         final Context context = InstrumentationRegistry.getTargetContext();
-        mDb = AppDatabase.buildInMemory(context);
+        mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
+                .allowMainThreadQueries()
+                .build();
         mDao = mDb.timeCreditDao();
     }
 
@@ -55,14 +58,14 @@ public class TimeCreditDaoTest {
 
         final Date date = getDate(1, 1, 2018);
         final LiveData<Integer> data = mDao
-                .loadTimeCredits(extractMinTimeOfDate(date), extractMaxDate(date));
+                .loadTimeCredits(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
 
         assertThat(getLiveDataValue(data), is(10));
     }
 
     private TimeCreditEntity createTestData(int month) {
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTimeInMinutes(5);
+        timeCreditEntity.setTime(5);
         timeCreditEntity.setTimestamp(getDate(1, month, 2018));
         return timeCreditEntity;
     }

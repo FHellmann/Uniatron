@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textViewTradeOffer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_list_item_height"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/dialog_vertical_margin"
+        android:paddingTop="@dimen/dialog_vertical_margin"
+        android:gravity="center_vertical|center_horizontal"
+        android:drawableStart="@drawable/ic_shop_black_24dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        tools:text="TextView" />
+</LinearLayout>

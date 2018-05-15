@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="uniatron.augsburg.uni.edu.com.domain" />
+<manifest package="com.edu.uni.augsburg.uniatron.domain" />
