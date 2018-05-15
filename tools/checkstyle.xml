@@ -154,7 +154,9 @@ Severity: HARD
         <module name="FinalClass" />
         <!-- <module name="HideUtilityClassConstructor" /> -->
         <module name="InterfaceIsType" />
-        <module name="VisibilityModifier" />
+        <module name="VisibilityModifier" >
+            <property name="ignoreAnnotationCanonicalNames" value="BindView"/>
+        </module>
 
 
         <!-- Miscellaneous other checks.                   -->

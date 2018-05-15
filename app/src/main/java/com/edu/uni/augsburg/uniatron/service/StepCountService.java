@@ -10,8 +10,8 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-// uncomment after merge wth master
-//import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 /**
  * The step count service collects steps and commits them to the database.
@@ -25,7 +25,7 @@ public class StepCountService extends Service implements SensorEventListener {
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(final Intent intent) {
         return null;
     }
 
@@ -36,29 +36,34 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     @Override
-    public int onStartCommand(Intent intent,   int flags, int startId) {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         // grab step detector and register the listener
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        // this could return null if the app has no permissions for that sensor, or it doesn't exist
+        final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // this could return null if the app has
+        // no permissions for that sensor, or it doesn't exist
         if (sensorManager != null) {
-            Sensor stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
+            final Sensor stepDetectorSensor = sensorManager.
+                    getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+            sensorManager.registerListener(this,
+                    stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
         // this causes the OS to restart the service if it has been force stopped
         return START_STICKY;
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(final SensorEvent event) {
         // detects every single step
         if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-            int detectedSteps = (int) event.values[0];
+            final int detectedSteps = (int) event.values[0];
             currentSteps += detectedSteps;
 
             if (currentSteps >= COMMIT_SIZE) {
 
-                // subtract steps here and always commit exactly <COMMIT_SIZE> steps to prevent async issues
-                // async could happen when the sensor delivers new data before the async task is completed
+                // subtract steps here and always commit exactly <COMMIT_SIZE> steps
+                // to prevent async issues
+                // async could happen when the sensor delivers new data
+                // before the async task is completed
                 currentSteps -= COMMIT_SIZE;
                 commitSteps(COMMIT_SIZE);
             }
@@ -66,14 +71,14 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
         // ok
     }
 
     @Override
     public void onDestroy() {
         // commit the steps that are due
-        int tempSteps = currentSteps;
+        final int tempSteps = currentSteps;
         // set to zero before commit in case of async issue
         currentSteps = 0;
         commitSteps(tempSteps);
@@ -84,13 +89,16 @@ public class StepCountService extends Service implements SensorEventListener {
     /**
      * The function to commit exactly <COMMIT_SIZE> to the DataRepository
      */
-    private void commitSteps(int numberOfSteps) {
+    private void commitSteps(final int numberOfSteps) {
         //execute this on a separate thread as it may some time
-        // java.lang.IllegalStateException: Cannot access database on the main thread since it may potentially lock the UI for a long period of time.
+        // java.lang.IllegalStateException: Cannot access database on the main thread
+        // since it may potentially lock the UI for a long period of time.
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                // uncomment after merge with master
+                DataRepository dataRepository;
+                dataRepository = ((MainApplication) getApplicationContext()).getRepository();
+                dataRepository.addStepCount(numberOfSteps);
                 //MainApplication.getRepository().addStepCount(numberOfSteps);
             }
         });

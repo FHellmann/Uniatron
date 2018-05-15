@@ -1,7 +1,7 @@
 apply plugin: 'com.novoda.static-analysis'
 
 staticAnalysis {
-    penalty failOnErrors
+    penalty failOnWarnings
     checkstyle {
         toolVersion '8.8'
         exclude project.fileTree('src/test/java')
@@ -10,7 +10,7 @@ staticAnalysis {
         includeVariants { variant -> variant.name.contains('debug') }
     }
     pmd {
-        toolVersion '6.1.0'
+        toolVersion '6.3.0'
         exclude project.fileTree('src/test/java')
         exclude project.fileTree('src/androidTest/java')
         ruleSetFiles = rootProject.files('tools/pmd.xml')
@@ -23,7 +23,10 @@ staticAnalysis {
         excludeFilter rootProject.file('tools/findbugs.xml')
         includeVariants { variant -> variant.name.contains('debug') }
     }
-    lint { }
+    lintOptions {
+        abortOnError false
+        disable 'GradleDependency', 'PluralsCandidate', 'UnusedResources', 'ObsoleteLintCustomCheck'
+    }
 }
 
 afterEvaluate {

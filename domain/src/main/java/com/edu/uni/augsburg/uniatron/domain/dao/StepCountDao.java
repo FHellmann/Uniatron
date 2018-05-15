@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
 
 import java.util.Date;
@@ -19,7 +19,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
  * @author Fabio Hellmann
  */
 @Dao
-@TypeConverters({DateConverter.class})
+@TypeConverters({DateConverterUtil.class})
 public interface StepCountDao {
     /**
      * Persist a step count.
@@ -30,13 +30,26 @@ public interface StepCountDao {
     void add(StepCountEntity stepCount);
 
     /**
-     * Load the step count for a specified date.
+     * Load the step count for a specified date range.
      *
      * @param dateFrom The date to start searching.
      * @param dateTo The date to end searching.
      * @return The step count.
      */
-    @Query("SELECT SUM(step_count) FROM StepCountEntity "
+    @Query("SELECT TOTAL(step_count) FROM StepCountEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
     LiveData<Integer> loadStepCounts(Date dateFrom, Date dateTo);
+
+    /**
+     * Load the remaining step count for a specified date range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo The date to end searching.
+     * @return The step count.
+     */
+    @Query("SELECT TOTAL(step_count) - (SELECT TOTAL(steps) FROM TimeCreditEntity "
+            + "WHERE TimeCreditEntity.timestamp BETWEEN :dateFrom AND :dateTo) "
+            + "FROM StepCountEntity "
+            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
+    LiveData<Integer> loadRemainingStepCount(Date dateFrom, Date dateTo);
 }

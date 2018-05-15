@@ -7,11 +7,15 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
+import com.edu.uni.augsburg.uniatron.domain.converter.EmotionConverterUtil;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.EmotionDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.SummaryDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 
@@ -20,8 +24,13 @@ import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
  *
  * @author Fabio Hellmann
  */
-@Database(version = 1, entities = {StepCountEntity.class, AppUsageEntity.class, TimeCreditEntity.class})
-@TypeConverters(DateConverter.class)
+@Database(version = 1, entities = {
+        StepCountEntity.class,
+        AppUsageEntity.class,
+        TimeCreditEntity.class,
+        EmotionEntity.class
+})
+@TypeConverters({DateConverterUtil.class, EmotionConverterUtil.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     /**
@@ -46,28 +55,28 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TimeCreditDao timeCreditDao();
 
     /**
-     * Create the app database.
+     * Get the emotion dao.
      *
-     * @param context The application context.
-     * @return the app database.
+     * @return the emotion dao.
      */
-    public static AppDatabase build(@NonNull final Context context) {
-        return Room.databaseBuilder(
-                context.getApplicationContext(),
-                AppDatabase.class,
-                "uniatron")
-                .build();
-    }
+    public abstract EmotionDao emotionDao();
 
     /**
-     * Create an in-memory app database.
+     * Get the summary dao.
      *
-     * @param context The application context.
-     * @return the in-memory app database.
+     * @return the summary dao.
      */
-    public static AppDatabase buildInMemory(@NonNull final Context context) {
-        return Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
-                .allowMainThreadQueries()
+    public abstract SummaryDao summaryDao();
+
+    /**
+     * Create the database.
+     *
+     * @param context The app context.
+     * @return the database.
+     */
+    public static AppDatabase create(@NonNull final Context context) {
+        return Room.databaseBuilder(context, AppDatabase.class, "uniatron")
+                //.addMigrations() -> For the future
                 .build();
     }
 }

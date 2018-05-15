@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3d3ef7bb3bbcca836f0670c37dae5034",
+    "identityHash": "775fd66688c4ef01224d0099dd240198",
     "entities": [
       {
         "tableName": "StepCountEntity",
@@ -59,7 +59,7 @@
             "notNull": false
           },
           {
-            "fieldPath": "mUsageTimeInSeconds",
+            "fieldPath": "mTime",
             "columnName": "usage_time_in_seconds",
             "affinity": "INTEGER",
             "notNull": true
@@ -85,7 +85,7 @@
       },
       {
         "tableName": "TimeCreditEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER, `time_in_minutes` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER, `time_in_minutes` INTEGER NOT NULL, `steps` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "mId",
@@ -100,10 +100,48 @@
             "notNull": false
           },
           {
-            "fieldPath": "mTimeInMinutes",
+            "fieldPath": "mTime",
             "columnName": "time_in_minutes",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "mStepCount",
+            "columnName": "steps",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "EmotionEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER, `value` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTimestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "value",
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -118,7 +156,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"3d3ef7bb3bbcca836f0670c37dae5034\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"775fd66688c4ef01224d0099dd240198\")"
     ]
   }
 }

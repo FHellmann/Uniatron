@@ -6,7 +6,7 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @author Fabio Hellmann
  */
 @Entity(indices = {@Index("app_name")})
-@TypeConverters({DateConverter.class})
+@TypeConverters({DateConverterUtil.class})
 public class AppUsageEntity implements AppUsage {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -27,37 +27,37 @@ public class AppUsageEntity implements AppUsage {
     @ColumnInfo(name = "timestamp")
     private Date mTimestamp;
     @ColumnInfo(name = "usage_time_in_seconds")
-    private int mUsageTimeInSeconds;
+    private int mTime;
 
     public long getId() {
         return mId;
     }
 
-    public void setId(long id) {
-        this.mId = id;
+    public void setId(final long identifier) {
+        this.mId = identifier;
     }
 
     public String getAppName() {
         return mAppName;
     }
 
-    public void setAppName(String appName) {
+    public void setAppName(final String appName) {
         this.mAppName = appName;
     }
 
     public Date getTimestamp() {
-        return mTimestamp;
+        return (Date) mTimestamp.clone();
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.mTimestamp = timestamp;
+    public void setTimestamp(final Date timestamp) {
+        this.mTimestamp = (Date) timestamp.clone();
     }
 
-    public int getUsageTimeInSeconds() {
-        return mUsageTimeInSeconds;
+    public int getTime() {
+        return mTime;
     }
 
-    public void setUsageTimeInSeconds(int usageTimeInSeconds) {
-        this.mUsageTimeInSeconds = usageTimeInSeconds;
+    public void setTime(final int time) {
+        this.mTime = time;
     }
 }

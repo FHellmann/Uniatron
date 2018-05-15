@@ -25,14 +25,14 @@ public class SharedPreferencesManager {
      *
      * @return true if the activity had its first run
      */
-    public static boolean isFirstRun(Activity activity) {
+    public static boolean isFirstRun(final Activity activity) {
 
         // Get current version code of this app
-        int currentVersionCode = BuildConfig.VERSION_CODE;
+        final int currentVersionCode = BuildConfig.VERSION_CODE;
 
         // Get version code saved in SharedPreferences
-        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        int savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST);
+        final SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        final int savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST);
 
         // Check for first run or upgrade
         if (currentVersionCode == savedVersionCode) {
@@ -45,7 +45,8 @@ public class SharedPreferencesManager {
             setPreferenceInt(activity, PREF_VERSION_CODE_KEY, currentVersionCode);
             return true;
         }
-        // default case is true. rather have a service restarted and use resources than missing out
+        // default case is true. rather have a service restarted
+        // and use resources than not starting it at all
         return true;
     }
 
@@ -56,8 +57,9 @@ public class SharedPreferencesManager {
      * @param preferenceName the key of the SharedPreference
      * @param value the value that is assigned to the key
      */
-    private static void setPreferenceInt(Activity activity, String preferenceName, int value) {
-        SharedPreferences prefs = activity.getSharedPreferences(preferenceName, MODE_PRIVATE);
+    private static void setPreferenceInt(final Activity activity,
+                                         final String preferenceName, final int value) {
+        final SharedPreferences prefs = activity.getSharedPreferences(preferenceName, MODE_PRIVATE);
         prefs.edit().putInt(preferenceName, value).apply();
     }
 }

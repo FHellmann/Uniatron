@@ -14,24 +14,26 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
  */
 public class BroadcastReceiverOnStateChanged extends BroadcastReceiver {
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, final Intent intent) {
 
-        String action = intent.getAction();
+        final String action = intent.getAction();
         // on device restart, restart the service
         if (action.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
                 startService(context);
         }
     }
 
-    private void startService(Context context) {
-        Intent i = new Intent(context, StepCountService.class);
+    private void startService(final Context context) {
+        final Intent stepCountServiceIntent = new Intent(context, StepCountService.class);
 
-        // fixes crash on post Android O devices; services cannot be started in background!
-        // IllegalStateException: Not allowed to start service Intent { StepCountService }: app is in background
+        // fixes crash on post Android O devices;
+        // services cannot be started in background!
+        // IllegalStateException: Not allowed to start service Intent
+        // { StepCountService }: app is in background
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(i);
+            context.startForegroundService(stepCountServiceIntent);
         } else {
-            context.startService(i);
+            context.startService(stepCountServiceIntent);
         }
     }
 }
