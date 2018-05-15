@@ -1,9 +1,11 @@
-package com.edu.uni.augsburg.uniatron.stepcounter;
+package com.edu.uni.augsburg.uniatron.broadcastreceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
+import com.edu.uni.augsburg.uniatron.service.StepCountService;
 
 /**
  * The BroadCastReceiver starts the StepCountService as soon as boot is completed.
@@ -22,7 +24,6 @@ public class BroadcastReceiverOnStateChanged extends BroadcastReceiver {
     }
 
     private void startService(Context context) {
-
         Intent i = new Intent(context, StepCountService.class);
 
         // fixes crash on post Android O devices; services cannot be started in background!

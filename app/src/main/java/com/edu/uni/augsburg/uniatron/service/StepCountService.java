@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.stepcounter;
+package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+// uncomment after merge wth master
 //import com.edu.uni.augsburg.uniatron.MainApplication;
 
 /**
@@ -19,8 +20,6 @@ import android.support.annotation.Nullable;
  */
 public class StepCountService extends Service implements SensorEventListener {
 
-    private SensorManager sensorManager;
-    private Sensor stepDetectorSensor;
     private static final int COMMIT_SIZE = 10;
     private int currentSteps;
 
@@ -39,10 +38,12 @@ public class StepCountService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent,   int flags, int startId) {
         // grab step detector and register the listener
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-        sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
-
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // this could return null if the app has no permissions for that sensor, or it doesn't exist
+        if (sensorManager != null) {
+            Sensor stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+            sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        }
         // this causes the OS to restart the service if it has been force stopped
         return START_STICKY;
     }
@@ -55,6 +56,7 @@ public class StepCountService extends Service implements SensorEventListener {
             currentSteps += detectedSteps;
 
             if (currentSteps >= COMMIT_SIZE) {
+
                 // subtract steps here and always commit exactly <COMMIT_SIZE> steps to prevent async issues
                 // async could happen when the sensor delivers new data before the async task is completed
                 currentSteps -= COMMIT_SIZE;
@@ -88,7 +90,7 @@ public class StepCountService extends Service implements SensorEventListener {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                // TODO uncomment after merge with master
+                // uncomment after merge with master
                 //MainApplication.getRepository().addStepCount(numberOfSteps);
             }
         });
