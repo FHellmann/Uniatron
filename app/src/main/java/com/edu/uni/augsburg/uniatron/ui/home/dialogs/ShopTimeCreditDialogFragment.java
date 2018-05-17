@@ -75,7 +75,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
         final HomeViewModel model = ViewModelProviders.of(this).get(HomeViewModel.class);
         model.getRemainingStepCountToday().observe(this, stepCount -> {
-            if (TimeCredits.CREDIT_1000.isUsable(stepCount)) {
+            if (stepCount != null && TimeCredits.CREDIT_100.isUsable(stepCount)) {
                 mAdapter.setStepCount(stepCount);
                 mAdapter.notifyDataSetChanged();
                 mRecyclerView.setVisibility(View.VISIBLE);
