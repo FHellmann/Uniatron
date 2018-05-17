@@ -1,6 +1,6 @@
 # Uniatron
 [![Build Status](https://travis-ci.org/FHellmann/Uniatron.svg?branch=master)](https://travis-ci.org/FHellmann/Uniatron)
-[![Coverage Status](https://coveralls.io/repos/github/FHellmann/Uniatron/badge.svg)](https://coveralls.io/github/FHellmann/Uniatron)
+[![Coverage Status](https://coveralls.io/repos/github/FHellmann/Uniatron/badge.svg?branch=master)](https://coveralls.io/github/FHellmann/Uniatron?branch=master)
 
 **Uniatron is the app to spend less time on the phone and more time with exercise!**
 
