@@ -1,19 +1,21 @@
 package com.edu.uni.augsburg.uniatron.Services;
 
 import android.app.ActivityManager;
+import android.app.Service;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class LockApplication extends AsyncTask<Context,Void, Boolean> {
+public class lockApplicationService extends Service {
 
-    @Override
-    protected Boolean doInBackground(Context... params){
-        final Context context = params[0].getApplicationContext();
-        return isAppOnForeground(context);
-    }
 
     private ActivityManager.RunningAppProcessInfo getForegroundApp(Context context){
         ActivityManager.RunningAppProcessInfo result = null, info = null;
@@ -30,6 +32,7 @@ public class LockApplication extends AsyncTask<Context,Void, Boolean> {
                 break;
             }
         }
+        Log.e(getClass().toString(),result.toString());
         return result;
     }
 
@@ -51,4 +54,40 @@ public class LockApplication extends AsyncTask<Context,Void, Boolean> {
         return false;
     }
 
+
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        // this causes the OS to restart the service if it has been force stopped
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    /**
+     * The function to commit appUsageTime
+     */
+    private void commitAppUsageTime( final String appName, final int appUsageTime) {
+        DataRepository dataRepository;
+        dataRepository = ((MainApplication) getApplicationContext()).getRepository();
+        dataRepository.addAppUsage(appName, appUsageTime);
+    }
+
+
+
+    // BroadcastReceiver mitverwenden und Service dort starten
 }
