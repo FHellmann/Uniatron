@@ -23,7 +23,7 @@
             android:entries="@array/pref_app_selection"
             android:entryValues="@array/pref_app_selection"
             android:icon="@drawable/ic_phonelink_lock_black_24dp"
-            android:key="pref_app_selection"
+            android:key="pref_app_blacklist"
             android:persistent="true"
             android:summary="@string/pref_app_blacklist_summary"
             android:title="@string/pref_app_blacklist" />

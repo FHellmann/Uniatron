@@ -16,23 +16,20 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public final class SharedPreferencesHandler {
-    public static final String PREF_APP_SELECTION = "pref_app_selection";
+    /** Preference for the app blacklist. */
+    public static final String PREF_APP_BLACKLIST = "pref_app_blacklist";
+    /** Preference for the steps per minute. */
     public static final String PREF_STEPS_PER_MINUTE = "pref_steps_per_minute";
 
     private final SharedPreferences mPrefs;
 
-    private SharedPreferencesHandler(@NonNull final Context context) {
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
     /**
-     * Get a instance of the shared preferences handler.
+     * Ctr.
      *
-     * @param context The context of the application.
-     * @return The shared preferences handler.
+     * @param context The application context.
      */
-    public static SharedPreferencesHandler getInstance(@NonNull final Context context) {
-        return new SharedPreferencesHandler(context);
+    public SharedPreferencesHandler(@NonNull final Context context) {
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     /**
@@ -41,7 +38,7 @@ public final class SharedPreferencesHandler {
      * @return The list of apps.
      */
     public Set<String> getAppsToBlock() {
-        return mPrefs.getStringSet(PREF_APP_SELECTION, Collections.emptySet());
+        return mPrefs.getStringSet(PREF_APP_BLACKLIST, Collections.emptySet());
     }
 
     /**
