@@ -36,18 +36,4 @@ public interface Summary {
      * @return the average emotion as double.
      */
     double getEmotionAvg();
-
-    /**
-     * Get the average emotion.
-     *
-     * @return the average emotion.
-     */
-    default Emotions getEmotion() {
-        if(getEmotionAvg() >= 0) {
-            final int emotionIndex = (int) Math.round(getEmotionAvg());
-            return Emotions.values()[emotionIndex];
-        } else {
-            return Emotions.NEUTRAL;
-        }
-    }
 }

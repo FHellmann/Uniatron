@@ -324,14 +324,7 @@ public final class DataRepository {
         final Date dateTo = extractMaxTimeOfDate(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAverageEmotion(dateFrom, dateTo),
-                data -> {
-                    if (data == null) {
-                        return Emotions.NEUTRAL;
-                    } else {
-                        final int index = (int) Math.round(data);
-                        return Emotions.values()[index];
-                    }
-                }
+                data -> data == null ? Emotions.NEUTRAL : Emotions.getAverage(data)
         );
     }
 

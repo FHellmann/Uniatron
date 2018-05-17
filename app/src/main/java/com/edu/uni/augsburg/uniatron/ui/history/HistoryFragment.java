@@ -239,7 +239,7 @@ public class HistoryFragment extends Fragment {
                 itemViewHolder.mTextViewSteps.setText(stepsFormatted);
                 itemViewHolder.mTextViewUsageTime.setText(timeFormatted);
 
-                final Emotions emotion = summary.getEmotion();
+                final Emotions emotion = Emotions.getAverage(summary.getEmotionAvg());
                 final Drawable drawable = getEmoticonDrawable(emotion);
                 itemViewHolder.mImageViewEmoticon.setImageDrawable(drawable);
             } else if (holder instanceof LoadingViewHolder) {
