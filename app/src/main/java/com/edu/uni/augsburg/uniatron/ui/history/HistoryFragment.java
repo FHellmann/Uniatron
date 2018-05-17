@@ -147,7 +147,7 @@ public class HistoryFragment extends Fragment {
         private static final int VIEW_TYPE_LOADING = 1;
         private static final int VISIBLE_THRESHOLD = 5;
 
-        private final Map<Date, Summary> mSummaryMap = new ConcurrentHashMap<>();
+        private final Map<String, Summary> mSummaryMap = new ConcurrentHashMap<>();
         private final Context mContext;
 
         private OnLoadMoreListener mOnLoadMoreListener;
@@ -192,7 +192,16 @@ public class HistoryFragment extends Fragment {
                 isLoading = false;
             }
 
-            Stream.of(newItems).forEach(item -> mSummaryMap.put(item.getTimestamp(), item));
+            Stream.of(newItems).forEach(item -> {
+                final String timestampFormatted = String.format(
+                        Locale.getDefault(),
+                        "%te. %tb %ty",
+                        item.getTimestamp(),
+                        item.getTimestamp(),
+                        item.getTimestamp()
+                );
+                mSummaryMap.put(timestampFormatted, item);
+            });
             notifyDataSetChanged();
         }
 
