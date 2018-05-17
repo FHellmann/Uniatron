@@ -50,15 +50,17 @@ public final class DataRepository {
      * Add a new time credit.
      *
      * @param timeCredits The time credit will be generated out of this.
+     * @param factor The factor to multiply with.
      * @return The time credit.
      */
-    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits) {
+    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits,
+                                              final double factor) {
         final MutableLiveData<TimeCredit> observable = new MutableLiveData<>();
         new AsyncTaskWrapper<>(
                 () -> {
                     final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
                     timeCreditEntity.setTime(timeCredits.getTimeInMinutes());
-                    timeCreditEntity.setStepCount(timeCredits.getStepCount());
+                    timeCreditEntity.setStepCount((int) (timeCredits.getStepCount() * factor));
                     timeCreditEntity.setTimestamp(new Date());
                     mDatabase.timeCreditDao().add(timeCreditEntity);
                     return timeCreditEntity;

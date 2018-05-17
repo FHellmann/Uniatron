@@ -2,15 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/fitness">
-        <EditTextPreference
-            android:defaultValue="100"
+        <ListPreference
+            android:defaultValue="0"
             android:dialogIcon="@drawable/ic_directions_walk_black_24dp"
+            android:entries="@array/pref_steps_per_minute"
+            android:entryValues="@array/pref_steps_per_minute"
             android:icon="@drawable/ic_directions_walk_black_24dp"
-            android:inputType="number"
             android:key="pref_steps_per_minute"
-            android:persistent="true"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
             android:summary="@string/pref_steps_per_minute_summary"
             android:title="@string/pref_steps_per_minute" />
     </PreferenceCategory>

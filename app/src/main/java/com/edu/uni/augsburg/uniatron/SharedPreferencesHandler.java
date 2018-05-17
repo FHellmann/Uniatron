@@ -16,11 +16,20 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public final class SharedPreferencesHandler {
-    /** Preference for the app blacklist. */
+    /**
+     * Preference for the app blacklist.
+     */
     public static final String PREF_APP_BLACKLIST = "pref_app_blacklist";
-    /** Preference for the steps per minute. */
+    /**
+     * Preference for the steps per minute.
+     */
     public static final String PREF_STEPS_PER_MINUTE = "pref_steps_per_minute";
 
+    private static final double STEP_FACTOR_HARD = 1.5;
+    private static final double STEP_FACTOR_MEDIUM = 1.25;
+    private static final double STEP_FACTOR_EASY = 1.0;
+
+    private final Context mContext;
     private final SharedPreferences mPrefs;
 
     /**
@@ -29,6 +38,7 @@ public final class SharedPreferencesHandler {
      * @param context The application context.
      */
     public SharedPreferencesHandler(@NonNull final Context context) {
+        mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -44,9 +54,20 @@ public final class SharedPreferencesHandler {
     /**
      * Get the steps amount per minute.
      *
+     * @param timeCredits The time credits to get the steps.
      * @return The steps amount.
      */
-    public int getStepsPerMinute() {
-        return mPrefs.getInt(PREF_STEPS_PER_MINUTE, TimeCredits.CREDIT_100.getStepCount());
+    public double getStepsFactor(@NonNull final TimeCredits timeCredits) {
+        final String levelEasy = mContext.getString(R.string.pref_steps_per_minute_easy);
+        final String level = mPrefs.getString(PREF_STEPS_PER_MINUTE, levelEasy);
+        if (level.equalsIgnoreCase(
+                mContext.getString(R.string.pref_steps_per_minute_medium))) {
+            return STEP_FACTOR_MEDIUM;
+        } else if (level.equalsIgnoreCase(
+                mContext.getString(R.string.pref_steps_per_minute_hard))) {
+            return STEP_FACTOR_HARD;
+        } else {
+            return STEP_FACTOR_EASY;
+        }
     }
 }

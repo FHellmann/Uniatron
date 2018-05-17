@@ -18,6 +18,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeViewModel;
 
@@ -50,6 +51,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     @BindView(R.id.tradeButton)
     Button mTradeButton;
 
+    private SharedPreferencesHandler mPrefHandler;
     private TimeCreditListAdapter mAdapter;
     private OnBuyButtonClickedListener mListener;
 
@@ -67,6 +69,8 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull final View view,
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mPrefHandler = new SharedPreferencesHandler(getContext());
 
         setupRecyclerView();
 
@@ -121,7 +125,9 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     public void onBuyButtonClicked() {
         if (getContext() != null) {
             final MainApplication context = (MainApplication) getContext().getApplicationContext();
-            context.getRepository().addTimeCredit(mAdapter.getSelection());
+            final TimeCredits timeCredits = mAdapter.getSelection();
+            final double stepsFactor = mPrefHandler.getStepsFactor(timeCredits);
+            context.getRepository().addTimeCredit(timeCredits, stepsFactor);
             dismiss();
             if (mListener != null) {
                 mListener.onClicked();
@@ -177,7 +183,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
             holder.mTextViewTradeOffer.setText(getString(
                     R.string.dialog_time_credit_item,
-                    timeCredits.getStepCount(),
+                    (int) (mPrefHandler.getStepsFactor(timeCredits) * timeCredits.getStepCount()),
                     timeCredits.getTimeInMinutes())
             );
         }
@@ -185,7 +191,8 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         @Override
         public int getItemCount() {
             return (int) Stream.of(TimeCredits.values())
-                    .filter(credit -> credit.isUsable(mStepCount))
+                    .filter(credit -> mPrefHandler.getStepsFactor(credit)
+                            * credit.getStepCount() <= mStepCount)
                     .count();
         }
 

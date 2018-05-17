@@ -17,8 +17,11 @@
     <string name="ok">OK</string>
     <string name="dialog_emotion_title">How do you feel?</string>
     <string name="fitness">Fitness</string>
-    <string name="pref_steps_per_minute">Steps to trade per minute</string>
-    <string name="pref_steps_per_minute_summary">The amount of steps which is worth for you to trade one minute. (Minimum: 100 steps)</string>
+    <string name="pref_steps_per_minute">Fitness level</string>
+    <string name="pref_steps_per_minute_summary">Choose your level depending on your fitness.</string>
     <string name="pref_app_blacklist">Apps to block on usage</string>
     <string name="pref_app_blacklist_summary">Select the apps you\'d like to block when you have no time left.</string>
+    <string name="pref_steps_per_minute_easy">Easy</string>
+    <string name="pref_steps_per_minute_medium">Medium</string>
+    <string name="pref_steps_per_minute_hard">Hard</string>
 </resources>
