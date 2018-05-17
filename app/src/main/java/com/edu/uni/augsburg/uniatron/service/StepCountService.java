@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 /**
  * The step count service collects steps and commits them to the database.
@@ -89,9 +88,7 @@ public class StepCountService extends Service implements SensorEventListener {
      * The function to commit exactly <COMMIT_SIZE> to the DataRepository
      */
     private void commitSteps(final int numberOfSteps) {
-        DataRepository dataRepository;
-        dataRepository = ((MainApplication) getApplicationContext()).getRepository();
-        dataRepository.addStepCount(numberOfSteps);
+        ((MainApplication) getApplicationContext()).getRepository().addStepCount(numberOfSteps);
     }
 
 }

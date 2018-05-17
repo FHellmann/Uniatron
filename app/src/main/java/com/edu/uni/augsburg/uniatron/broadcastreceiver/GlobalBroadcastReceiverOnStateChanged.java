@@ -12,7 +12,7 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
  *
  * @author Leon Wöhrl
  */
-public class BroadcastReceiverOnStateChanged extends BroadcastReceiver {
+public class GlobalBroadcastReceiverOnStateChanged extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
 
@@ -23,7 +23,7 @@ public class BroadcastReceiverOnStateChanged extends BroadcastReceiver {
         }
     }
 
-    private void startService(final Context context, Class<?> serviceClass) {
+    private void startService(final Context context, final Class<?> serviceClass) {
         final Intent stepCountServiceIntent = new Intent(context, serviceClass);
 
         // fixes crash on post Android O devices;
