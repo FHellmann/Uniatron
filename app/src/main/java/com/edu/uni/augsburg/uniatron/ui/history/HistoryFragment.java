@@ -35,9 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
-
 /**
  * This displays a history of all the previous data.
  *
