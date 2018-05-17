@@ -20,7 +20,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -31,10 +30,18 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_OFF"/>
+                <action android:name="android.intent.action.SCREEN_ON"/>
+            </intent-filter>
         </receiver>
         <service
             android:name=".service.StepCountService"
             android:label="StepCountService" >
+        </service>
+        <service
+            android:name=".service.LockApplicationService"
+            android:label="LockApplicationService" >
         </service>
     </application>
 

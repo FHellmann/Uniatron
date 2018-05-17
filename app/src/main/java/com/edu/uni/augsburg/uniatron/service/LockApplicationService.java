@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class LockApplicationService extends Service {
 
+    private boolean serviceRunning = false;
 
     private ActivityManager.RunningAppProcessInfo getForegroundApp(Context context){
         ActivityManager.RunningAppProcessInfo result = null, info = null;
@@ -32,7 +34,7 @@ public class LockApplicationService extends Service {
                 break;
             }
         }
-        Log.e(getClass().toString(),result.toString());
+        Log.e(getClass().toString(),"test");
         return result;
     }
 
@@ -54,16 +56,17 @@ public class LockApplicationService extends Service {
         return false;
     }
 
-
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
+    
     @Override
     public void onCreate() {
+        serviceRunning = true;
+        checkForegroundedApp();
+        Log.e(getClass().toString(),"test2");
         super.onCreate();
     }
 
@@ -73,9 +76,11 @@ public class LockApplicationService extends Service {
         return START_STICKY;
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        serviceRunning = false;
     }
 
     /**
@@ -88,6 +93,12 @@ public class LockApplicationService extends Service {
     }
 
 
+    private void checkForegroundedApp(){
+        while(serviceRunning == true){
+            getForegroundApp(getApplicationContext());
+            SystemClock.sleep(15000);
+        }
+    }
 
     // BroadcastReceiver mitverwenden und Service dort starten
 }
