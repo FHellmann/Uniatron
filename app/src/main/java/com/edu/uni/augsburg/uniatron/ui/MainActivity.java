@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
-import com.edu.uni.augsburg.uniatron.sharedpreferences.SharedPreferencesManager;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingFragment;
@@ -71,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         });
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
-        startServiceOnFirstRun();
+        // we always start the service. if it is already running, nothing bad will happen
+        startStepCountService();
     }
 
     @Override
@@ -137,14 +137,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    private void startServiceOnFirstRun() {
-        // check SharedPreferences to find out if this is the first run of this activity
-        final boolean isFirstRun = SharedPreferencesManager.isFirstRun(this);
-        if (isFirstRun) {
-            startService(new Intent(getBaseContext(), StepCountService.class));
-            // rebooting will automatically start the service
-            // via BroadcastReceiverOnStateChanged class
-            // force closing via OS will automatically start the service because it's sticky
-        }
+    private void startStepCountService() {
+        startService(new Intent(getBaseContext(), StepCountService.class));
     }
 }

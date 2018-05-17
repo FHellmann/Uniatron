@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -33,10 +32,7 @@ public class StepCountService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
         currentSteps = 0;
-    }
 
-    @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         // grab step detector and register the listener
         final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         // this could return null if the app has
@@ -47,6 +43,10 @@ public class StepCountService extends Service implements SensorEventListener {
             sensorManager.registerListener(this,
                     stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         // this causes the OS to restart the service if it has been force stopped
         return START_STICKY;
     }
@@ -59,7 +59,6 @@ public class StepCountService extends Service implements SensorEventListener {
             currentSteps += detectedSteps;
 
             if (currentSteps >= COMMIT_SIZE) {
-
                 // subtract steps here and always commit exactly <COMMIT_SIZE> steps
                 // to prevent async issues
                 // async could happen when the sensor delivers new data
@@ -90,18 +89,9 @@ public class StepCountService extends Service implements SensorEventListener {
      * The function to commit exactly <COMMIT_SIZE> to the DataRepository
      */
     private void commitSteps(final int numberOfSteps) {
-        //execute this on a separate thread as it may some time
-        // java.lang.IllegalStateException: Cannot access database on the main thread
-        // since it may potentially lock the UI for a long period of time.
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                DataRepository dataRepository;
-                dataRepository = ((MainApplication) getApplicationContext()).getRepository();
-                dataRepository.addStepCount(numberOfSteps);
-                //MainApplication.getRepository().addStepCount(numberOfSteps);
-            }
-        });
+        DataRepository dataRepository;
+        dataRepository = ((MainApplication) getApplicationContext()).getRepository();
+        dataRepository.addStepCount(numberOfSteps);
     }
 
 }
