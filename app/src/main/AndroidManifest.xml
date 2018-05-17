@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.edu.uni.augsburg.uniatron">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
+
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
@@ -21,6 +24,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.edu.uni.augsburg.uniatron.broadcastreceiver.GlobalBroadcastReceiverOnStateChanged"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".service.StepCountService"
+            android:label="StepCountService" >
+        </service>
     </application>
+
+
 
 </manifest>

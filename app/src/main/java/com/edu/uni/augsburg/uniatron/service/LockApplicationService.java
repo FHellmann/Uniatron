@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.Services;
+package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.ActivityManager;
 import android.app.Service;
@@ -14,7 +14,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import java.util.Iterator;
 import java.util.List;
 
-public class lockApplicationService extends Service {
+public class LockApplicationService extends Service {
 
 
     private ActivityManager.RunningAppProcessInfo getForegroundApp(Context context){
