@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
                 Stream.of(item.entrySet())
                         .map(entry -> new PieEntry(entry.getValue().floatValue(), entry.getKey()))
                         .forEach(pieDataSet::addEntry);
-                
+
                 pieDataSet.addEntry(new PieEntry(1 - value, getString(R.string.app_others)));
             }
             mAppUsagePieChart.animateY(ANIMATION_DURATION_LENGTH, Easing.EasingOption.EaseInQuad);

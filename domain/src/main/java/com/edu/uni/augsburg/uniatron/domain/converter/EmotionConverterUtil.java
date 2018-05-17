@@ -15,10 +15,10 @@ public final class EmotionConverterUtil {
     }
 
     /**
-     * Converts a long into a date.
+     * Converts a int into a emotion.
      *
-     * @param value The long to convert.
-     * @return The date.
+     * @param value The int to convert.
+     * @return The emotion.
      */
     @TypeConverter
     public static Emotions fromRawValue(final Integer value) {
@@ -26,13 +26,13 @@ public final class EmotionConverterUtil {
     }
 
     /**
-     * Converts a date into a long.
+     * Converts a emotions into a int.
      *
-     * @param date The date to convert.
-     * @return The long.
+     * @param emotions The emotions to convert.
+     * @return The int.
      */
     @TypeConverter
-    public static Integer fromRealValue(final Emotions date) {
-        return date == null ? null : date.ordinal();
+    public static Integer fromRealValue(final Emotions emotions) {
+        return emotions == null ? null : emotions.ordinal();
     }
 }
