@@ -9,6 +9,8 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
 import org.junit.Before;
@@ -109,6 +111,28 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
         assertThat(liveDataValue.get(0).getTime(), is(75));
         assertThat(liveDataValue.get(1).getTime(), is(25));
+    }
+
+    @Test
+    public void loadRemainingAppUsageTime() throws InterruptedException {
+        final Date date = new Date();
+
+        final AppUsageEntity test = create("Test", date);
+        mDao.add(test);
+
+        final TimeCredits credits = TimeCredits.CREDIT_1000;
+        final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
+        timeCreditEntity.setTime(credits.getTimeInMinutes());
+        timeCreditEntity.setStepCount(credits.getStepCount());
+        timeCreditEntity.setTimestamp(date);
+        mDb.timeCreditDao().add(timeCreditEntity);
+
+        final LiveData<Integer> liveData = mDao
+                .loadRemainingAppUsageTime(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+
+        final Integer liveDataValue = getLiveDataValue(liveData);
+        assertThat(liveDataValue, is(notNullValue()));
+        assertThat(liveDataValue, is(credits.getTimeInMinutes() * 60 - test.getTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {

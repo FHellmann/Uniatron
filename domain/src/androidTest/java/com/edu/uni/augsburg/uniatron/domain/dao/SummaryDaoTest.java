@@ -76,4 +76,24 @@ public class SummaryDaoTest {
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue.isEmpty(), is(false));
     }
+
+    @Test
+    public void getSummariesUpdate() throws InterruptedException {
+        final Date date = new Date();
+
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+
+        final LiveData<List<SummaryEntity>> summaries = mDao.getSummaries(calendar.getTime(), date);
+
+        final List<SummaryEntity> liveDataValue = getLiveDataValue(summaries);
+        assertThat(liveDataValue, is(notNullValue()));
+        assertThat(liveDataValue.isEmpty(), is(true));
+
+        DatabaseUtil.createRandomData(mDb);
+
+        final List<SummaryEntity> liveDataValue1 = getLiveDataValue(summaries);
+        assertThat(liveDataValue1, is(notNullValue()));
+        assertThat(liveDataValue1.isEmpty(), is(false));
+    }
 }

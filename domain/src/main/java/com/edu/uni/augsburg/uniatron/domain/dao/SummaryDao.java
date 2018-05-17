@@ -28,13 +28,13 @@ public interface SummaryDao {
      * @return The summaries.
      */
     @Query("SELECT MAX(timestamp) as 'mTimestamp', "
-            + "TOTAL(usage_time_in_seconds) as 'mAppUsageTime', "
-            + "(SELECT TOTAL(step_count) FROM StepCountEntity "
-            + "WHERE date(timestamp/1000, 'unixepoch') = date(aue.timestamp/1000, 'unixepoch')) "
-            + "as 'mSteps', (SELECT CASE WHEN AVG(value) IS NULL THEN 0.0 ELSE AVG(value) END "
+            + "TOTAL(step_count) as 'mSteps', "
+            + "(SELECT TOTAL(usage_time_in_seconds) FROM AppUsageEntity "
+            + "WHERE date(timestamp/1000, 'unixepoch') = date(sce.timestamp/1000, 'unixepoch')) "
+            + "as 'mAppUsageTime', (SELECT CASE WHEN AVG(value) IS NULL THEN 0.0 ELSE AVG(value) END "
             + "FROM EmotionEntity WHERE date(timestamp/1000, 'unixepoch') = "
-            + "date(aue.timestamp/1000, 'unixepoch')) as 'mEmotionAvg' "
-            + "FROM AppUsageEntity aue "
+            + "date(sce.timestamp/1000, 'unixepoch')) as 'mEmotionAvg' "
+            + "FROM StepCountEntity sce "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo "
             + "GROUP BY date(timestamp/1000, 'unixepoch') "
             + "ORDER BY timestamp DESC")

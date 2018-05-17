@@ -31,9 +31,9 @@ public interface Summary {
     long getSteps();
 
     /**
-     * Get the average emotion.
+     * Get the average emotion as double.
      *
-     * @return the average emotion.
+     * @return the average emotion as double.
      */
     double getEmotionAvg();
 }
