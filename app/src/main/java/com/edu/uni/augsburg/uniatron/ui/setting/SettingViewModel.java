@@ -64,7 +64,6 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications != null) {
             final Set<String> result = Stream.of(installedApplications)
                     .filter(info -> !info.equals(context.getApplicationInfo()))
-                    .filter(info -> packageManager.getApplicationIcon(info) != null)
                     .map(item -> packageManager.getApplicationLabel(item).toString())
                     .collect(Collectors.toSet());
 
