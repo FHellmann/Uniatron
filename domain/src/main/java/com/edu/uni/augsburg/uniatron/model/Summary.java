@@ -31,9 +31,23 @@ public interface Summary {
     long getSteps();
 
     /**
+     * Get the average emotion as double.
+     *
+     * @return the average emotion as double.
+     */
+    double getEmotionAvg();
+
+    /**
      * Get the average emotion.
      *
      * @return the average emotion.
      */
-    double getEmotionAvg();
+    default Emotions getEmotion() {
+        if(getEmotionAvg() >= 0) {
+            final int emotionIndex = (int) Math.round(getEmotionAvg());
+            return Emotions.values()[emotionIndex];
+        } else {
+            return Emotions.NEUTRAL;
+        }
+    }
 }

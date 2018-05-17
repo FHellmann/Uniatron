@@ -344,8 +344,10 @@ public final class DataRepository {
      */
     public LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
                                               @NonNull final Date dateTo) {
+        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
+        final Date dateToMax = extractMaxTimeOfDate(dateTo);
         return Transformations.map(
-                mDatabase.summaryDao().getSummaries(dateFrom, dateTo),
+                mDatabase.summaryDao().getSummaries(dateFromMin, dateToMax),
                 data -> data == null ? Collections.emptyList()
                         : Stream.of(data).collect(Collectors.toList())
         );

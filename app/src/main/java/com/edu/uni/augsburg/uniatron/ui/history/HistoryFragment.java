@@ -86,16 +86,16 @@ public class HistoryFragment extends Fragment {
         final ItemAdapter itemAdapter = new ItemAdapter(mRecyclerViewHistory);
         mRecyclerViewHistory.setAdapter(itemAdapter);
 
-        mDateTo = extractMaxTimeOfDate(new Date());
-        mDateFrom = extractMinTimeOfDate(getPreviousDate(mDateTo, DAYS_TO_LOAD));
+        mDateTo = new Date();
+        mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
         model.registerDateRange(mDateFrom, mDateTo);
 
         model.getSummary().observe(this, itemAdapter::addItems);
 
         itemAdapter.setOnLoadMoreListener(() -> {
             // define next interval to load
-            mDateTo = extractMaxTimeOfDate(mDateFrom);
-            mDateFrom = extractMinTimeOfDate(getPreviousDate(mDateTo, DAYS_TO_LOAD));
+            mDateTo = mDateFrom;
+            mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
 
             model.registerDateRange(mDateFrom, mDateTo);
         });
@@ -148,6 +148,7 @@ public class HistoryFragment extends Fragment {
 
         private static final int VIEW_TYPE_ITEM = 0;
         private static final int VIEW_TYPE_LOADING = 1;
+        private static final int VISIBLE_THRESHOLD = 5;
 
         private final Map<Date, Summary> mSummaryMap = new ConcurrentHashMap<>();
         private final Context mContext;
@@ -155,8 +156,6 @@ public class HistoryFragment extends Fragment {
         private OnLoadMoreListener mOnLoadMoreListener;
 
         private boolean isLoading;
-        private static final int VISIBLE_THRESHOLD = 5;
-        private int lastVisibleItem, totalItemCount;
 
         ItemAdapter(@NonNull final RecyclerView recyclerView) {
             super();
@@ -171,10 +170,11 @@ public class HistoryFragment extends Fragment {
                                        final int dScrollY) {
                     super.onScrolled(recyclerView, dScrollX, dScrollY);
 
-                    totalItemCount = linearLayoutManager.getItemCount();
-                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    final int totalItemCount = linearLayoutManager.getItemCount();
+                    final int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
-                    if (!isLoading && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
+                    if (getItemCount() > 0 && !isLoading
+                            && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
                         if (mOnLoadMoreListener != null) {
                             mOnLoadMoreListener.onLoadMore();
                         }
@@ -239,10 +239,7 @@ public class HistoryFragment extends Fragment {
                 itemViewHolder.mTextViewSteps.setText(stepsFormatted);
                 itemViewHolder.mTextViewUsageTime.setText(timeFormatted);
 
-                final double emotionAvg = summary.getEmotionAvg();
-                final int emotionIndex = (int) Math.round(emotionAvg);
-                final Emotions emotion = Emotions.values()[emotionIndex];
-
+                final Emotions emotion = summary.getEmotion();
                 final Drawable drawable = getEmoticonDrawable(emotion);
                 itemViewHolder.mImageViewEmoticon.setImageDrawable(drawable);
             } else if (holder instanceof LoadingViewHolder) {
