@@ -63,10 +63,7 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew clean build connectedCheck connectedAndroidTest -PdisablePreDex --stacktrace
-
-after_success:
-  - ./gradlew coveralls
+  - ./gradlew clean build coveralls -PdisablePreDex --stacktrace
 
 after_failure:
   - "cat $TRAVIS_BUILD_DIR/app/build/reports/checkstyle/main.xml"
