@@ -19,12 +19,12 @@ public class BroadcastReceiverOnStateChanged extends BroadcastReceiver {
         final String action = intent.getAction();
         // on device restart, restart the service
         if (action.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
-                startService(context);
+            startService(context, StepCountService.class);
         }
     }
 
-    private void startService(final Context context) {
-        final Intent stepCountServiceIntent = new Intent(context, StepCountService.class);
+    private void startService(final Context context, Class<?> serviceClass) {
+        final Intent stepCountServiceIntent = new Intent(context, serviceClass);
 
         // fixes crash on post Android O devices;
         // services cannot be started in background!
