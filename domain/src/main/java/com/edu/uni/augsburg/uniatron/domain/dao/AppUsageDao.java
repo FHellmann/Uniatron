@@ -69,7 +69,7 @@ public interface AppUsageDao {
      * @param dateTo The date to end searching.
      * @return The remaining app usage time.
      */
-    @Query("SELECT (SELECT TOTAL(usage_time_in_seconds * 60) FROM TimeCreditEntity "
+    @Query("SELECT (SELECT TOTAL(time_in_minutes * 60) FROM TimeCreditEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time_in_seconds) "
             + "FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo")
     LiveData<Integer> loadRemainingAppUsageTime(Date dateFrom, Date dateTo);

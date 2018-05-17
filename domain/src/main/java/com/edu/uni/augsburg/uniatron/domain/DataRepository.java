@@ -346,7 +346,8 @@ public final class DataRepository {
                                               @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.summaryDao().getSummaries(dateFrom, dateTo),
-                data -> Stream.of(data).collect(Collectors.toList())
+                data -> data == null ? Collections.emptyList()
+                        : Stream.of(data).collect(Collectors.toList())
         );
     }
 }

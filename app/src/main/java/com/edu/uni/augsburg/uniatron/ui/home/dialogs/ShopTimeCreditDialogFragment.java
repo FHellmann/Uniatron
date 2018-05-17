@@ -167,10 +167,10 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                     .get(position);
 
             if (mModel.isInShoppingCart(timeCredits)) {
-                final int color = getResources().getColor(android.R.color.transparent);
+                final int color = getResources().getColor(R.color.secondaryLightColor);
                 holder.mTextViewTradeOffer.setBackgroundColor(color);
             } else {
-                final int color = getResources().getColor(R.color.secondaryLightColor);
+                final int color = getResources().getColor(android.R.color.transparent);
                 holder.mTextViewTradeOffer.setBackgroundColor(color);
             }
             holder.mValue = timeCredits;
@@ -192,7 +192,6 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
         void setStepCount(final int stepCount) {
             this.mStepCount = stepCount;
-            notifyDataSetChanged();
         }
 
         /**

@@ -39,7 +39,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
 
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
-                mRepository.getRemainingAppUsageTimeToday(),
+                mRepository.getRemainingStepCountsToday(),
                 mRemainingStepCount::setValue
         );
     }
@@ -61,6 +61,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      * @param timeCredits The time credit to add.
      */
     public void addToShoppingCart(@NonNull final TimeCredits timeCredits) {
+        mShoppingCart.clear(); // We only want one entry
         mShoppingCart.add(timeCredits);
     }
 
