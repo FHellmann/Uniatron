@@ -73,9 +73,9 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         mRecyclerView.setAdapter(mAdapter);
 
         mModel.getRemainingStepCountToday().observe(this, stepCount -> {
-            if (Stream.of(TimeCredits.values()).anyMatch(credit -> credit.isUsable(stepCount))) {
-                mAdapter.setStepCount(stepCount);
-                mAdapter.notifyDataSetChanged();
+            mAdapter.setStepCount(stepCount);
+            mAdapter.notifyDataSetChanged();
+            if (mAdapter.getItemCount() > 0) {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mTradeButton.setVisibility(View.VISIBLE);
                 mTextViewError.setVisibility(View.GONE);
@@ -166,13 +166,13 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                     .collect(Collectors.toList())
                     .get(position);
 
-            final int color;
             if (mModel.isInShoppingCart(timeCredits)) {
-                color = getResources().getColor(android.R.color.transparent);
+                final int color = getResources().getColor(android.R.color.transparent);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
             } else {
-                color = getResources().getColor(R.color.secondaryLightColor);
+                final int color = getResources().getColor(R.color.secondaryLightColor);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
             }
-            holder.mTextViewTradeOffer.setBackgroundColor(color);
             holder.mValue = timeCredits;
             holder.mTextViewTradeOffer.setText(getString(
                     R.string.dialog_time_credit_item,

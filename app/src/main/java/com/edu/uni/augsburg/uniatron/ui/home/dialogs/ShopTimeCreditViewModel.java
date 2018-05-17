@@ -32,7 +32,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    public ShopTimeCreditViewModel(@NonNull Application application) {
+    public ShopTimeCreditViewModel(@NonNull final Application application) {
         super(application);
         mRepository = ((MainApplication) application).getRepository();
         mShoppingCart = new ArrayList<>();
