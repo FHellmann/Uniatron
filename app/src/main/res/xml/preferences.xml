@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/fitness">
+        <EditTextPreference
+            android:defaultValue="100"
+            android:dialogIcon="@drawable/ic_directions_walk_black_24dp"
+            android:icon="@drawable/ic_directions_walk_black_24dp"
+            android:inputType="number"
+            android:key="pref_steps_per_minute"
+            android:persistent="true"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/pref_steps_per_minute_summary"
+            android:title="@string/pref_steps_per_minute" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/general">
 
         <MultiSelectListPreference
             android:defaultValue="@array/pref_app_selection"
+            android:dialogIcon="@drawable/ic_phonelink_lock_black_24dp"
             android:enabled="true"
             android:entries="@array/pref_app_selection"
             android:entryValues="@array/pref_app_selection"
+            android:icon="@drawable/ic_phonelink_lock_black_24dp"
             android:key="pref_app_selection"
             android:persistent="true"
-            android:title="@string/pref_app_selection" />
+            android:summary="@string/pref_app_blacklist_summary"
+            android:title="@string/pref_app_blacklist" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -12,9 +12,13 @@
     <string name="pie_chart_center_text">%1$d:%2$02d minute(s)\nremaining</string>
     <string name="trade">Trade</string>
     <string name="general">General</string>
-    <string name="pref_app_selection">Installed Apps</string>
     <string name="pref_dialog_app_selection_message">Select the apps you want to block</string>
     <string name="pref_dialog_app_selection_title">Blacklist</string>
     <string name="ok">OK</string>
     <string name="dialog_emotion_title">How do you feel?</string>
+    <string name="fitness">Fitness</string>
+    <string name="pref_steps_per_minute">Steps to trade per minute</string>
+    <string name="pref_steps_per_minute_summary">The amount of steps which is worth for you to trade one minute. (Minimum: 100 steps)</string>
+    <string name="pref_app_blacklist">Apps to block on usage</string>
+    <string name="pref_app_blacklist_summary">Select the apps you\'d like to block when you have no time left.</string>
 </resources>
