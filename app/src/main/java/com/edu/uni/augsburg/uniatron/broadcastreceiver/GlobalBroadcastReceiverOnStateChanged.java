@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.edu.uni.augsburg.uniatron.notification.NotificationSenderUtil;
+import com.edu.uni.augsburg.uniatron.notification.NotificationType;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 
 /**
@@ -15,10 +17,10 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
 public class GlobalBroadcastReceiverOnStateChanged extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        final String action = intent.getAction();
-        // on device restart, restart the service
-        if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(action)) {
+        if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction())) {
             startService(context, StepCountService.class);
+        } else if (Intent.ACTION_PACKAGE_ADDED.equalsIgnoreCase(intent.getAction())) {
+            NotificationSenderUtil.send(context, intent, NotificationType.APP_INSTALLATION);
         }
     }
 
