@@ -25,15 +25,14 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name="com.edu.uni.augsburg.uniatron.broadcastreceiver.GlobalBroadcastReceiverOnStateChanged"
+            android:name="com.edu.uni.augsburg.uniatron.service.StickyServiceStarterBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <data android:scheme="package"/>
             </intent-filter>
         </receiver>
+
         <service
             android:name=".service.StepCountService"
             android:label="StepCountService" >

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.notification.builder.AppInstallationNotificationBuilder;
+import com.edu.uni.augsburg.uniatron.notification.installation.AppInstallationNotificationBuilder;
 
 public enum NotificationType {
     APP_INSTALLATION(AppInstallationNotificationBuilder::new);

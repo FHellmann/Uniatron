@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.notification.builder;
+package com.edu.uni.augsburg.uniatron.notification.installation;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.broadcastreceiver.NotificationBroadcastReceiver;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 
 import java.util.concurrent.TimeUnit;
@@ -40,7 +39,7 @@ public class AppInstallationNotificationBuilder implements AppNotificationBuilde
     private NotificationCompat.Action buildBlacklistAddAction() {
         final String installedPackageName = mIntent.getData().getEncodedSchemeSpecificPart();
 
-        final Intent blacklistIntent = new Intent(mContext, NotificationBroadcastReceiver.class);
+        final Intent blacklistIntent = new Intent(mContext, AppInstallationBroadcastReceiver.class);
         blacklistIntent.putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, installedPackageName);
         final PendingIntent blacklistPendingIntent = PendingIntent.getBroadcast(
                 mContext,
@@ -52,7 +51,8 @@ public class AppInstallationNotificationBuilder implements AppNotificationBuilde
         final NotificationCompat.Action.Builder builder = new NotificationCompat.Action.Builder(
                 R.drawable.ic_phonelink_lock_black_24dp,
                 mContext.getString(R.string.pref_app_blacklist),
-                blacklistPendingIntent);
+                blacklistPendingIntent
+        );
 
         return builder.build();
     }

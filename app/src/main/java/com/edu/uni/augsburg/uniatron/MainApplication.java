@@ -16,8 +16,12 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        final AppDatabase database = AppDatabase.create(this);
-        mDataRepository = new DataRepository(database);
+
+        // initialize app database
+        mDataRepository = new DataRepository(AppDatabase.create(this));
+
+        // initialize explicit broadcast receivers -> See class description
+        BroadcastReceiverUtil.registerReceivers(this);
     }
 
     /**

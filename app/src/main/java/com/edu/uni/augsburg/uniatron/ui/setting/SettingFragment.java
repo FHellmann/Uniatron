@@ -30,9 +30,10 @@ public class SettingFragment extends PreferenceFragmentCompat {
 
         model.getInstalledApps(getContext()).observe(this, data -> {
             if (data != null) {
-                final String[] entries = Stream.of(data).toArray(String[]::new);
+                final String[] entries = Stream.of(data.keySet()).toArray(String[]::new);
+                final String[] entryValues = Stream.of(data.values()).toArray(String[]::new);
                 list.setEntries(entries);
-                list.setEntryValues(entries);
+                list.setEntryValues(entryValues);
             }
         });
     }

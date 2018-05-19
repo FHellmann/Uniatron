@@ -16,7 +16,7 @@ import com.annimon.stream.Stream;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
@@ -24,12 +24,13 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public class SettingViewModel extends AndroidViewModel {
-    private final MutableLiveData<Set<String>> mInstalledApps;
+    private final MutableLiveData<Map<String, String>> mInstalledApps;
 
     /**
      * Ctr.
      *
-     * @param application The application.
+     * @param application
+     *         The application.
      */
     public SettingViewModel(@NonNull final Application application) {
         super(application);
@@ -40,11 +41,13 @@ public class SettingViewModel extends AndroidViewModel {
     /**
      * Get the installed apps.
      *
-     * @param context The context of the app.
+     * @param context
+     *         The context of the app.
+     *
      * @return The app-names.
      */
     @NonNull
-    public LiveData<Set<String>> getInstalledApps(@NonNull final Context context) {
+    public LiveData<Map<String, String>> getInstalledApps(@NonNull final Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -53,17 +56,21 @@ public class SettingViewModel extends AndroidViewModel {
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
         if (installedApplications != null) {
-            final Set<String> result = Stream.of(installedApplications)
-                    .map(item -> packageManager.getApplicationLabel(item).toString())
-                    .filter(item -> !item.equals(
-                            context.getApplicationInfo().loadLabel(packageManager).toString()
-                    ))
-                    .collect(Collectors.toSet());
-
-            mInstalledApps.setValue(result);
+            mInstalledApps.setValue(Stream.of(installedApplications)
+                                          .filter(item -> !item.packageName.equals(
+                                                  context.getApplicationInfo().packageName
+                                          ))
+                                          .sortBy(item -> item.packageName)
+                                          .collect(Collectors.toMap(
+                                                  key -> key.packageName,
+                                                  value -> packageManager.getApplicationLabel(value)
+                                                                         .toString()
+                                          )));
         }
 
-        return Transformations.map(mInstalledApps,
-                data -> data == null ? Collections.emptySet() : data);
+        return Transformations.map(
+                mInstalledApps,
+                data -> data == null ? Collections.emptyMap() : data
+        );
     }
 }
