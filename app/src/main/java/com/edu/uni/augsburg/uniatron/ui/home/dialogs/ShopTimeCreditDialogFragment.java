@@ -180,7 +180,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
             holder.mValue = timeCredits;
             holder.mTextViewTradeOffer.setText(getString(
                     R.string.dialog_time_credit_item,
-                    (int) (mPrefHandler.getStepsFactor(timeCredits) * timeCredits.getStepCount()),
+                    (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()),
                     timeCredits.getTimeInMinutes())
             );
 
@@ -190,7 +190,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         @Override
         public int getItemCount() {
             return (int) Stream.of(TimeCredits.values())
-                    .filter(credit -> mPrefHandler.getStepsFactor(credit)
+                    .filter(credit -> mPrefHandler.getStepsFactor()
                             * credit.getStepCount() <= mStepCount)
                     .count();
         }

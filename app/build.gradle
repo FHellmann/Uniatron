@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion configCompileSdkVersion
-    buildToolsVersion configBuildToolsVersion
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.edu.uni.augsburg.uniatron"
-        minSdkVersion configMinSdkVersion
-        targetSdkVersion configTargetSdkVersion
-        versionCode configVersionCode
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 1
         versionName project.version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

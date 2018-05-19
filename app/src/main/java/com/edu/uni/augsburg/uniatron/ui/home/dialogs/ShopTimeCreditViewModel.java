@@ -103,7 +103,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      */
     public void buy() {
         Stream.of(mShoppingCart).forEach(credit -> {
-            final double stepsFactor = mPrefHandler.getStepsFactor(credit);
+            final double stepsFactor = mPrefHandler.getStepsFactor();
             mRepository.addTimeCredit(credit, stepsFactor);
         });
     }

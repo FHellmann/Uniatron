@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/fitness">
+    <PreferenceCategory android:title="@string/pref_category_general">
         <ListPreference
             android:defaultValue="0"
             android:dialogIcon="@drawable/ic_directions_walk_black_24dp"
-            android:entries="@array/pref_steps_per_minute"
-            android:entryValues="@array/pref_steps_per_minute"
+            android:entries="@array/pref_fitness_level"
+            android:entryValues="@array/pref_fitness_level"
             android:icon="@drawable/ic_directions_walk_black_24dp"
-            android:key="pref_steps_per_minute"
-            android:summary="@string/pref_steps_per_minute_summary"
-            android:title="@string/pref_steps_per_minute" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/general">
+            android:key="pref_fitness_level"
+            android:summary="@string/pref_fitness_level_summary"
+            android:title="@string/pref_fitness_level" />
 
         <MultiSelectListPreference
-            android:defaultValue="@array/pref_app_selection"
+            android:defaultValue="@array/pref_app_blacklist"
             android:dialogIcon="@drawable/ic_phonelink_lock_black_24dp"
             android:enabled="true"
-            android:entries="@array/pref_app_selection"
-            android:entryValues="@array/pref_app_selection"
+            android:entries="@array/pref_app_blacklist"
+            android:entryValues="@array/pref_app_blacklist"
             android:icon="@drawable/ic_phonelink_lock_black_24dp"
             android:key="pref_app_blacklist"
             android:persistent="true"
