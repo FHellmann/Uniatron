@@ -46,6 +46,7 @@ public class GlobalBroadcastReceiverOnStateChanged extends BroadcastReceiver {
             context.startForegroundService(serviceIntent);
         } else {
             context.startService(serviceIntent);
+
         }
     }
 }

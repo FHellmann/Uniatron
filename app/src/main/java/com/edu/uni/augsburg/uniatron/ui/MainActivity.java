@@ -1,6 +1,8 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,8 +13,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.service.StepCountService;
+import com.edu.uni.augsburg.uniatron.broadcastreceiver.GlobalBroadcastReceiverOnStateChanged;
 import com.edu.uni.augsburg.uniatron.service.LockApplicationService;
+import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingFragment;
@@ -34,6 +37,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private static final int NAV_POSITION_HOME = 1;
     private static final int NAV_POSITION_SETTING = 2;
 
+
+    private BroadcastReceiver mReceiver = null;
+
+
     @BindView(R.id.viewPager)
     ViewPager mViewPager;
     @BindView(R.id.navigation)
@@ -44,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        mReceiver = new GlobalBroadcastReceiverOnStateChanged();
+
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -73,8 +85,15 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         //Start all services
         startServices();
+    }
 
-
+    @Override
+    protected void onDestroy() {
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -139,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             return mFragments.size();
         }
     }
+
 
     private void startServices() {
         //add StepService

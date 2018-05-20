@@ -5,7 +5,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -30,11 +29,12 @@ public class LockApplicationService extends Service {
             info = i.next();
             if (info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
                     && !isRunningService(info.processName,context)){
+                Log.e(getClass().toString(), "found process");
                 result = info;
                 break;
             }
         }
-        Log.e(getClass().toString(),"test");
+        Log.e(getClass().toString(),info.processName);
         return result;
     }
 
@@ -61,18 +61,20 @@ public class LockApplicationService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-    
+
     @Override
     public void onCreate() {
         serviceRunning = true;
         checkForegroundedApp();
-        Log.e(getClass().toString(),"test2");
+        Log.e(getClass().toString(),"Service created");
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         // this causes the OS to restart the service if it has been force stopped
+        serviceRunning = true;
+        checkForegroundedApp();
         return START_STICKY;
     }
 
@@ -80,9 +82,18 @@ public class LockApplicationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.e(getClass().toString(),"onDestroy()");
         serviceRunning = false;
     }
 
+    @Override
+    public boolean stopService(Intent name) {
+        Log.e(getClass().toString(),"StopService called");
+        serviceRunning = false;
+        return super.stopService(name);
+    }
+
+    
     /**
      * The function to commit appUsageTime
      */
@@ -92,13 +103,19 @@ public class LockApplicationService extends Service {
         dataRepository.addAppUsage(appName, appUsageTime);
     }
 
-
     private void checkForegroundedApp(){
-        while(serviceRunning == true){
-            getForegroundApp(getApplicationContext());
-            SystemClock.sleep(15000);
+        //while(serviceRunning == true) {
+            //ActivityManager.RunningAppProcessInfo process;
+            //process = getForegroundApp(getApplicationContext());
+            //if (process != null) {
+        while(serviceRunning){
+            getForegroundApp(getBaseContext());
+            String str = "check foreground "+ String.valueOf(serviceRunning);
+            Log.e(getClass().toString(), str);
         }
+            //}
+           // SystemClock.sleep(5000);
+        //}
     }
-
     // BroadcastReceiver mitverwenden und Service dort starten
 }
