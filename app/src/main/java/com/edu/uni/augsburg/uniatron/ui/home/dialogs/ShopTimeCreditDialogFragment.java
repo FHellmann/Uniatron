@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import butterknife.BindView;
@@ -45,6 +46,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     @BindView(R.id.tradeButton)
     Button mTradeButton;
 
+    private SharedPreferencesHandler mPrefHandler;
     private TimeCreditListAdapter mAdapter;
     private OnBuyButtonClickedListener mListener;
     private ShopTimeCreditViewModel mModel;
@@ -63,6 +65,8 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull final View view,
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mPrefHandler = new SharedPreferencesHandler(getContext());
 
         mModel = ViewModelProviders.of(this)
                 .get(ShopTimeCreditViewModel.class);
@@ -176,7 +180,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
             holder.mValue = timeCredits;
             holder.mTextViewTradeOffer.setText(getString(
                     R.string.dialog_time_credit_item,
-                    timeCredits.getStepCount(),
+                    (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()),
                     timeCredits.getTimeInMinutes())
             );
 
@@ -186,7 +190,8 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         @Override
         public int getItemCount() {
             return (int) Stream.of(TimeCredits.values())
-                    .filter(credit -> credit.isUsable(mStepCount))
+                    .filter(credit -> mPrefHandler.getStepsFactor()
+                            * credit.getStepCount() <= mStepCount)
                     .count();
         }
 

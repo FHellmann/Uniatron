@@ -74,7 +74,7 @@ public class DataRepositoryTest {
     @Test
     public void addTimeCredit() throws InterruptedException {
         final TimeCredits timeCredits = TimeCredits.CREDIT_1000;
-        final LiveData<TimeCredit> timeCredit = mRepository.addTimeCredit(timeCredits);
+        final LiveData<TimeCredit> timeCredit = mRepository.addTimeCredit(timeCredits, 1.0);
 
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
 
