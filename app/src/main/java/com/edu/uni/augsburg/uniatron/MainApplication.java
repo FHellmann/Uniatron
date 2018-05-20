@@ -21,7 +21,9 @@ public class MainApplication extends Application {
         mDataRepository = new DataRepository(AppDatabase.create(this));
 
         // initialize explicit broadcast receivers -> See class description
-        BroadcastReceiverUtil.registerReceivers(this);
+        // Initialize app broadcast receivers for explicit broadcasts (SDK > Android O)
+        // See: https://developer.android.com/about/versions/oreo/background#broadcasts
+        ExplicitBroadcastReceivers.APP_INSTALLATION.register(this);
     }
 
     /**

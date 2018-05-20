@@ -22,7 +22,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         final SettingViewModel model = ViewModelProviders.of(this).get(SettingViewModel.class);
-        model.getInstalledApps(getContext()).observe(this, data -> {
+        model.getInstalledApps().observe(this, data -> {
             final String[] entries = Stream.of(data.keySet()).toArray(String[]::new);
             final String[] entryValues = Stream.of(data.values()).toArray(String[]::new);
 

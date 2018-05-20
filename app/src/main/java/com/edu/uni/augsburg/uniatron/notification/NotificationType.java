@@ -6,7 +6,13 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.notification.installation.AppInstallationNotificationBuilder;
 
+/**
+ * The different notifications.
+ *
+ * @author Fabio Hellmann
+ */
 public enum NotificationType {
+    /** The app installation notification. */
     APP_INSTALLATION(AppInstallationNotificationBuilder::new);
 
     @NonNull
@@ -16,7 +22,16 @@ public enum NotificationType {
         this.mNotificationBuilder = notificationBuilder;
     }
 
-    public AppNotificationBuilder build(@NonNull Context context, @NonNull Intent intent) {
+    /**
+     * Creates the notification builder.
+     *
+     * @param context The context.
+     * @param intent  The intent of the event.
+     *
+     * @return The notification builder.
+     */
+    public AppNotificationBuilder build(@NonNull final Context context,
+                                        @NonNull final Intent intent) {
         return mNotificationBuilder.build(context, intent);
     }
 

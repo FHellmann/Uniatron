@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -45,8 +46,22 @@ public final class SharedPreferencesHandler {
      *
      * @return The list of apps.
      */
-    public Set<String> getAppsToBlock() {
+    public Set<String> getAppsBlacklist() {
         return mPrefs.getStringSet(PREF_APP_BLACKLIST, Collections.emptySet());
+    }
+
+    /**
+     * Add a app to the blacklist.
+     *
+     * @param packageName The package name of the app.
+     */
+    public void addAppToBlacklist(final String packageName) {
+        final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
+        newAppBlacklist.add(packageName);
+
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
+        editor.apply();
     }
 
     /**

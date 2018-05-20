@@ -12,50 +12,55 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 
+/**
+ * This is a helper class to send notifications backward compatible.
+ *
+ * @author Fabio Hellmann
+ */
 public final class NotificationSenderUtil {
     private static final String CHANNEL_ID = "UNIAtronNotificationChannel";
-    @NonNull
-    private final Context mContext;
-    private final NotificationManagerCompat mNotificationManager;
+    private static int mNotificationIdCounter;
 
-    private int mNotificationIdCounter;
-
-    private NotificationSenderUtil(@NonNull final Context context) {
-        mContext = context;
-        mNotificationManager = NotificationManagerCompat.from(context);
-        createNotificationChannel(context);
+    private NotificationSenderUtil() {
     }
 
+    /**
+     * Send a notification.
+     *
+     * @param context The context.
+     * @param intent  The intent of the event.
+     * @param type    The type of notification to send.
+     */
     public static void send(@NonNull final Context context,
                             @NonNull final Intent intent,
                             @NonNull final NotificationType type) {
-        NotificationSenderUtil notificationSenderUtil = new NotificationSenderUtil(context);
-        notificationSenderUtil.send(type, intent);
-    }
+        createNotificationChannel(context);
 
-    private void send(@NonNull final NotificationType type, @NonNull final Intent intent) {
-        final AppNotificationBuilder notificationBuilder = type.build(mContext, intent);
+        final NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(context);
+        final AppNotificationBuilder notificationBuilder = type.build(context, intent);
         final Notification notification = notificationBuilder.build(CHANNEL_ID);
-        mNotificationManager.notify(mNotificationIdCounter++, notification);
+        notificationManager.notify(mNotificationIdCounter++, notification);
     }
 
-    private void createNotificationChannel(@NonNull final Context context) {
+    private static void createNotificationChannel(@NonNull final Context context) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = context.getString(R.string.app_name);
-            String description = context.getString(R.string.app_channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            final CharSequence name = context.getString(R.string.app_name);
+            final String description = context.getString(R.string.app_channel_description);
+            final int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            final NotificationChannel channel =
+                    new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other mNotificationBuilder behaviors after this
-            NotificationManager notificationManager =
+            final NotificationManager notificationManager =
                     context.getSystemService(NotificationManager.class);
             if (notificationManager != null
-                    && Stream.of(notificationManager.getNotificationChannels())
-                    .map(NotificationChannel::getId)
-                    .noneMatch(channelId -> channelId.equals(CHANNEL_ID))) {
+                && Stream.of(notificationManager.getNotificationChannels())
+                         .map(NotificationChannel::getId)
+                         .noneMatch(channelId -> channelId.equals(CHANNEL_ID))) {
                 notificationManager.createNotificationChannel(channel);
             }
         }
