@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="pref_app_selection" />
+    <string-array name="pref_app_blacklist" />
+    <string-array name="pref_fitness_level">
+        <item>@string/pref_fitness_level_easy</item>
+        <item>@string/pref_fitness_level_medium</item>
+        <item>@string/pref_fitness_level_hard</item>
+    </string-array>
 </resources>

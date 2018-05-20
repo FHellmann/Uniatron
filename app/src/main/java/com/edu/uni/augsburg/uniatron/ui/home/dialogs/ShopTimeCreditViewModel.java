@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
@@ -23,6 +24,7 @@ import java.util.List;
  */
 public class ShopTimeCreditViewModel extends AndroidViewModel {
 
+    private final SharedPreferencesHandler mPrefHandler;
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
@@ -34,6 +36,9 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      */
     public ShopTimeCreditViewModel(@NonNull final Application application) {
         super(application);
+
+        mPrefHandler = new SharedPreferencesHandler(application);
+
         mRepository = ((MainApplication) application).getRepository();
         mShoppingCart = new ArrayList<>();
 
@@ -97,6 +102,9 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      * Stores the saved time credits of the shopping cart in the database.
      */
     public void buy() {
-        Stream.of(mShoppingCart).forEach(mRepository::addTimeCredit);
+        Stream.of(mShoppingCart).forEach(credit -> {
+            final double stepsFactor = mPrefHandler.getStepsFactor();
+            mRepository.addTimeCredit(credit, stepsFactor);
+        });
     }
 }
