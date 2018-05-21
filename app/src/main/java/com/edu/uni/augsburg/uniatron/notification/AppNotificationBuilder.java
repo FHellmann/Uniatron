@@ -8,15 +8,22 @@ import android.app.Notification;
  * @author Fabio Hellmann
  */
 public interface AppNotificationBuilder {
-    /** The app installation request id. */
+    /**
+     * The app installation request id.
+     */
     int APP_INSTALLATION_ID = 1;
 
     /**
      * Build the notification.
      *
-     * @param channelId The channel id.
-     *
      * @return The notification.
      */
-    Notification build(String channelId);
+    Notification build();
+
+    /**
+     * Get the id of the notification.
+     *
+     * @return The notification id.
+     */
+    int getId();
 }

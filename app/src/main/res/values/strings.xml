@@ -23,5 +23,7 @@
     <string name="pref_fitness_level_easy">Easy</string>
     <string name="pref_fitness_level_medium">Medium</string>
     <string name="pref_fitness_level_hard">Hard</string>
-    <string name="app_channel_description">The notifications of UNIAtron.</string>
+    <string name="channel_blacklist">Blacklist</string>
+    <string name="notify_package_added">An app was installed</string>
+    <string name="notify_package_added_summary">Click to add %1$s to the blacklist</string>
 </resources>

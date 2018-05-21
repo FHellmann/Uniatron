@@ -1,24 +1,27 @@
 package com.edu.uni.augsburg.uniatron.service;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 /**
- * The BroadCastReceiver starts the StepCountService as soon as boot is completed.
+ * A util class to start services.
  *
- * @author Leon Wöhrl
+ * @author Fabio Hellmann
  */
-public class StickyServiceStarterBroadcastReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(final Context context, final Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction())) {
-            startService(context, StepCountService.class);
-        }
+public final class ServiceUtil {
+    private ServiceUtil() {
     }
 
-    private void startService(final Context context, final Class<?> serviceClass) {
+    /**
+     * Start a service.
+     *
+     * @param context      The context.
+     * @param serviceClass The class of the service.
+     */
+    public static void startService(@NonNull final Context context,
+                                    @NonNull final Class<?> serviceClass) {
         final Intent serviceIntent = new Intent(context, serviceClass);
 
         // fixes crash on post Android O devices;

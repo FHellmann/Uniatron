@@ -6,7 +6,7 @@
             android:defaultValue="0"
             android:dialogIcon="@drawable/ic_directions_walk_black_24dp"
             android:entries="@array/pref_fitness_level"
-            android:entryValues="@array/pref_fitness_level"
+            android:entryValues="@array/pref_fitness_level_values"
             android:icon="@drawable/ic_directions_walk_black_24dp"
             android:key="pref_fitness_level"
             android:summary="@string/pref_fitness_level_summary"

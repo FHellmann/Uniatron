@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,20 +17,13 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public final class SharedPreferencesHandler {
-    /**
-     * Preference for the app blacklist.
-     */
+    /** Preference for the app blacklist. */
     public static final String PREF_APP_BLACKLIST = "pref_app_blacklist";
-    /**
-     * Preference for the steps per minute.
-     */
+    /** Preference for the steps per minute. */
     public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
 
-    private static final double STEP_FACTOR_HARD = 2.0;
-    private static final double STEP_FACTOR_MEDIUM = 1.5;
-    private static final double STEP_FACTOR_EASY = 1.0;
+    private static final float STEP_FACTOR_EASY = 1.0f;
 
-    private final Context mContext;
     private final SharedPreferences mPrefs;
 
     /**
@@ -37,7 +32,6 @@ public final class SharedPreferencesHandler {
      * @param context The application context.
      */
     public SharedPreferencesHandler(@NonNull final Context context) {
-        mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -56,6 +50,8 @@ public final class SharedPreferencesHandler {
      * @param packageName The package name of the app.
      */
     public void addAppToBlacklist(final String packageName) {
+        Logger.d("Add '" + packageName + "' to blacklist");
+
         final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
         newAppBlacklist.add(packageName);
 
@@ -70,16 +66,6 @@ public final class SharedPreferencesHandler {
      * @return The steps amount.
      */
     public double getStepsFactor() {
-        final String levelEasy = mContext.getString(R.string.pref_fitness_level_easy);
-        final String level = mPrefs.getString(PREF_STEPS_PER_MINUTE, levelEasy);
-        if (level.equalsIgnoreCase(
-                mContext.getString(R.string.pref_fitness_level_medium))) {
-            return STEP_FACTOR_MEDIUM;
-        } else if (level.equalsIgnoreCase(
-                mContext.getString(R.string.pref_fitness_level_hard))) {
-            return STEP_FACTOR_HARD;
-        } else {
-            return STEP_FACTOR_EASY;
-        }
+        return mPrefs.getFloat(PREF_STEPS_PER_MINUTE, STEP_FACTOR_EASY);
     }
 }

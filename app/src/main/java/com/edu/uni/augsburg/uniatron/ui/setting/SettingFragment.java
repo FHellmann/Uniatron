@@ -23,13 +23,13 @@ public class SettingFragment extends PreferenceFragmentCompat {
 
         final SettingViewModel model = ViewModelProviders.of(this).get(SettingViewModel.class);
         model.getInstalledApps().observe(this, data -> {
-            final String[] entries = Stream.of(data.keySet()).toArray(String[]::new);
-            final String[] entryValues = Stream.of(data.values()).toArray(String[]::new);
+            final String[] packageNames = Stream.of(data.keySet()).toArray(String[]::new);
+            final String[] labelNames = Stream.of(data.values()).toArray(String[]::new);
 
             final MultiSelectListPreference list =
                     (MultiSelectListPreference) findPreference(PREF_APP_BLACKLIST);
-            list.setEntries(entries);
-            list.setEntryValues(entryValues);
+            list.setEntries(labelNames);
+            list.setEntryValues(packageNames);
         });
     }
 }
