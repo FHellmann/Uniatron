@@ -14,7 +14,7 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.service.tasks.PackageAddedTask;
+import com.edu.uni.augsburg.uniatron.service.handler.PackageAddedHandler;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +25,6 @@ import java.util.concurrent.TimeUnit;
  * @author Fabio Hellmann
  */
 public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
-    private static final int DISPLAY_TIMEOUT_MINUTES = 5;
-
     private final Context mContext;
     private final Intent mIntent;
 
@@ -44,37 +42,32 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
-        return new NotificationCompat.Builder(mContext, NotificationChannels.BLACKLIST.getName())
+        return new NotificationCompat.Builder(mContext, NotificationChannels.BLACKLIST.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.notify_package_added))
                 .setContentText(mContext.getString(
                         R.string.notify_package_added_summary,
                         getLastInstalledAppLabel()
                 ))
-                .setTimeoutAfter(TimeUnit.MINUTES.toMinutes(DISPLAY_TIMEOUT_MINUTES))
-                .setContentIntent(buildBlacklistAddIntent())
-                .setAutoCancel(true)
+                .setContentIntent(PendingIntent.getBroadcast(
+                        mContext,
+                        (int) System.currentTimeMillis(),
+                        new Intent(mContext, PackageAddedHandler.class)
+                                .setAction(Intent.ACTION_PACKAGE_ADDED)
+                                .putExtra(
+                                        Intent.EXTRA_INSTALLER_PACKAGE_NAME,
+                                        getLastInstalledAppPackageName()
+                                ),
+                        0))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                //.setAutoCancel(true)
+                .setOngoing(false)
                 .build();
     }
 
     @Override
     public int getId() {
         return APP_INSTALLATION_ID;
-    }
-
-    private PendingIntent buildBlacklistAddIntent() {
-        final Intent blacklistIntent = PackageAddedTask.getBroadcastIntent(mContext);
-        blacklistIntent.putExtra(
-                Intent.EXTRA_INSTALLER_PACKAGE_NAME,
-                getLastInstalledAppPackageName()
-        );
-
-        return PendingIntent.getBroadcast(
-                mContext,
-                getId(),
-                blacklistIntent,
-                0
-        );
     }
 
     private String getLastInstalledAppLabel() {

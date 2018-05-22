@@ -17,34 +17,21 @@ import com.orhanobut.logger.Logger;
  * @author Fabio Hellmann
  */
 public enum NotificationChannels {
-    /** The notification channel for app blacklisting. */
+    /**
+     * The notification channel for app blacklisting.
+     */
     BLACKLIST(
-            "BLACKLIST",
             R.string.channel_blacklist,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
     );
 
-    @NonNull
-    private final String mChannelName;
     private final int mChannelNameResId;
     private final int mImportance;
 
-    NotificationChannels(@NonNull final String channelName,
-                         final int channelNameResId,
+    NotificationChannels(final int channelNameResId,
                          final int importance) {
-        this.mChannelName = channelName;
         this.mChannelNameResId = channelNameResId;
         this.mImportance = importance;
-    }
-
-    /**
-     * Get the channel name.
-     *
-     * @return The channel name.
-     */
-    @NonNull
-    public String getName() {
-        return mChannelName;
     }
 
     /**
@@ -63,9 +50,9 @@ public enum NotificationChannels {
             if (notificationManager != null
                     && Stream.of(notificationManager.getNotificationChannels())
                     .map(NotificationChannel::getId)
-                    .noneMatch(channelId -> channelId.equals(mChannelName))) {
+                    .noneMatch(channelId -> channelId.equals(name()))) {
                 final NotificationChannel channel = new NotificationChannel(
-                        mChannelName,
+                        name(),
                         context.getString(mChannelNameResId),
                         mImportance
                 );

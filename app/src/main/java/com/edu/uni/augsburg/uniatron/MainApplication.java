@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.service.ServiceUtil;
-import com.edu.uni.augsburg.uniatron.service.StickyService;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -32,9 +30,6 @@ public class MainApplication extends Application {
 
         // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
-
-        // we always start the service. if it is already running, nothing bad will happen
-        ServiceUtil.startService(this, StickyService.class);
     }
 
     /**

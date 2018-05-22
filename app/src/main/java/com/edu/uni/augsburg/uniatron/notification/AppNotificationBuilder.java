@@ -8,9 +8,7 @@ import android.app.Notification;
  * @author Fabio Hellmann
  */
 public interface AppNotificationBuilder {
-    /**
-     * The app installation request id.
-     */
+    /** The app installation request id. */
     int APP_INSTALLATION_ID = 1;
 
     /**
