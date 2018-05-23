@@ -84,6 +84,8 @@ public class StepCountService extends Service implements SensorEventListener {
         super.onDestroy();
     }
 
+
+
     /**
      * The function to commit exactly <COMMIT_SIZE> to the DataRepository
      */

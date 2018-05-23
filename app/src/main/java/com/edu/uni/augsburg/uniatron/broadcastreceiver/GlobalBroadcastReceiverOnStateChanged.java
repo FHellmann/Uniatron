@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.service.LockApplicationService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
@@ -14,6 +15,10 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
  * @author Leon Wöhrl
  */
 public class GlobalBroadcastReceiverOnStateChanged extends BroadcastReceiver {
+
+
+    public static boolean wasScreenOn = true;
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
         final String action = intent.getAction();
@@ -22,13 +27,15 @@ public class GlobalBroadcastReceiverOnStateChanged extends BroadcastReceiver {
             startService(context, StepCountService.class);
             startService(context, LockApplicationService.class);
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+            //wasScreenOn = false;
+            Log.e("LockApplicationService", "ServiceStop");
             stopService(context,LockApplicationService.class);
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+            //wasScreenOn = true;
+            Log.e("LockApplicationService", "ServiceStart");
             startService(context,LockApplicationService.class);
         }
-
     }
-
 
     private void stopService(final Context context, final Class<?> serviceClass) {
         final Intent serviceIntent = new Intent(context, serviceClass);

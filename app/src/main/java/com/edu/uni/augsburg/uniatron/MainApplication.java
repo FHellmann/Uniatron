@@ -1,6 +1,8 @@
 package com.edu.uni.augsburg.uniatron;
 
+import android.app.AppOpsManager;
 import android.app.Application;
+import android.content.Context;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
@@ -20,6 +22,16 @@ public class MainApplication extends Application {
         mDataRepository = new DataRepository(database);
     }
 
+
+    private boolean hasPermission() {
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+
     /**
      * Get the data repository.
      *
@@ -28,4 +40,6 @@ public class MainApplication extends Application {
     public DataRepository getRepository() {
         return mDataRepository;
     }
+
+
 }
