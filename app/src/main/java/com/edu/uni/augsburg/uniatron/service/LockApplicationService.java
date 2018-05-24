@@ -65,11 +65,12 @@ public class LockApplicationService extends Service {
         while(screenOn){
             String actName = getRecentActivity(getBaseContext());
             SystemClock.sleep(1000);
+            commitAppUsageTime(actName,1);
             Log.d(getClass().toString(), actName);
         }
     }
 
-
+    //TODO handle get app for under lollipop
     //TODO ask for permission with library (@... get permission or simmilar)
     public String getRecentActivity(Context context) {
         String topActivityName = "";
