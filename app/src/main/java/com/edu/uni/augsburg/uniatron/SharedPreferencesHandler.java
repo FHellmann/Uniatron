@@ -109,8 +109,16 @@ public final class SharedPreferencesHandler {
      * @return The steps amount.
      */
     public double getStepsFactor() {
-        return Double.valueOf(mPrefs.getString(PREF_STEPS_PER_MINUTE, String.valueOf
-                (STEP_FACTOR_EASY)));
+        if (mPrefs.contains(PREF_STEPS_PER_MINUTE)) {
+            return Float.valueOf(
+                    mPrefs.getString(
+                            PREF_STEPS_PER_MINUTE,
+                            String.valueOf(STEP_FACTOR_EASY)
+                    )
+            );
+        } else {
+            return STEP_FACTOR_EASY;
+        }
     }
 
     /**

@@ -68,8 +68,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
         mPrefHandler = SharedPreferencesHandler.getInstance(getContext());
 
-        mModel = ViewModelProviders.of(this)
-                .get(ShopTimeCreditViewModel.class);
+        mModel = ViewModelProviders.of(this).get(ShopTimeCreditViewModel.class);
 
         setupRecyclerView();
 
