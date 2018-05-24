@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -62,7 +63,9 @@ public class LockApplicationService extends Service {
 
     private void checkForegroundApp(){
         while(screenOn){
-            getRecentActivity(getBaseContext());
+            String actName = getRecentActivity(getBaseContext());
+            SystemClock.sleep(1000);
+            Log.d(getClass().toString(), actName);
         }
     }
 
@@ -81,9 +84,8 @@ public class LockApplicationService extends Service {
             while (usageEvents.hasNextEvent()) {
                 usageEvents.getNextEvent(event);
             }
-
             if (event != null && !TextUtils.isEmpty(event.getPackageName()) && event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                return event.getClassName();
+                return event.getPackageName();
             } else {
                 topActivityName = "";
             }
@@ -126,13 +128,11 @@ public class LockApplicationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction("android.intent.action.SCREEN_ON");
+        filter.addAction("android.intent.action.SCREEN_OFF");
         registerReceiver(appReadReceiver, filter);
         Log.e(getClass().toString(),"Service created");
-
     }
 
        @Override
