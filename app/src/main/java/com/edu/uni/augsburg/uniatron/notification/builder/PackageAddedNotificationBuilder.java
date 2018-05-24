@@ -72,8 +72,8 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
                             0
                     )).toString();
         } catch (PackageManager.NameNotFoundException e) {
-            throw new IllegalStateException("Unable to find the added package '" +
-                    addedPackageName + "'");
+            throw new IllegalStateException("Unable to find the added package '"
+                    + addedPackageName + "'", e);
         }
     }
 

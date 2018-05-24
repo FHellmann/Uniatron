@@ -14,7 +14,7 @@ import com.edu.uni.augsburg.uniatron.service.handler.PackageAddedHandler;
  * @author Fabio Hellmann
  */
 public class BroadcastService extends Service {
-    private BroadcastReceiver mPackageAddedReceiver = new PackageAddedHandler();
+    private final BroadcastReceiver mPackageAddedReceiver = new PackageAddedHandler();
 
     @Nullable
     @Override

@@ -36,8 +36,17 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
+        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        observable.setValue(getAllInstalledApps(application.getBaseContext()));
+
         mInstalledApps = new MediatorLiveData<>();
-        mInstalledApps.addSource(getInstalledApps(application), mInstalledApps::setValue);
+        mInstalledApps.addSource(observable, mInstalledApps::setValue);
+
+        final SharedPreferencesHandler handler =
+                new SharedPreferencesHandler(application.getBaseContext());
+        handler.setOnBlacklistChangeListener((packageName, added) -> {
+            observable.postValue(getAllInstalledApps(application.getBaseContext()));
+        });
     }
 
     /**
@@ -51,19 +60,6 @@ public class SettingViewModel extends AndroidViewModel {
                 data -> data == null ? Collections.emptyMap() : data);
     }
 
-    @NonNull
-    private LiveData<Map<String, String>> getInstalledApps(@NonNull final Context context) {
-        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
-        observable.setValue(getAllInstalledApps(context));
-
-        final SharedPreferencesHandler handler = SharedPreferencesHandler.getInstance(context);
-        handler.setOnBlacklistChangeListener((packageName, added) -> {
-            observable.postValue(getAllInstalledApps(context));
-        });
-
-        return observable;
-    }
-
     private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -72,7 +68,9 @@ public class SettingViewModel extends AndroidViewModel {
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
-        if (installedApplications != null) {
+        if (installedApplications == null) {
+            return Collections.emptyMap();
+        } else {
             return Stream.of(installedApplications)
                     .filter(item -> !item.packageName.equals(
                             context.getApplicationInfo().packageName
@@ -83,8 +81,6 @@ public class SettingViewModel extends AndroidViewModel {
                             value -> packageManager.getApplicationLabel(value)
                                     .toString()
                     ));
-        } else {
-            return Collections.emptyMap();
         }
     }
 }

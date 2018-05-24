@@ -42,9 +42,9 @@ public class PackageAddedHandler extends BroadcastReceiver {
     }
 
     private void removePackageFromBlacklist(final Context context, final Intent intent) {
-        final SharedPreferencesHandler handler = SharedPreferencesHandler.getInstance(context);
         final Uri data = intent.getData();
         if (data != null) {
+            final SharedPreferencesHandler handler = new SharedPreferencesHandler(context);
             handler.removeAppFromBlacklist(data.getEncodedSchemeSpecificPart());
         }
     }

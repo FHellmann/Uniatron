@@ -28,30 +28,16 @@ public final class SharedPreferencesHandler {
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 
-    private static SharedPreferencesHandler mInstance;
     private final SharedPreferences mPrefs;
-    private OnBlacklistChangeListener mOnBlacklistChangeListener;
+    private OnBlacklistChangeListener mBlacklistListener;
 
     /**
      * Ctr.
      *
      * @param context The application context.
      */
-    private SharedPreferencesHandler(@NonNull final Context context) {
+    public SharedPreferencesHandler(@NonNull final Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    /**
-     * Get a single instance of the shared preferences handler.
-     *
-     * @param context The context.
-     * @return The shared preferences handler.
-     */
-    public static SharedPreferencesHandler getInstance(@NonNull final Context context) {
-        if (mInstance == null) {
-            mInstance = new SharedPreferencesHandler(context);
-        }
-        return mInstance;
     }
 
     /**
@@ -78,8 +64,8 @@ public final class SharedPreferencesHandler {
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
 
-        if (mOnBlacklistChangeListener != null) {
-            mOnBlacklistChangeListener.onChanged(packageName, true);
+        if (mBlacklistListener != null) {
+            mBlacklistListener.onChanged(packageName, true);
         }
     }
 
@@ -98,8 +84,8 @@ public final class SharedPreferencesHandler {
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
 
-        if (mOnBlacklistChangeListener != null) {
-            mOnBlacklistChangeListener.onChanged(packageName, false);
+        if (mBlacklistListener != null) {
+            mBlacklistListener.onChanged(packageName, false);
         }
     }
 
@@ -127,17 +113,17 @@ public final class SharedPreferencesHandler {
      * @return The listener.
      */
     public OnBlacklistChangeListener getOnBlacklistChangeListener() {
-        return mOnBlacklistChangeListener;
+        return mBlacklistListener;
     }
 
     /**
      * Set the on blacklist change listener.
      *
-     * @param onBlacklistChangeListener The listener.
+     * @param listener The listener.
      */
     public void setOnBlacklistChangeListener(
-            final OnBlacklistChangeListener onBlacklistChangeListener) {
-        this.mOnBlacklistChangeListener = onBlacklistChangeListener;
+            final OnBlacklistChangeListener listener) {
+        this.mBlacklistListener = listener;
     }
 
     /**
@@ -150,8 +136,9 @@ public final class SharedPreferencesHandler {
          * Will be called when the blacklist is changed by the amount of entries.
          *
          * @param packageName The package name.
-         * @param added       {@code true} if the package was installed, {@code false} otherwise
+         * @param added       {@code true} if the package was installed,
+         *                    {@code false} otherwise
          */
-        void onChanged(final String packageName, final boolean added);
+        void onChanged(String packageName, boolean added);
     }
 }

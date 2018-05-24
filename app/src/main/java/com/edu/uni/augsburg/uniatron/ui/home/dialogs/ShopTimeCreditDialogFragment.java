@@ -66,7 +66,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPrefHandler = SharedPreferencesHandler.getInstance(getContext());
+        mPrefHandler = new SharedPreferencesHandler(getContext());
 
         mModel = ViewModelProviders.of(this).get(ShopTimeCreditViewModel.class);
 
