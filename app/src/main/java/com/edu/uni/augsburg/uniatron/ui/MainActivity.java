@@ -1,12 +1,8 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
-import android.app.AppOpsManager;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -55,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_SCREEN_ON);
         mReceiver = new GlobalBroadcastReceiverOnStateChanged();
 
 
@@ -86,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         });
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
+        /*
         //check permissions:
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             if(!hasPermission()){
@@ -94,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                         Constant.MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
             }
         }
+        */
 
         //Start all services
         startServices();
@@ -101,10 +97,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     protected void onDestroy() {
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-            mReceiver = null;
-        }
         super.onDestroy();
     }
 
@@ -180,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         startService(new Intent(getBaseContext(), LockApplicationService.class));
     }
 
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -202,5 +195,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
         return mode == AppOpsManager.MODE_ALLOWED;
     }
-
+    */
 }
