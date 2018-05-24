@@ -31,8 +31,6 @@ dependencies {
     implementation project(':domain')
 
     implementation 'com.orhanobut:logger:2.2.0'
-
-    implementation 'com.orhanobut:logger:2.2.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
