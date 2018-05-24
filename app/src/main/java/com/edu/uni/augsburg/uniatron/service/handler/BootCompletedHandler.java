@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.edu.uni.augsburg.uniatron.service.PackageAddedService;
+import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.service.util.ServiceUtil;
 
@@ -20,7 +20,7 @@ public class BootCompletedHandler extends BroadcastReceiver {
             ServiceUtil.startServices(
                     context,
                     StepCountService.class,
-                    PackageAddedService.class
+                    BroadcastService.class
             );
         }
     }

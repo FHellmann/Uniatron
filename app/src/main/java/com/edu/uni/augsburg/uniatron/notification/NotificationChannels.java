@@ -39,7 +39,7 @@ public enum NotificationChannels {
      *
      * @param context The context.
      */
-    public void setup(@NonNull final Context context) {
+    private void setup(@NonNull final Context context) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -61,5 +61,15 @@ public enum NotificationChannels {
                 Logger.d("Notification channel '" + channel + "' was created");
             }
         }
+    }
+
+    /**
+     * Setup all the notification channels.
+     *
+     * @param context The context.
+     */
+    public static void setupChannels(@NonNull final Context context) {
+        // setup all notification channels
+        Stream.of(NotificationChannels.values()).forEach(channel -> channel.setup(context));
     }
 }

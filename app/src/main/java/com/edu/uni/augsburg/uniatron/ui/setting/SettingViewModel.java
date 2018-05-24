@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +31,7 @@ public class SettingViewModel extends AndroidViewModel {
     /**
      * Ctr.
      *
-     * @param application
-     *         The application.
+     * @param application The application.
      */
     public SettingViewModel(@NonNull final Application application) {
         super(application);
@@ -47,16 +47,24 @@ public class SettingViewModel extends AndroidViewModel {
      */
     @NonNull
     public LiveData<Map<String, String>> getInstalledApps() {
-        return Transformations.map(
-                mInstalledApps,
-                data -> data == null ? Collections.emptyMap() : data
-        );
+        return Transformations.map(mInstalledApps,
+                data -> data == null ? Collections.emptyMap() : data);
     }
 
     @NonNull
     private LiveData<Map<String, String>> getInstalledApps(@NonNull final Context context) {
         final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        observable.setValue(getAllInstalledApps(context));
 
+        final SharedPreferencesHandler handler = SharedPreferencesHandler.getInstance(context);
+        handler.setOnBlacklistChangeListener((packageName, added) -> {
+            observable.postValue(getAllInstalledApps(context));
+        });
+
+        return observable;
+    }
+
+    private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -65,18 +73,18 @@ public class SettingViewModel extends AndroidViewModel {
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
         if (installedApplications != null) {
-            observable.setValue(Stream.of(installedApplications)
-                                      .filter(item -> !item.packageName.equals(
-                                              context.getApplicationInfo().packageName
-                                      ))
-                                      .sortBy(item -> item.packageName)
-                                      .collect(Collectors.toMap(
-                                              key -> key.packageName,
-                                              value -> packageManager.getApplicationLabel(value)
-                                                                     .toString()
-                                      )));
+            return Stream.of(installedApplications)
+                    .filter(item -> !item.packageName.equals(
+                            context.getApplicationInfo().packageName
+                    ))
+                    .sortBy(item -> item.packageName)
+                    .collect(Collectors.toMap(
+                            key -> key.packageName,
+                            value -> packageManager.getApplicationLabel(value)
+                                    .toString()
+                    ));
+        } else {
+            return Collections.emptyMap();
         }
-
-        return observable;
     }
 }

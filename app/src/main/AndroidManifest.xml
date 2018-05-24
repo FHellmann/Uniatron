@@ -34,6 +34,7 @@
         </receiver>
 
         <service android:name=".service.StepCountService" />
-        <service android:name=".service.PackageAddedService" />
+        <service android:name=".service.BroadcastService" />
+        <service android:name=".service.AddBlacklistEntryService" />
     </application>
 </manifest>

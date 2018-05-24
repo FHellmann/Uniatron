@@ -52,15 +52,19 @@ public class StepCountService extends Service implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             final int detectedSteps = (int) event.values[0];
 
-            final MainApplication application = (MainApplication) getApplicationContext();
-            final DataRepository dataRepository = application.getRepository();
-
-            dataRepository.addStepCount(detectedSteps);
+            commitSteps(detectedSteps);
         }
     }
 
     @Override
     public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
         // ok
+    }
+
+    private void commitSteps(final int detectedSteps) {
+        final MainApplication application = (MainApplication) getApplicationContext();
+        final DataRepository dataRepository = application.getRepository();
+
+        dataRepository.addStepCount(detectedSteps);
     }
 }

@@ -66,7 +66,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPrefHandler = new SharedPreferencesHandler(getContext());
+        mPrefHandler = SharedPreferencesHandler.getInstance(getContext());
 
         mModel = ViewModelProviders.of(this)
                 .get(ShopTimeCreditViewModel.class);
@@ -77,7 +77,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         mRecyclerView.setAdapter(mAdapter);
 
         mModel.getRemainingStepCountToday().observe(this, stepCount -> {
-            mAdapter.setStepCount(stepCount);
+            mAdapter.setStepCount(stepCount == null ? 0 : stepCount);
             mAdapter.notifyDataSetChanged();
             if (mAdapter.getItemCount() > 0) {
                 mRecyclerView.setVisibility(View.VISIBLE);

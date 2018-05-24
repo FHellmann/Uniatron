@@ -17,22 +17,41 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public final class SharedPreferencesHandler {
-    /** Preference for the app blacklist. */
+    /**
+     * Preference for the app blacklist.
+     */
     public static final String PREF_APP_BLACKLIST = "pref_app_blacklist";
-    /** Preference for the steps per minute. */
+    /**
+     * Preference for the steps per minute.
+     */
     public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 
+    private static SharedPreferencesHandler mInstance;
     private final SharedPreferences mPrefs;
+    private OnBlacklistChangeListener mOnBlacklistChangeListener;
 
     /**
      * Ctr.
      *
      * @param context The application context.
      */
-    public SharedPreferencesHandler(@NonNull final Context context) {
+    private SharedPreferencesHandler(@NonNull final Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    /**
+     * Get a single instance of the shared preferences handler.
+     *
+     * @param context The context.
+     * @return The shared preferences handler.
+     */
+    public static SharedPreferencesHandler getInstance(@NonNull final Context context) {
+        if (mInstance == null) {
+            mInstance = new SharedPreferencesHandler(context);
+        }
+        return mInstance;
     }
 
     /**
@@ -58,6 +77,30 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
+
+        if (mOnBlacklistChangeListener != null) {
+            mOnBlacklistChangeListener.onChanged(packageName, true);
+        }
+    }
+
+    /**
+     * Remove a app from the blacklist.
+     *
+     * @param packageName The package name of the app.
+     */
+    public void removeAppFromBlacklist(final String packageName) {
+        Logger.d("Remove '" + packageName + "' from blacklist");
+
+        final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
+        newAppBlacklist.remove(packageName);
+
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
+        editor.apply();
+
+        if (mOnBlacklistChangeListener != null) {
+            mOnBlacklistChangeListener.onChanged(packageName, false);
+        }
     }
 
     /**
@@ -66,6 +109,41 @@ public final class SharedPreferencesHandler {
      * @return The steps amount.
      */
     public double getStepsFactor() {
-        return mPrefs.getFloat(PREF_STEPS_PER_MINUTE, STEP_FACTOR_EASY);
+        return Double.valueOf(mPrefs.getString(PREF_STEPS_PER_MINUTE, String.valueOf
+                (STEP_FACTOR_EASY)));
+    }
+
+    /**
+     * Get the on blacklist change listener.
+     *
+     * @return The listener.
+     */
+    public OnBlacklistChangeListener getOnBlacklistChangeListener() {
+        return mOnBlacklistChangeListener;
+    }
+
+    /**
+     * Set the on blacklist change listener.
+     *
+     * @param onBlacklistChangeListener The listener.
+     */
+    public void setOnBlacklistChangeListener(
+            final OnBlacklistChangeListener onBlacklistChangeListener) {
+        this.mOnBlacklistChangeListener = onBlacklistChangeListener;
+    }
+
+    /**
+     * The listener for on blacklist change events.
+     *
+     * @author Fabio Hellmann
+     */
+    public interface OnBlacklistChangeListener {
+        /**
+         * Will be called when the blacklist is changed by the amount of entries.
+         *
+         * @param packageName The package name.
+         * @param added       {@code true} if the package was installed, {@code false} otherwise
+         */
+        void onChanged(final String packageName, final boolean added);
     }
 }

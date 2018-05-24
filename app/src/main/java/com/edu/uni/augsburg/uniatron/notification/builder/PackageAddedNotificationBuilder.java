@@ -1,23 +1,18 @@
-package com.edu.uni.augsburg.uniatron.notification.type;
+package com.edu.uni.augsburg.uniatron.notification.builder;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
-import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.service.handler.PackageAddedHandler;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.edu.uni.augsburg.uniatron.service.AddBlacklistEntryService;
 
 /**
  * This notification will be displayed to the user when a new app is installed.
@@ -49,18 +44,15 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
                         R.string.notify_package_added_summary,
                         getLastInstalledAppLabel()
                 ))
-                .setContentIntent(PendingIntent.getBroadcast(
-                        mContext,
-                        (int) System.currentTimeMillis(),
-                        new Intent(mContext, PackageAddedHandler.class)
-                                .setAction(Intent.ACTION_PACKAGE_ADDED)
-                                .putExtra(
-                                        Intent.EXTRA_INSTALLER_PACKAGE_NAME,
-                                        getLastInstalledAppPackageName()
-                                ),
-                        0))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                //.setAutoCancel(true)
+                .setContentIntent(PendingIntent.getService(
+                        mContext,
+                        0,
+                        new Intent(mContext, AddBlacklistEntryService.class)
+                                .putExtra(Intent.EXTRA_RETURN_RESULT, getAddedPackageName()),
+                        PendingIntent.FLAG_UPDATE_CURRENT))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
                 .setOngoing(false)
                 .build();
     }
@@ -72,39 +64,24 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
 
     private String getLastInstalledAppLabel() {
         final PackageManager packageManager = mContext.getPackageManager();
+        final String addedPackageName = getAddedPackageName();
         try {
             return packageManager.getApplicationLabel(
-                    packageManager.getApplicationInfo(getLastInstalledAppPackageName(),
-                            0)
-            ).toString();
+                    packageManager.getApplicationInfo(
+                            addedPackageName,
+                            0
+                    )).toString();
         } catch (PackageManager.NameNotFoundException e) {
-            return "Unknown";
+            throw new IllegalStateException("Unable to find the added package '" +
+                    addedPackageName + "'");
         }
     }
 
-    private String getLastInstalledAppPackageName() {
+    private String getAddedPackageName() {
         final Uri data = mIntent.getData();
         if (data == null) {
             // If the intent does not provide the installed package name
-            final PackageManager packageManager = mContext.getPackageManager();
-            final List<ApplicationInfo> installedApplications =
-                    packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-            return Stream.of(installedApplications)
-                    .map(applicationInfo -> {
-                        try {
-                            return packageManager.getPackageInfo(
-                                    applicationInfo.packageName,
-                                    0
-                            );
-                        } catch (PackageManager.NameNotFoundException e) {
-                            return null;
-                        }
-                    })
-                    .filter(packageInfo -> packageInfo != null)
-                    .sortBy(packageInfo -> packageInfo.firstInstallTime)
-                    .findFirst()
-                    .map(packageInfo -> packageInfo.packageName)
-                    .orElse("");
+            throw new IllegalStateException("The intent need's to contain the added package name");
         } else {
             // The intent provides the installed package name
             return data.getEncodedSchemeSpecificPart();

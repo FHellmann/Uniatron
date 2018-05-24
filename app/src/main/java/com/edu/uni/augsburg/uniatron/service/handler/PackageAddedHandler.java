@@ -4,11 +4,13 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.notification.NotificationSenderUtil;
-import com.edu.uni.augsburg.uniatron.notification.type.PackageAddedNotificationBuilder;
+import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
+import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
 import com.orhanobut.logger.Logger;
 
 /**
@@ -19,18 +21,16 @@ import com.orhanobut.logger.Logger;
 public class PackageAddedHandler extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (Intent.ACTION_PACKAGE_ADDED.equalsIgnoreCase(intent.getAction())) {
-            if (intent.hasExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME)) {
-                addAppToBlacklist(context, intent);
-            } else {
-                postNotification(context, intent);
-            }
+        if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
+            postNotification(context, intent);
+        } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
+            removePackageFromBlacklist(context, intent);
         }
     }
 
     private void postNotification(final Context context, final Intent intent) {
-        Logger.d("Package added from user to system");
-        NotificationSenderUtil.setupChannels(context);
+        Logger.d("A new package was found -> notifying user");
+        NotificationChannels.setupChannels(context);
 
         final PackageAddedNotificationBuilder builder =
                 new PackageAddedNotificationBuilder(context, intent);
@@ -41,14 +41,24 @@ public class PackageAddedHandler extends BroadcastReceiver {
         NotificationManagerCompat.from(context).notify(notificationId, notification);
     }
 
-    private void addAppToBlacklist(final Context context, final Intent intent) {
-        final String packageName = intent
-                .getStringExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME);
+    private void removePackageFromBlacklist(final Context context, final Intent intent) {
+        final SharedPreferencesHandler handler = SharedPreferencesHandler.getInstance(context);
+        final Uri data = intent.getData();
+        if (data != null) {
+            handler.removeAppFromBlacklist(data.getEncodedSchemeSpecificPart());
+        }
+    }
 
-        Logger.d("Installed app (" + packageName + ") will be blacklisted");
-
-        final SharedPreferencesHandler preferencesHandler =
-                new SharedPreferencesHandler(context);
-        preferencesHandler.addAppToBlacklist(packageName);
+    /**
+     * Get the intent filter for this broadcast receiver.
+     *
+     * @return The intent filter.
+     */
+    public static IntentFilter getIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        intentFilter.addDataScheme("package");
+        return intentFilter;
     }
 }

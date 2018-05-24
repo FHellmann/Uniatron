@@ -3,7 +3,6 @@ package com.edu.uni.augsburg.uniatron.service;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -14,7 +13,7 @@ import com.edu.uni.augsburg.uniatron.service.handler.PackageAddedHandler;
  *
  * @author Fabio Hellmann
  */
-public class PackageAddedService extends Service {
+public class BroadcastService extends Service {
     private BroadcastReceiver mPackageAddedReceiver = new PackageAddedHandler();
 
     @Nullable
@@ -25,9 +24,7 @@ public class PackageAddedService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-        intentFilter.addDataScheme("package");
-        registerReceiver(mPackageAddedReceiver, intentFilter);
+        registerReceiver(mPackageAddedReceiver, PackageAddedHandler.getIntentFilter());
 
         return START_STICKY;
     }

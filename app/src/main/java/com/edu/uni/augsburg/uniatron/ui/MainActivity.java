@@ -11,9 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.service.PackageAddedService;
+import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
-import com.edu.uni.augsburg.uniatron.service.util.ServiceUtil;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingFragment;
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private void startServices() {
         // we always start the service. if it is already running, nothing bad will happen
         startService(new Intent(this, StepCountService.class));
-        startService(new Intent(this, PackageAddedService.class));
+        startService(new Intent(this, BroadcastService.class));
     }
 
     @Override
