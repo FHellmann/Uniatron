@@ -21,8 +21,8 @@ public class AddBlacklistEntryService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        // #30: It seems like intent is sometimes null at this time. Then we can not add the app
-        // automatically.
+        // #30: It seems like intent is sometimes null at this time.
+        // Then we can not add the app automatically.
         if (intent != null && intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             final String packageName = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
             final SharedPreferencesHandler preferencesHandler =
