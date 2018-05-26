@@ -68,8 +68,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
         mPrefHandler = new SharedPreferencesHandler(getContext());
 
-        mModel = ViewModelProviders.of(this)
-                .get(ShopTimeCreditViewModel.class);
+        mModel = ViewModelProviders.of(this).get(ShopTimeCreditViewModel.class);
 
         setupRecyclerView();
 
@@ -77,7 +76,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         mRecyclerView.setAdapter(mAdapter);
 
         mModel.getRemainingStepCountToday().observe(this, stepCount -> {
-            mAdapter.setStepCount(stepCount);
+            mAdapter.setStepCount(stepCount == null ? 0 : stepCount);
             mAdapter.notifyDataSetChanged();
             if (mAdapter.getItemCount() > 0) {
                 mRecyclerView.setVisibility(View.VISIBLE);

@@ -14,10 +14,11 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
@@ -25,7 +26,7 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public class SettingViewModel extends AndroidViewModel {
-    private final MediatorLiveData<Set<String>> mInstalledApps;
+    private final MediatorLiveData<Map<String, String>> mInstalledApps;
 
     /**
      * Ctr.
@@ -35,8 +36,17 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
+        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        observable.setValue(getAllInstalledApps(application.getBaseContext()));
+
         mInstalledApps = new MediatorLiveData<>();
-        mInstalledApps.addSource(getInstalledApps(application), mInstalledApps::setValue);
+        mInstalledApps.addSource(observable, mInstalledApps::setValue);
+
+        final SharedPreferencesHandler handler =
+                new SharedPreferencesHandler(application.getBaseContext());
+        handler.setOnBlacklistChangeListener((packageName, added) -> {
+            observable.postValue(getAllInstalledApps(application.getBaseContext()));
+        });
     }
 
     /**
@@ -45,15 +55,12 @@ public class SettingViewModel extends AndroidViewModel {
      * @return The app-names.
      */
     @NonNull
-    public LiveData<Set<String>> getInstalledApps() {
+    public LiveData<Map<String, String>> getInstalledApps() {
         return Transformations.map(mInstalledApps,
-                data -> data == null ? Collections.emptySet() : data);
+                data -> data == null ? Collections.emptyMap() : data);
     }
 
-    @NonNull
-    private LiveData<Set<String>> getInstalledApps(@NonNull final Context context) {
-        final MutableLiveData<Set<String>> observable = new MutableLiveData<>();
-
+    private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -61,15 +68,19 @@ public class SettingViewModel extends AndroidViewModel {
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
-        if (installedApplications != null) {
-            final Set<String> result = Stream.of(installedApplications)
-                    .filter(info -> !info.equals(context.getApplicationInfo()))
-                    .map(item -> packageManager.getApplicationLabel(item).toString())
-                    .collect(Collectors.toSet());
-
-            observable.setValue(result);
+        if (installedApplications == null) {
+            return Collections.emptyMap();
+        } else {
+            return Stream.of(installedApplications)
+                    .filter(item -> !item.packageName.equals(
+                            context.getApplicationInfo().packageName
+                    ))
+                    .sortBy(item -> item.packageName)
+                    .collect(Collectors.toMap(
+                            key -> key.packageName,
+                            value -> packageManager.getApplicationLabel(value)
+                                    .toString()
+                    ));
         }
-
-        return observable;
     }
 }

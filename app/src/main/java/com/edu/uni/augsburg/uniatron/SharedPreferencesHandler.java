@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -23,12 +26,10 @@ public final class SharedPreferencesHandler {
      */
     public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
 
-    private static final double STEP_FACTOR_HARD = 2.0;
-    private static final double STEP_FACTOR_MEDIUM = 1.5;
-    private static final double STEP_FACTOR_EASY = 1.0;
+    private static final float STEP_FACTOR_EASY = 1.0f;
 
-    private final Context mContext;
     private final SharedPreferences mPrefs;
+    private OnBlacklistChangeListener mBlacklistListener;
 
     /**
      * Ctr.
@@ -36,7 +37,6 @@ public final class SharedPreferencesHandler {
      * @param context The application context.
      */
     public SharedPreferencesHandler(@NonNull final Context context) {
-        mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -45,8 +45,48 @@ public final class SharedPreferencesHandler {
      *
      * @return The list of apps.
      */
-    public Set<String> getAppsToBlock() {
+    public Set<String> getAppsBlacklist() {
         return mPrefs.getStringSet(PREF_APP_BLACKLIST, Collections.emptySet());
+    }
+
+    /**
+     * Add a app to the blacklist.
+     *
+     * @param packageName The package name of the app.
+     */
+    public void addAppToBlacklist(final String packageName) {
+        Logger.d("Add '" + packageName + "' to blacklist");
+
+        final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
+        newAppBlacklist.add(packageName);
+
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
+        editor.apply();
+
+        if (mBlacklistListener != null) {
+            mBlacklistListener.onChanged(packageName, true);
+        }
+    }
+
+    /**
+     * Remove a app from the blacklist.
+     *
+     * @param packageName The package name of the app.
+     */
+    public void removeAppFromBlacklist(final String packageName) {
+        Logger.d("Remove '" + packageName + "' from blacklist");
+
+        final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
+        newAppBlacklist.remove(packageName);
+
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
+        editor.apply();
+
+        if (mBlacklistListener != null) {
+            mBlacklistListener.onChanged(packageName, false);
+        }
     }
 
     /**
@@ -55,16 +95,50 @@ public final class SharedPreferencesHandler {
      * @return The steps amount.
      */
     public double getStepsFactor() {
-        final String levelEasy = mContext.getString(R.string.pref_fitness_level_easy);
-        final String level = mPrefs.getString(PREF_STEPS_PER_MINUTE, levelEasy);
-        if (level.equalsIgnoreCase(
-                mContext.getString(R.string.pref_fitness_level_medium))) {
-            return STEP_FACTOR_MEDIUM;
-        } else if (level.equalsIgnoreCase(
-                mContext.getString(R.string.pref_fitness_level_hard))) {
-            return STEP_FACTOR_HARD;
+        if (mPrefs.contains(PREF_STEPS_PER_MINUTE)) {
+            return Float.valueOf(
+                    mPrefs.getString(
+                            PREF_STEPS_PER_MINUTE,
+                            String.valueOf(STEP_FACTOR_EASY)
+                    )
+            );
         } else {
             return STEP_FACTOR_EASY;
         }
+    }
+
+    /**
+     * Get the on blacklist change listener.
+     *
+     * @return The listener.
+     */
+    public OnBlacklistChangeListener getOnBlacklistChangeListener() {
+        return mBlacklistListener;
+    }
+
+    /**
+     * Set the on blacklist change listener.
+     *
+     * @param listener The listener.
+     */
+    public void setOnBlacklistChangeListener(
+            final OnBlacklistChangeListener listener) {
+        this.mBlacklistListener = listener;
+    }
+
+    /**
+     * The listener for on blacklist change events.
+     *
+     * @author Fabio Hellmann
+     */
+    public interface OnBlacklistChangeListener {
+        /**
+         * Will be called when the blacklist is changed by the amount of entries.
+         *
+         * @param packageName The package name.
+         * @param added       {@code true} if the package was installed,
+         *                    {@code false} otherwise
+         */
+        void onChanged(String packageName, boolean added);
     }
 }

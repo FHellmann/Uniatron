@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation project(':domain')
 
+    implementation 'com.orhanobut:logger:2.2.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
@@ -48,6 +49,7 @@ dependencies {
     implementation 'com.shuhart.stepview:stepview:1.2.6'
     implementation 'com.annimon:stream:1.2.0'
     implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
+    implementation 'com.github.marlonlom:timeago:3.0.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

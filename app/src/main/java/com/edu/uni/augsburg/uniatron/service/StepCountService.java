@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 /**
  * The step count service collects steps and commits them to the database.
@@ -18,9 +19,6 @@ import com.edu.uni.augsburg.uniatron.MainApplication;
  */
 public class StepCountService extends Service implements SensorEventListener {
 
-    private static final int COMMIT_SIZE = 10;
-    private int currentSteps;
-
     @Nullable
     @Override
     public IBinder onBind(final Intent intent) {
@@ -28,9 +26,13 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        return START_STICKY;
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-        currentSteps = 0;
 
         // grab step detector and register the listener
         final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -45,26 +47,12 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        // this causes the OS to restart the service if it has been force stopped
-        return START_STICKY;
-    }
-
-    @Override
     public void onSensorChanged(final SensorEvent event) {
         // detects every single step
         if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             final int detectedSteps = (int) event.values[0];
-            currentSteps += detectedSteps;
 
-            if (currentSteps >= COMMIT_SIZE) {
-                // subtract steps here and always commit exactly <COMMIT_SIZE> steps
-                // to prevent async issues
-                // async could happen when the sensor delivers new data
-                // before the async task is completed
-                currentSteps -= COMMIT_SIZE;
-                commitSteps(COMMIT_SIZE);
-            }
+            commitSteps(detectedSteps);
         }
     }
 
@@ -73,22 +61,10 @@ public class StepCountService extends Service implements SensorEventListener {
         // ok
     }
 
-    @Override
-    public void onDestroy() {
-        // commit the steps that are due
-        final int tempSteps = currentSteps;
-        // set to zero before commit in case of async issue
-        currentSteps = 0;
-        commitSteps(tempSteps);
+    private void commitSteps(final int detectedSteps) {
+        final MainApplication application = (MainApplication) getApplicationContext();
+        final DataRepository dataRepository = application.getRepository();
 
-        super.onDestroy();
+        dataRepository.addStepCount(detectedSteps);
     }
-
-    /**
-     * The function to commit exactly <COMMIT_SIZE> to the DataRepository
-     */
-    private void commitSteps(final int numberOfSteps) {
-        ((MainApplication) getApplicationContext()).getRepository().addStepCount(numberOfSteps);
-    }
-
 }

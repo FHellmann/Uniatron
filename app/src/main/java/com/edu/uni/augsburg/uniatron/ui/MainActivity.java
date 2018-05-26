@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
@@ -70,8 +71,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         });
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
+        startServices();
+    }
+
+    private void startServices() {
         // we always start the service. if it is already running, nothing bad will happen
-        startStepCountService();
+        startService(new Intent(this, StepCountService.class));
+        startService(new Intent(this, BroadcastService.class));
     }
 
     @Override
@@ -135,9 +141,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         public int getCount() {
             return mFragments.size();
         }
-    }
-
-    private void startStepCountService() {
-        startService(new Intent(getBaseContext(), StepCountService.class));
     }
 }
