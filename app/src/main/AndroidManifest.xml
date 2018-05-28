@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
@@ -34,11 +35,12 @@
         </receiver>
         <service
             android:name=".service.StepCountService"
-            android:label="StepCountService" >
+            android:label="StepCountService">
         </service>
         <service
             android:name=".service.LockApplicationService"
-            android:label="LockApplicationService">
+            android:label="LockApplicationService"
+            android:process=":remote">
         </service>
     </application>
 

@@ -17,7 +17,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 import java.util.List;
 
@@ -30,11 +29,11 @@ public class LockApplicationService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action  = intent.getAction();
             if(action.equals(Intent.ACTION_SCREEN_OFF)){
-                Log.e(getClass().toString(), "ScreenOFF");
+                Log.d(getClass().toString(), "ScreenOFF");
                 screenOn = false;
             }
             else if(action.equals(Intent.ACTION_SCREEN_ON)){
-                Log.e(getClass().toString(), "ScreenON");
+                Log.d(getClass().toString(), "ScreenON");
                 screenOn = true;
             }
         }
@@ -64,8 +63,8 @@ public class LockApplicationService extends Service {
     private void checkForegroundApp(){
         while(screenOn){
             String actName = getRecentActivity(getBaseContext());
-            SystemClock.sleep(1000);
-            commitAppUsageTime(actName,1);
+            SystemClock.sleep(3000);
+            commitAppUsageTime(actName,3);
             Log.d(getClass().toString(), actName);
         }
     }
@@ -133,7 +132,8 @@ public class LockApplicationService extends Service {
         filter.addAction("android.intent.action.SCREEN_ON");
         filter.addAction("android.intent.action.SCREEN_OFF");
         registerReceiver(appReadReceiver, filter);
-        Log.e(getClass().toString(),"Service created");
+        Log.d(getClass().toString(),"Service created");
+
     }
 
        @Override
@@ -147,7 +147,7 @@ public class LockApplicationService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(appReadReceiver);
-        Log.e(getClass().toString(),"onDestroy()");
+        Log.d(getClass().toString(),"onDestroy()");
     }
 
 
@@ -155,9 +155,6 @@ public class LockApplicationService extends Service {
      * The function to commit appUsageTime
      */
     private void commitAppUsageTime( final String appName, final int appUsageTime) {
-        DataRepository dataRepository;
-        dataRepository = ((MainApplication) getApplicationContext()).getRepository();
-        dataRepository.addAppUsage(appName, appUsageTime);
+        ((MainApplication) getApplicationContext()).getRepository().addAppUsage(appName,appUsageTime);
     }
-
 }

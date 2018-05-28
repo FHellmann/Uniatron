@@ -71,6 +71,7 @@ public class StepCountService extends Service implements SensorEventListener {
     @Override
     public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
         // ok
+        // ok
     }
 
     @Override
