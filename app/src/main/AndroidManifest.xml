@@ -40,9 +40,7 @@
         </service>
         <service
             android:name=".service.LockApplicationService"
-            android:label="LockApplicationService"
-            android:process=":remote"
-            android:enabled="true">
+            android:label="LockApplicationService">
         </service>
     </application>
 
