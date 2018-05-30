@@ -15,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:enabled="true"
         android:name=".MainApplication">
         <activity
             android:name=".ui.MainActivity"
@@ -40,7 +41,8 @@
         <service
             android:name=".service.LockApplicationService"
             android:label="LockApplicationService"
-            android:process=":remote">
+            android:process=":remote"
+            android:enabled="true">
         </service>
     </application>
 

@@ -38,27 +38,46 @@ public class LockApplicationService extends Service {
             }
         }
     };
-    /*
-    private ActivityManager.RunningAppProcessInfo getForegroundApp(Context context){
-        ActivityManager.RunningAppProcessInfo result = null, info = null;
 
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        //ActivityManager.RunningTaskInfo foregroundTaskInfo = activityManager.getRunningTasks(1).get(0);
-        List<ActivityManager.RunningAppProcessInfo> l = activityManager.getRunningAppProcesses();
-        Iterator<ActivityManager.RunningAppProcessInfo> i = l.iterator();
-        while(i.hasNext()){
-            info = i.next();
-            if (info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                    && !isRunningService(info.processName,context)){
-                Log.e(getClass().toString(), "found process");
-                result = info;
-                break;
-            }
-        }
-        String str = "Processname: " + result.processName;
-        //Log.e(getClass().toString(),str);
-        return result;
-    }*/
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.SCREEN_ON");
+        filter.addAction("android.intent.action.SCREEN_OFF");
+        registerReceiver(appReadReceiver, filter);
+        Log.d(getClass().toString(),"Service created");
+    }
+
+       @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        Log.d(getClass().toString(), "onStartCommand Function");
+        checkForegroundApp();
+        return START_STICKY;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(appReadReceiver);
+        Log.d(getClass().toString(),"onDestroy()");
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    /**
+     * The function to commit appUsageTime
+     */
+    private void commitAppUsageTime( final String appName, final int appUsageTime) {
+        ((MainApplication) getApplicationContext()).getRepository().addAppUsage(appName,appUsageTime);
+    }
+
+
 
     private void checkForegroundApp(){
         while(screenOn){
@@ -119,42 +138,4 @@ public class LockApplicationService extends Service {
     }
     */
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("android.intent.action.SCREEN_ON");
-        filter.addAction("android.intent.action.SCREEN_OFF");
-        registerReceiver(appReadReceiver, filter);
-        Log.d(getClass().toString(),"Service created");
-
-    }
-
-       @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        checkForegroundApp();
-        return START_STICKY;
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(appReadReceiver);
-        Log.d(getClass().toString(),"onDestroy()");
-    }
-
-
-    /**
-     * The function to commit appUsageTime
-     */
-    private void commitAppUsageTime( final String appName, final int appUsageTime) {
-        ((MainApplication) getApplicationContext()).getRepository().addAppUsage(appName,appUsageTime);
-    }
 }
