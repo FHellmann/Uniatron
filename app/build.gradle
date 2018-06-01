@@ -57,4 +57,4 @@ dependencies {
 
 }
 
-apply from: rootProject.file('gradle/static-analysis.gradle')
+//apply from: rootProject.file('gradle/static-analysis.gradle')

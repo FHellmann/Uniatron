@@ -9,7 +9,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -22,7 +24,7 @@ import java.util.List;
 
 public class LockApplicationService extends Service {
 
-    private boolean screenOn = true;
+    Handler handler;
 
     private BroadcastReceiver  appReadReceiver = new BroadcastReceiver() {
         @Override
@@ -30,14 +32,37 @@ public class LockApplicationService extends Service {
             String action  = intent.getAction();
             if(action.equals(Intent.ACTION_SCREEN_OFF)){
                 Log.d(getClass().toString(), "ScreenOFF");
-                screenOn = false;
+                stopHandler();
             }
+
+            // we only check the foreground app when the screen is on
             else if(action.equals(Intent.ACTION_SCREEN_ON)){
                 Log.d(getClass().toString(), "ScreenON");
-                screenOn = true;
+                startHandler();
             }
         }
     };
+
+    private void startHandler() {
+        // every <delay> seconds, we check which app is in the foreground
+        handler = new Handler();
+        int delay = 1000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                Log.d(getClass().toString(), "trying to get foreground app");
+                checkForegroundApp();
+
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+    }
+
+    private void stopHandler() {
+        if (handler != null ) {
+            handler.removeCallbacksAndMessages(null);
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -47,12 +72,15 @@ public class LockApplicationService extends Service {
         filter.addAction("android.intent.action.SCREEN_OFF");
         registerReceiver(appReadReceiver, filter);
         Log.d(getClass().toString(),"Service created");
+
+        // we have to start the handler once upon service start
+        startHandler();
+
     }
 
        @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         Log.d(getClass().toString(), "onStartCommand Function");
-        checkForegroundApp();
         return START_STICKY;
     }
 
@@ -77,14 +105,12 @@ public class LockApplicationService extends Service {
         ((MainApplication) getApplicationContext()).getRepository().addAppUsage(appName,appUsageTime);
     }
 
-
-
-    private void checkForegroundApp(){
-        while(screenOn){
-            String actName = getRecentActivity(getBaseContext());
-            SystemClock.sleep(3000);
-            commitAppUsageTime(actName,3);
-            Log.d(getClass().toString(), actName);
+    private void checkForegroundApp() {
+        String actName = getRecentActivity(getBaseContext());
+        Log.d(getClass().toString(), "App used: " + actName);
+        SystemClock.sleep(1000);
+        if (actName != "" ) {
+            //commitAppUsageTime(actName, 1);
         }
     }
 
@@ -106,7 +132,10 @@ public class LockApplicationService extends Service {
             if (event != null && !TextUtils.isEmpty(event.getPackageName()) && event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
                 return event.getPackageName();
             } else {
-                topActivityName = "";
+                topActivityName = "didn't work";
+                Log.d(getClass().toString(), "event: " + event.getPackageName());
+                Log.d(getClass().toString(), "event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND: " + (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND?"true":"false"));
+
             }
         } else {
             ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
