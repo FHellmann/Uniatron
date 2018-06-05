@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.edu.uni.augsburg.uniatron">
 
-    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -40,6 +40,6 @@
         <service android:name=".service.StepCountService" />
         <service android:name=".service.BroadcastService" />
         <service android:name=".service.AddBlacklistEntryService" />
-        <service android:name=".service.LockApplicationService" />
+        <service android:name=".service.AppTrackingService" />
     </application>
 </manifest>

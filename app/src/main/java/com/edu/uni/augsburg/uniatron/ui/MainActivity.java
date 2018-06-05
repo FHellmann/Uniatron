@@ -11,7 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.service.LockApplicationService;
+import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
+import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
@@ -138,10 +139,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     private void startServices() {
-        //add StepService
-        //startService(new Intent(getBaseContext(), StepCountService.class));
-        //add LockApplicationService
+        startService(new Intent(getBaseContext(), BroadcastService.class));
         startService(new Intent(getBaseContext(), StepCountService.class));
-        startService(new Intent(getBaseContext(), LockApplicationService.class));
+        startService(new Intent(getBaseContext(), AppTrackingService.class));
     }
 }
