@@ -2,21 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.edu.uni.augsburg.uniatron">
+
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:enabled="true"
-        android:name=".MainApplication">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name">
@@ -26,24 +27,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver
-            android:name="com.edu.uni.augsburg.uniatron.broadcastreceiver.GlobalBroadcastReceiverOnStateChanged"
+            android:name="com.edu.uni.augsburg.uniatron.service.handler.BootCompletedHandler"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <service
-            android:name=".service.StepCountService"
-            android:label="StepCountService">
-        </service>
-        <service
-            android:name=".service.LockApplicationService"
-            android:label="LockApplicationService">
-        </service>
+
+        <service android:name=".service.StepCountService" />
+        <service android:name=".service.BroadcastService" />
+        <service android:name=".service.AddBlacklistEntryService" />
+        <service android:name=".service.LockApplicationService" />
     </application>
-
-
-
 </manifest>

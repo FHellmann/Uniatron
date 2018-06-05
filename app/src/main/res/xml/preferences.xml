@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/general">
+    <PreferenceCategory android:title="@string/pref_category_general">
+        <ListPreference
+            android:defaultValue="1.0"
+            android:dialogIcon="@drawable/ic_directions_walk_black_24dp"
+            android:enabled="true"
+            android:entries="@array/pref_fitness_level"
+            android:entryValues="@array/pref_fitness_level_values"
+            android:icon="@drawable/ic_directions_walk_black_24dp"
+            android:key="pref_fitness_level"
+            android:persistent="true"
+            android:summary="@string/pref_fitness_level_summary"
+            android:title="@string/pref_fitness_level" />
 
         <MultiSelectListPreference
-            android:defaultValue="@array/pref_app_selection"
+            android:defaultValue="@array/pref_app_blacklist"
+            android:dialogIcon="@drawable/ic_phonelink_lock_black_24dp"
             android:enabled="true"
-            android:entries="@array/pref_app_selection"
-            android:entryValues="@array/pref_app_selection"
-            android:key="pref_app_selection"
+            android:entries="@array/pref_app_blacklist"
+            android:entryValues="@array/pref_app_blacklist"
+            android:icon="@drawable/ic_phonelink_lock_black_24dp"
+            android:key="pref_app_blacklist"
             android:persistent="true"
-            android:title="@string/pref_app_selection" />
+            android:summary="@string/pref_app_blacklist_summary"
+            android:title="@string/pref_app_blacklist" />
     </PreferenceCategory>
 </PreferenceScreen>

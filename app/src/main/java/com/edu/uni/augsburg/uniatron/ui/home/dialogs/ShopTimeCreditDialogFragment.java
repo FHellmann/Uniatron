@@ -16,13 +16,9 @@ import android.widget.TextView;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
-import com.edu.uni.augsburg.uniatron.ui.home.HomeViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,8 +46,10 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
     @BindView(R.id.tradeButton)
     Button mTradeButton;
 
+    private SharedPreferencesHandler mPrefHandler;
     private TimeCreditListAdapter mAdapter;
     private OnBuyButtonClickedListener mListener;
+    private ShopTimeCreditViewModel mModel;
 
     @Nullable
     @Override
@@ -68,16 +66,19 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mPrefHandler = new SharedPreferencesHandler(getContext());
+
+        mModel = ViewModelProviders.of(this).get(ShopTimeCreditViewModel.class);
+
         setupRecyclerView();
 
         mAdapter = new TimeCreditListAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
-        final HomeViewModel model = ViewModelProviders.of(this).get(HomeViewModel.class);
-        model.getRemainingStepCountToday().observe(this, stepCount -> {
-            if (stepCount != null && TimeCredits.CREDIT_100.isUsable(stepCount)) {
-                mAdapter.setStepCount(stepCount);
-                mAdapter.notifyDataSetChanged();
+        mModel.getRemainingStepCountToday().observe(this, stepCount -> {
+            mAdapter.setStepCount(stepCount == null ? 0 : stepCount);
+            mAdapter.notifyDataSetChanged();
+            if (mAdapter.getItemCount() > 0) {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mTradeButton.setVisibility(View.VISIBLE);
                 mTextViewError.setVisibility(View.GONE);
@@ -119,13 +120,10 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
      */
     @OnClick(R.id.tradeButton)
     public void onBuyButtonClicked() {
-        if (getContext() != null) {
-            final MainApplication context = (MainApplication) getContext().getApplicationContext();
-            context.getRepository().addTimeCredit(mAdapter.getSelection());
-            dismiss();
-            if (mListener != null) {
-                mListener.onClicked();
-            }
+        mModel.buy();
+        dismiss();
+        if (mListener != null) {
+            mListener.onClicked();
         }
     }
 
@@ -152,9 +150,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
     final class TimeCreditListAdapter extends
             RecyclerView.Adapter<TimeCreditListAdapter.ViewHolder> {
-        private final List<ViewHolder> viewHolders = new ArrayList<>();
         private int mStepCount;
-        private int mSelectionIndex = -1;
 
         @NonNull
         @Override
@@ -162,9 +158,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                                              final int viewType) {
             final View view = LayoutInflater.from(getContext())
                     .inflate(R.layout.dialog_shop_time_credit_item, parent, false);
-            final ViewHolder viewHolder = new ViewHolder(view);
-            viewHolders.add(viewHolder);
-            return viewHolder;
+            return new ViewHolder(view);
         }
 
         @Override
@@ -175,30 +169,33 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                     .collect(Collectors.toList())
                     .get(position);
 
+            if (mModel.isInShoppingCart(timeCredits)) {
+                final int color = getResources().getColor(R.color.secondaryLightColor);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
+            } else {
+                final int color = getResources().getColor(android.R.color.transparent);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
+            }
+            holder.mValue = timeCredits;
             holder.mTextViewTradeOffer.setText(getString(
                     R.string.dialog_time_credit_item,
-                    timeCredits.getStepCount(),
+                    (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()),
                     timeCredits.getTimeInMinutes())
             );
+
+            mTradeButton.setEnabled(mModel.isShoppingCartNotEmpty());
         }
 
         @Override
         public int getItemCount() {
             return (int) Stream.of(TimeCredits.values())
-                    .filter(credit -> credit.isUsable(mStepCount))
+                    .filter(credit -> mPrefHandler.getStepsFactor()
+                            * credit.getStepCount() <= mStepCount)
                     .count();
         }
 
         void setStepCount(final int stepCount) {
             this.mStepCount = stepCount;
-        }
-
-        @NonNull
-        TimeCredits getSelection() {
-            return Stream.of(TimeCredits.values())
-                    .sortBy(TimeCredits::getStepCount)
-                    .collect(Collectors.toList())
-                    .get(mSelectionIndex);
         }
 
         /**
@@ -209,7 +206,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
         public final class ViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.textViewTradeOffer)
             TextView mTextViewTradeOffer;
-            private int mDefaultBackgroundColor;
+            private TimeCredits mValue;
 
             ViewHolder(final View itemView) {
                 super(itemView);
@@ -218,25 +215,12 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
 
             @OnClick(R.id.textViewTradeOffer)
             public void onClick() {
-                if (mSelectionIndex == getAdapterPosition()) {
-                    mTextViewTradeOffer.setBackgroundColor(mDefaultBackgroundColor);
-                    mSelectionIndex = -1;
-
-                    mTradeButton.setEnabled(false);
+                if (mModel.isInShoppingCart(mValue)) {
+                    mModel.removeFromShoppingCart(mValue);
                 } else {
-                    mDefaultBackgroundColor = mTextViewTradeOffer.getDrawingCacheBackgroundColor();
-
-                    // reset all items to default color
-                    Stream.of(viewHolders).forEach(view -> view.mTextViewTradeOffer
-                            .setBackgroundColor(mDefaultBackgroundColor));
-
-                    // highlight the new selected item
-                    final int color = getResources().getColor(R.color.secondaryLightColor);
-                    mTextViewTradeOffer.setBackgroundColor(color);
-                    mSelectionIndex = getAdapterPosition();
-
-                    mTradeButton.setEnabled(true);
+                    mModel.addToShoppingCart(mValue);
                 }
+                notifyDataSetChanged();
             }
         }
     }

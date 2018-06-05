@@ -50,15 +50,17 @@ public final class DataRepository {
      * Add a new time credit.
      *
      * @param timeCredits The time credit will be generated out of this.
+     * @param factor The factor to multiply with.
      * @return The time credit.
      */
-    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits) {
+    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits,
+                                              final double factor) {
         final MutableLiveData<TimeCredit> observable = new MutableLiveData<>();
         new AsyncTaskWrapper<>(
                 () -> {
                     final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
                     timeCreditEntity.setTime(timeCredits.getTimeInMinutes());
-                    timeCreditEntity.setStepCount(timeCredits.getStepCount());
+                    timeCreditEntity.setStepCount((int) (timeCredits.getStepCount() * factor));
                     timeCreditEntity.setTimestamp(new Date());
                     mDatabase.timeCreditDao().add(timeCreditEntity);
                     return timeCreditEntity;
@@ -324,14 +326,7 @@ public final class DataRepository {
         final Date dateTo = extractMaxTimeOfDate(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAverageEmotion(dateFrom, dateTo),
-                data -> {
-                    if (data == null) {
-                        return Emotions.NEUTRAL;
-                    } else {
-                        final int index = (int) Math.round(data);
-                        return Emotions.values()[index];
-                    }
-                }
+                data -> data == null ? Emotions.NEUTRAL : Emotions.getAverage(data)
         );
     }
 
@@ -344,9 +339,12 @@ public final class DataRepository {
      */
     public LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
                                               @NonNull final Date dateTo) {
+        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
+        final Date dateToMax = extractMaxTimeOfDate(dateTo);
         return Transformations.map(
-                mDatabase.summaryDao().getSummaries(dateFrom, dateTo),
-                data -> Stream.of(data).collect(Collectors.toList())
+                mDatabase.summaryDao().getSummaries(dateFromMin, dateToMax),
+                data -> data == null ? Collections.emptyList()
+                        : Stream.of(data).collect(Collectors.toList())
         );
     }
 }

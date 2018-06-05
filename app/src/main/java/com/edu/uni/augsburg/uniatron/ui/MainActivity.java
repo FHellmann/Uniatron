@@ -1,6 +1,5 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.broadcastreceiver.GlobalBroadcastReceiverOnStateChanged;
 import com.edu.uni.augsburg.uniatron.service.LockApplicationService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
@@ -36,23 +34,16 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private static final int NAV_POSITION_HOME = 1;
     private static final int NAV_POSITION_SETTING = 2;
 
-
-    private BroadcastReceiver mReceiver = null;
-
     @BindView(R.id.viewPager)
     ViewPager mViewPager;
     @BindView(R.id.navigation)
     BottomNavigationView mNavigation;
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        mReceiver = new GlobalBroadcastReceiverOnStateChanged();
-
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -80,24 +71,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         });
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
-        /*
-        //check permissions:
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            if(!hasPermission()){
-                startActivityForResult(
-                        new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS),
-                        Constant.MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
-            }
-        }
-        */
-
-        //Start all services
         startServices();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -163,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-
     private void startServices() {
         //add StepService
         //startService(new Intent(getBaseContext(), StepCountService.class));
@@ -171,29 +144,4 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         startService(new Intent(getBaseContext(), StepCountService.class));
         startService(new Intent(getBaseContext(), LockApplicationService.class));
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constant.MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS){
-            if (!hasPermission()){
-                startActivityForResult(
-                        new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS),
-                        Constant.MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
-            }
-        }
-    }
-
-    private boolean hasPermission() {
-        AppOpsManager appOps = (AppOpsManager)
-                getSystemService(Context.APP_OPS_SERVICE);
-        int mode = 0;
-        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.KITKAT) {
-            mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                    android.os.Process.myUid(), getPackageName());
-        }
-        return mode == AppOpsManager.MODE_ALLOWED;
-    }
-    */
 }
