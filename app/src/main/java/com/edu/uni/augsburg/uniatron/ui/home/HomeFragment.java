@@ -36,7 +36,7 @@ import butterknife.OnClick;
  */
 public class HomeFragment extends Fragment {
 
-    private static final int ANIMATION_DURATION_LENGTH = 2000;
+    private static final int ANIMATION_DURATION_LENGTH = 500;
 
     @BindView(R.id.appUsageChart)
     PieChart mAppUsagePieChart;
@@ -62,18 +62,19 @@ public class HomeFragment extends Fragment {
 
         final HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
 
-        homeViewModel.getAppUsageOfTop5Apps().observe(this, item -> {
+        homeViewModel.getAppUsageOfTop5Apps(getContext()).observe(this, item -> {
             pieDataSet.clear();
             if (item != null && !item.isEmpty()) {
-                final float value = (float) Stream.of(item.values())
-                        .mapToDouble(dValue -> dValue)
-                        .sum();
-
                 Stream.of(item.entrySet())
                         .map(entry -> new PieEntry(entry.getValue().floatValue(), entry.getKey()))
                         .forEach(pieDataSet::addEntry);
 
-                pieDataSet.addEntry(new PieEntry(1 - value, getString(R.string.app_others)));
+                if (item.size() > HomeViewModel.MAX_COUNT) {
+                    final float value = (float) Stream.of(item.values())
+                            .mapToDouble(dValue -> dValue)
+                            .sum();
+                    pieDataSet.addEntry(new PieEntry(1 - value, getString(R.string.app_others)));
+                }
             }
             mAppUsagePieChart.animateY(ANIMATION_DURATION_LENGTH, Easing.EasingOption.EaseInQuad);
             mAppUsagePieChart.notifyDataSetChanged();
