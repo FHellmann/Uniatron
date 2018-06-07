@@ -10,12 +10,15 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.orhanobut.logger.Logger;
 import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,7 +68,7 @@ public class AppTrackingService extends Service {
     }
 
     private void startAppChecker() {
-        mAppChecker.whenAny(process -> commitAppUsageTime(process, DELAY))
+        mAppChecker.whenAny(process -> delegateAppUsage(process, DELAY))
                 .timeout(DELAY)
                 .start(getBaseContext());
     }
@@ -93,4 +96,23 @@ public class AppTrackingService extends Service {
             repository.addAppUsage(appName, time);
         }
     }
+
+    private void delegateAppUsage(final String appName, final int timeMillis) {
+        commitAppUsageTime(appName, timeMillis);
+        blockAppIfNecessary(appName);
+
+    }
+
+    private void blockAppIfNecessary(final String appName) {
+        final MainApplication application = (MainApplication) getApplicationContext();
+        final SharedPreferencesHandler sharedPreferencesHandler =
+                application.getSharedPreferencesHandler();
+        final Set<String> blackList = sharedPreferencesHandler.getAppsBlacklist();
+        if (blackList.contains(appName)) {
+            //TODO check if appUsageTime of Apps in Blacklist is 0 or not then lock App
+            final Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+    }
+
 }
