@@ -59,4 +59,4 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:1.0.0"
 }
 
-apply from: rootProject.file('gradle/static-analysis.gradle')
+//apply from: rootProject.file('gradle/static-analysis.gradle')
