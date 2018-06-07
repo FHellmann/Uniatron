@@ -1,11 +1,6 @@
 package com.edu.uni.augsburg.uniatron;
 
-import android.annotation.TargetApi;
-import android.app.AppOpsManager;
 import android.app.Application;
-import android.content.Intent;
-import android.os.Build;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
@@ -36,7 +31,6 @@ public class MainApplication extends Application {
         // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
 
-        requestUsageStatsPermission();
     }
 
     /**
@@ -48,18 +42,4 @@ public class MainApplication extends Application {
         return mDataRepository;
     }
 
-    private void requestUsageStatsPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !hasUsageStatsPermission()) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private boolean hasUsageStatsPermission() {
-        final AppOpsManager appOps = (AppOpsManager) getSystemService(APP_OPS_SERVICE);
-        final int mode = appOps.checkOpNoThrow("android:get_usage_stats",
-                android.os.Process.myUid(), getPackageName());
-        return mode == AppOpsManager.MODE_ALLOWED;
-    }
 }

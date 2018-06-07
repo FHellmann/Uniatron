@@ -1,7 +1,11 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.annotation.TargetApi;
+import android.app.AppOpsManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -9,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
@@ -29,7 +34,8 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener,
+        BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final int NAV_POSITION_HISTORY = 0;
     private static final int NAV_POSITION_HOME = 1;
@@ -55,22 +61,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         mViewPager.setAdapter(mScreenSlideAdapter);
         mViewPager.addOnPageChangeListener(this);
 
-        mNavigation.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mViewPager.setCurrentItem(NAV_POSITION_HOME);
-                    return true;
-                case R.id.navigation_history:
-                    mViewPager.setCurrentItem(NAV_POSITION_HISTORY);
-                    return true;
-                case R.id.navigation_settings:
-                    mViewPager.setCurrentItem(NAV_POSITION_SETTING);
-                    return true;
-                default:
-                    return false;
-            }
-        });
+        mNavigation.setOnNavigationItemSelectedListener(this);
         mNavigation.setSelectedItemId(R.id.navigation_home);
+
+        requestUsageStatsPermission();
 
         startServices();
     }
@@ -116,6 +110,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                mViewPager.setCurrentItem(NAV_POSITION_HOME);
+                return true;
+            case R.id.navigation_history:
+                mViewPager.setCurrentItem(NAV_POSITION_HISTORY);
+                return true;
+            case R.id.navigation_settings:
+                mViewPager.setCurrentItem(NAV_POSITION_SETTING);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         private final Map<Integer, Fragment> mFragments;
 
@@ -142,5 +153,20 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         startService(new Intent(getBaseContext(), BroadcastService.class));
         startService(new Intent(getBaseContext(), StepCountService.class));
         startService(new Intent(getBaseContext(), AppTrackingService.class));
+    }
+
+    private void requestUsageStatsPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && !hasUsageStatsPermission()) {
+            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private boolean hasUsageStatsPermission() {
+        final AppOpsManager appOps = (AppOpsManager) getSystemService(APP_OPS_SERVICE);
+        final int mode = appOps.checkOpNoThrow("android:get_usage_stats",
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
     }
 }
