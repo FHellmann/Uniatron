@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
                         .map(entry -> new PieEntry(entry.getValue().floatValue(), entry.getKey()))
                         .forEach(pieDataSet::addEntry);
 
-                if (item.size() > HomeViewModel.MAX_COUNT) {
+                if (item.size() == HomeViewModel.MAX_COUNT) {
                     final float value = (float) Stream.of(item.values())
                             .mapToDouble(dValue -> dValue)
                             .sum();
