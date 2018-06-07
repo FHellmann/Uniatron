@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -127,13 +128,11 @@ public class AppUsageDaoTest {
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
 
-        java.util.Set<String> test = new java.util.HashSet<>(java.util.Arrays.asList("facebook",  "whatsapp", "youtube");
-
-
+        java.util.Set<String> blacklist_test = new java.util.HashSet<>(Arrays.asList("facebook",  "whatsapp", "youtube"));
 
 
         final LiveData<Integer> liveData = mDao
-                .loadRemainingAppUsageTimeByBlacklist(extractMinTimeOfDate(date), extractMaxTimeOfDate(date),);
+                .loadRemainingAppUsageTimeByBlacklist(extractMinTimeOfDate(date), extractMaxTimeOfDate(date), blacklist_test);
 
         final Integer liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
