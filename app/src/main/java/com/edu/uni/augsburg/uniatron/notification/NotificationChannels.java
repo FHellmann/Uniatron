@@ -23,7 +23,16 @@ public enum NotificationChannels {
     BLACKLIST(
             R.string.channel_blacklist,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
-    );
+    ),
+    /**
+     *  The notification channel for app usage time's running out
+     */
+    TIME_UP(
+            R.string.channel_time_up,
+            NotificationManagerCompat.IMPORTANCE_DEFAULT
+            );
+    //TODO modify setup and this class for times up
+    //TODO add Notification Builder like PackageAddedNotificationBuilder (copy and modify)
 
     private final int mChannelNameResId;
     private final int mImportance;
