@@ -11,6 +11,7 @@ import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -71,6 +72,6 @@ public interface AppUsageDao {
      */
     @Query("SELECT (SELECT TOTAL(time_in_minutes * 60) FROM TimeCreditEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time_in_seconds) "
-            + "FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo")
-    LiveData<Integer> loadRemainingAppUsageTime(Date dateFrom, Date dateTo);
+            + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) AND  app_name IN (:blacklist)" )
+    LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom, Date dateTo, Set<String> blacklist);
 }

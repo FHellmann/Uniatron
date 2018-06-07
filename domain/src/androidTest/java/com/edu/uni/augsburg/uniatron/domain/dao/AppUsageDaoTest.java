@@ -127,8 +127,13 @@ public class AppUsageDaoTest {
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
 
+        java.util.Set<String> test = new java.util.HashSet<>(java.util.Arrays.asList("facebook",  "whatsapp", "youtube");
+
+
+
+
         final LiveData<Integer> liveData = mDao
-                .loadRemainingAppUsageTime(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadRemainingAppUsageTimeByBlacklist(extractMinTimeOfDate(date), extractMaxTimeOfDate(date),);
 
         final Integer liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
