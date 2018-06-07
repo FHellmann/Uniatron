@@ -27,6 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.home.shop.TimeCreditShopActivity" />
 
         <receiver
             android:name="com.edu.uni.augsburg.uniatron.service.handler.BootCompletedHandler"

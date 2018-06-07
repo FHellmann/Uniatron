@@ -39,4 +39,14 @@ public interface TimeCreditDao {
     @Query("SELECT TOTAL(time_in_minutes) FROM TimeCreditEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
     LiveData<Integer> loadTimeCredits(Date dateFrom, Date dateTo);
+
+    /**
+     * Query whether the learning aid is active or not.<br>
+     * <b>Note</b>: A learning aid interval is 45 minutes long.
+     *
+     * @return {@code true} if the learning aid is active, {@code false} otherwise.
+     */
+    @Query("SELECT TOTAL(time_in_minutes) > 0 FROM TimeCreditEntity "
+            + "WHERE timestamp >= strftime('%s', 'now') - 45 * 60 * 1000 AND steps = 0")
+    LiveData<Boolean> isLearningAidActive();
 }

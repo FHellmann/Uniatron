@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -68,6 +69,16 @@ public final class DataRepository {
                 observable::setValue
         ).execute();
         return observable;
+    }
+
+    /**
+     * @see TimeCreditDao#isLearningAidActive()
+     */
+    public LiveData<Boolean> isLearningAidActive() {
+        return Transformations.map(
+                mDatabase.timeCreditDao().isLearningAidActive(),
+                data -> data == null ? Boolean.FALSE : data
+        );
     }
 
     /**

@@ -6,6 +6,8 @@ package com.edu.uni.augsburg.uniatron.model;
  * @author Fabio Hellmann
  */
 public enum TimeCredits {
+    /** The time credit for a learning aid. */
+    CREDIT_LEARNING(0, 5),
     /** The time credit for 10000 steps. */
     CREDIT_10000(10_000, 100),
     /** The time credit for 7500 steps. */
@@ -49,17 +51,5 @@ public enum TimeCredits {
      */
     public int getTimeInMinutes() {
         return mTime;
-    }
-
-    /**
-     * Checks whether this time credit is usable with the
-     * specified amount of remaining steps.
-     *
-     * @param availableSteps The available amount of steps.
-     * @return <code>true</code> if this time credit is usable,
-     * <code>false</code> otherwise.
-     */
-    public boolean isUsable(final int availableSteps) {
-        return availableSteps >= mStepCount;
     }
 }

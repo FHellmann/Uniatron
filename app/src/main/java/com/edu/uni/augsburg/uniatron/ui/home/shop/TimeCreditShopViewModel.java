@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.home.dialogs;
+package com.edu.uni.augsburg.uniatron.ui.home.shop;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -11,6 +11,7 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.ArrayList;
@@ -18,12 +19,11 @@ import java.util.List;
 
 /**
  * The model is the connection between the {@link DataRepository}
- * and the {@link ShopTimeCreditDialogFragment}.
+ * and the {@link TimeCreditShopActivity}.
  *
  * @author Fabio Hellmann
  */
-public class ShopTimeCreditViewModel extends AndroidViewModel {
-
+public class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
@@ -34,7 +34,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    public ShopTimeCreditViewModel(@NonNull final Application application) {
+    public TimeCreditShopViewModel(@NonNull final Application application) {
         super(application);
 
         mPrefHandler = new SharedPreferencesHandler(application);
@@ -100,11 +100,16 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
 
     /**
      * Stores the saved time credits of the shopping cart in the database.
+     *
+     * @param emotion The emotion.
      */
-    public void buy() {
-        Stream.of(mShoppingCart).forEach(credit -> {
-            final double stepsFactor = mPrefHandler.getStepsFactor();
-            mRepository.addTimeCredit(credit, stepsFactor);
-        });
+    public void buy(@NonNull final Emotions emotion) {
+        if (!mShoppingCart.isEmpty()) {
+            Stream.of(mShoppingCart).forEach(credit -> {
+                final double stepsFactor = mPrefHandler.getStepsFactor();
+                mRepository.addTimeCredit(credit, stepsFactor);
+            });
+            mRepository.addEmotion(emotion);
+        }
     }
 }
