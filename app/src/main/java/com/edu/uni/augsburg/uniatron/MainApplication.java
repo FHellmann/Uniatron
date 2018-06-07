@@ -30,6 +30,7 @@ public class MainApplication extends Application {
 
         // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
+
     }
 
     /**
@@ -40,4 +41,5 @@ public class MainApplication extends Application {
     public DataRepository getRepository() {
         return mDataRepository;
     }
+
 }
