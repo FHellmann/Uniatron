@@ -17,8 +17,8 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Fabio Hellmann
  */
 public class SettingViewModel extends AndroidViewModel {
-    private final MediatorLiveData<Map<String, String>> mInstalledApps;
+    private final MediatorLiveData<List<String>> mInstalledApps;
 
     /**
      * Ctr.
@@ -36,7 +36,7 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        final MutableLiveData<List<String>> observable = new MutableLiveData<>();
         observable.setValue(getAllInstalledApps(application.getBaseContext()));
 
         mInstalledApps = new MediatorLiveData<>();
@@ -55,12 +55,12 @@ public class SettingViewModel extends AndroidViewModel {
      * @return The app-names.
      */
     @NonNull
-    public LiveData<Map<String, String>> getInstalledApps() {
+    public LiveData<List<String>> getInstalledApps() {
         return Transformations.map(mInstalledApps,
-                data -> data == null ? Collections.emptyMap() : data);
+                data -> data == null ? Collections.emptyList() : data);
     }
 
-    private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
+    private List<String> getAllInstalledApps(final @NonNull Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -69,18 +69,36 @@ public class SettingViewModel extends AndroidViewModel {
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
         if (installedApplications == null) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         } else {
-            return Stream.of(installedApplications)
-                    .filter(item -> !item.packageName.equals(
-                            context.getApplicationInfo().packageName
-                    ))
-                    .sortBy(item -> item.packageName)
-                    .collect(Collectors.toMap(
-                            key -> key.packageName,
-                            value -> packageManager.getApplicationLabel(value)
-                                    .toString()
-                    ));
+            final List<String> appNames =
+                    Stream.of(installedApplications)
+                            // filter our own app
+                            .filter(item -> !item.packageName.equals(
+                                    context.getApplicationInfo().packageName))
+                            // don't fetch system apps or services
+                            .filter(info -> (info.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+                                    | ApplicationInfo.FLAG_SYSTEM)) == 0)
+                            .map(item -> packageManager.getApplicationLabel(item).toString())
+                            .sorted()
+                            .collect(Collectors.toList());
+
+
+            // grab the blacklist created by user, sort and attach the remaining apps
+            final SharedPreferencesHandler handler = new SharedPreferencesHandler(getApplication());
+            final List<String> appBlacklistList = Stream.of(handler.getAppsBlacklist())
+                    .sorted().toList();
+
+            final LinkedList<String> finalList = new LinkedList<>();
+
+            for (final String name : appBlacklistList) {
+                finalList.add(name);
+                appNames.remove(name);
+            }
+            for (final String name : appNames) {
+                finalList.add(name);
+            }
+            return finalList;
         }
     }
 }
