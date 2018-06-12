@@ -39,10 +39,11 @@ public class AppTrackingService extends Service {
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                 Logger.d("ScreenOFF");
                 stopAppChecker();
+                startService(new Intent(getBaseContext(), StepCountService.class));
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 Logger.d("ScreenON");
                 startAppChecker();
-                //startService(new Intent(getBaseContext(), BroadcastService.class));
+                startService(new Intent(getBaseContext(), StepCountService.class));
             }
         }
     };
