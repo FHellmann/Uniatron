@@ -42,6 +42,7 @@ public class AppTrackingService extends Service {
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 Logger.d("ScreenON");
                 startAppChecker();
+                //startService(new Intent(getBaseContext(), BroadcastService.class));
             }
         }
     };
