@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         requestUsageStatsPermission();
 
+        NotificationChannels.setupChannels(this);
         startServices();
     }
 
