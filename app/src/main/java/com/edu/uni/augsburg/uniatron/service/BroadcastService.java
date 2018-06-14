@@ -32,7 +32,6 @@ public class BroadcastService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(mPackageAddedReceiver);
-
         super.onDestroy();
     }
 }

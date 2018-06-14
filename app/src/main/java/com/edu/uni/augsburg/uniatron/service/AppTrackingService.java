@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * This service detects when the screen is activated/deactivated
- * and tracks the time of open apps.
- *
+ * and tracks the time of the currently opened application.
+ * If there is no remaining app-usage-time, the MainActivity comes to foreground
  * @author Danilo Hoss
  */
 public class AppTrackingService extends Service {
@@ -101,6 +101,12 @@ public class AppTrackingService extends Service {
         commitAppUsageTime(appName, timeMillis);
         blockAppIfNecessary(appName);
 
+    }
+
+    private void showTimesUoNotification(){
+        if (true){ // TODO add remaining app usage time
+            //TODO create Notification
+        }
     }
 
     private void blockAppIfNecessary(final String appName) {
