@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
 import com.orhanobut.logger.Logger;
 
@@ -30,7 +29,7 @@ public class PackageAddedHandler extends BroadcastReceiver {
 
     private void postNotification(final Context context, final Intent intent) {
         Logger.d("A new package was found -> notifying user");
-        NotificationChannels.setupChannels(context);
+
 
         final PackageAddedNotificationBuilder builder =
                 new PackageAddedNotificationBuilder(context, intent);
@@ -58,6 +57,7 @@ public class PackageAddedHandler extends BroadcastReceiver {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+
         intentFilter.addDataScheme("package");
         return intentFilter;
     }
