@@ -19,12 +19,9 @@ import com.edu.uni.augsburg.uniatron.model.StepCount;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -254,7 +251,7 @@ public final class DataRepository {
 
     /**
      * Get the remaining usage time for today.
-     *
+     * @param blacklist The blacklist for observed apps
      * @return The remaining usage time.
      */
     @NonNull
@@ -269,7 +266,7 @@ public final class DataRepository {
      * @return The remaining usage time.
      */
     @NonNull
-    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date, Set<String> blacklist) {
+    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date, final Set<String> blacklist) {
         final Date dateFrom = extractMinTimeOfDate(date);
         final Date dateTo = extractMaxTimeOfDate(date);
         return mDatabase.appUsageDao().loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, blacklist);
