@@ -49,7 +49,7 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
                         mContext,
                         0,
                         new Intent(mContext, AddBlacklistEntryService.class)
-                                .putExtra(Intent.EXTRA_RETURN_RESULT, getAddedPackageName()),
+                                .putExtra(Intent.EXTRA_RETURN_RESULT, getLastInstalledAppLabel()),
                         PendingIntent.FLAG_UPDATE_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
