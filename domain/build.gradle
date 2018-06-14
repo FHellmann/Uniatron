@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 27
@@ -56,7 +57,11 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:2.7.6"
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 apply from: rootProject.file('gradle/static-analysis.gradle')
 apply from: rootProject.file('gradle/coverage.gradle')
+repositories {
+    mavenCentral()
+}

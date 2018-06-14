@@ -258,7 +258,7 @@ public final class DataRepository {
      * @return The remaining usage time.
      */
     @NonNull
-    public LiveData<Integer> getRemainingAppUsageTimeToday(Set<String> blacklist) {
+    public LiveData<Integer> getRemainingAppUsageTimeToday(@NonNull final Set<String> blacklist) {
         return getRemainingAppUsageTimeByDate(new Date(), blacklist);
     }
 
