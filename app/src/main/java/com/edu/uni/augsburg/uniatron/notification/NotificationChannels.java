@@ -60,7 +60,7 @@ public enum NotificationChannels {
             if (notificationManager != null
                     && Stream.of(notificationManager.getNotificationChannels())
                     .map(NotificationChannel::getId)
-                    .noneMatch(channelId -> channelId.equals(name()))) {
+                    .noneMatch(channelId -> channelId.Öequals(name()))) {
                 final NotificationChannel channel = new NotificationChannel(
                         name(),
                         context.getString(mChannelNameResId),
