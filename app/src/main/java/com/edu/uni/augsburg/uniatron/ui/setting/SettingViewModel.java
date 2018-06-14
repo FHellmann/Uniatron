@@ -68,6 +68,11 @@ public class SettingViewModel extends AndroidViewModel {
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
+        final Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        final String launcherPackageName = packageManager.resolveActivity(intent,
+                PackageManager.MATCH_DEFAULT_ONLY).activityInfo.packageName;
+
         if (installedApplications == null) {
             return Collections.emptyList();
         } else {
@@ -76,6 +81,8 @@ public class SettingViewModel extends AndroidViewModel {
                             // filter our own app
                             .filter(item -> !item.packageName.equals(
                                     context.getApplicationInfo().packageName))
+                            // filter the default launcher
+                            .filter(item -> !item.packageName.equals(launcherPackageName))
                             // don't fetch system apps or services
                             .filter(info -> (info.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
                                     | ApplicationInfo.FLAG_SYSTEM)) == 0)
