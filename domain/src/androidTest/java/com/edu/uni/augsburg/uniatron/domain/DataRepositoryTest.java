@@ -27,9 +27,13 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -232,11 +236,14 @@ public class DataRepositoryTest {
     @Test
     public void getRemainingAppUsageTime() throws InterruptedException {
         final int value = 10;
+        final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
+
         final MutableLiveData<Integer> liveData = new MutableLiveData<>();
         liveData.setValue(value);
-        when(appUsageDao.loadRemainingAppUsageTime(any(), any())).thenReturn(liveData);
+        when(appUsageDao.loadRemainingAppUsageTimeByBlacklist(any(), any(), any()))
+                .thenReturn(liveData);
 
-        final LiveData<Integer> data = mRepository.getRemainingAppUsageTimeToday();
+        final LiveData<Integer> data = mRepository.getRemainingAppUsageTimeToday(filters);
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
