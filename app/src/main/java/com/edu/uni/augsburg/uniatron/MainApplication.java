@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -20,17 +21,14 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // initialize logger
         Logger.addLogAdapter(new AndroidLogAdapter() {
             @Override
             public boolean isLoggable(final int priority, @Nullable final String tag) {
                 return BuildConfig.DEBUG;
             }
         });
-
-        // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
-
+        NotificationChannels.setupChannels(this);
     }
 
     /**
