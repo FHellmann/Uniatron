@@ -5,8 +5,13 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Transformations;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
@@ -24,7 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Fabio Hellmann
  */
 public class HomeViewModel extends AndroidViewModel {
-    private static final int MAX_COUNT = 5;
+    /** The maximum count of apps shown as top n apps. */
+    public static final int MAX_COUNT = 5;
     private final MediatorLiveData<Map<String, Double>> mAppUsages;
     private final MediatorLiveData<Integer> mRemainingStepCount;
     private final MediatorLiveData<Integer> mRemainingAppUsageTime;
@@ -62,11 +68,12 @@ public class HomeViewModel extends AndroidViewModel {
     /**
      * Get the app usage of the top 5 apps.
      *
+     * @param context The context.
      * @return The app usage.
      */
     @NonNull
-    public LiveData<Map<String, Double>> getAppUsageOfTop5Apps() {
-        return Transformations.map(mAppUsages, data -> extractValues(data, MAX_COUNT));
+    public LiveData<Map<String, Double>> getAppUsageOfTop5Apps(@NonNull final Context context) {
+        return Transformations.map(mAppUsages, data -> extractValues(context, data, MAX_COUNT));
     }
 
     /**
@@ -92,7 +99,9 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     @NonNull
-    private Map<String, Double> extractValues(final Map<String, Double> data, final int maxCount) {
+    private Map<String, Double> extractValues(final Context context,
+                                              final Map<String, Double> data,
+                                              final int maxCount) {
         if (data == null) {
             return Collections.emptyMap();
         }
@@ -105,10 +114,23 @@ public class HomeViewModel extends AndroidViewModel {
 
         // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
         final Map<String, Double> sortedMap = new ConcurrentHashMap<>();
-        for (int index = 0; index < list.size() && index < maxCount; index++) {
+        for (int index = 0; index < list.size() && sortedMap.size() < maxCount; index++) {
             final Map.Entry<String, Double> entry = list.get(index);
-            sortedMap.put(entry.getKey(), entry.getValue());
+            getApplicationLabel(context, entry.getKey())
+                    .ifPresent(appLabel -> sortedMap.put(appLabel, entry.getValue()));
         }
         return sortedMap;
+    }
+
+    @NonNull
+    private Optional<String> getApplicationLabel(@NonNull final Context context,
+                                                 @NonNull final String packageName) {
+        final PackageManager packageManager = context.getPackageManager();
+        final List<ApplicationInfo> installedApplications = packageManager
+                .getInstalledApplications(PackageManager.GET_META_DATA);
+        return Stream.of(installedApplications)
+                .filter(app -> app.packageName.equals(packageName))
+                .findFirst()
+                .map(appInfo -> packageManager.getApplicationLabel(appInfo).toString());
     }
 }
