@@ -20,8 +20,11 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
@@ -118,8 +121,13 @@ public class AppUsageDaoTest {
     public void loadRemainingAppUsageTime() throws InterruptedException {
         final Date date = new Date();
 
-        final AppUsageEntity test = create("Test", date);
+        final AppUsageEntity test = create("app1", date);
         mDao.add(test);
+        mDao.add(create("app2", date));
+        mDao.add(create("app3", date));
+        mDao.add(create("app4", date));
+        mDao.add(create("app5", date));
+        mDao.add(create("app6", date));
 
         final TimeCredits credits = TimeCredits.CREDIT_1000;
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
@@ -128,11 +136,13 @@ public class AppUsageDaoTest {
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
 
-        java.util.Set<String> blacklist_test = new java.util.HashSet<>(Arrays.asList("facebook",  "whatsapp", "youtube"));
+        final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
-
-        final LiveData<Integer> liveData = mDao
-                .loadRemainingAppUsageTimeByBlacklist(extractMinTimeOfDate(date), extractMaxTimeOfDate(date), blacklist_test);
+        final LiveData<Integer> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
+                extractMinTimeOfDate(date),
+                extractMaxTimeOfDate(date),
+                filters
+        );
 
         final Integer liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));

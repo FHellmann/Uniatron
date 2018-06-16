@@ -73,6 +73,9 @@ public interface AppUsageDao {
      */
     @Query("SELECT (SELECT TOTAL(time_in_minutes * 60) FROM TimeCreditEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time_in_seconds) "
-            + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) AND  app_name IN (:blacklist)")
-    LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom, Date dateTo, Set<String> blacklist);
+            + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) "
+            + "AND app_name IN (:blacklist)")
+    LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
+                                                           Date dateTo,
+                                                           Set<String> blacklist);
 }
