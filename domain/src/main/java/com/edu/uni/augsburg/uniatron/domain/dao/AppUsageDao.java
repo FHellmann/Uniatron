@@ -68,14 +68,14 @@ public interface AppUsageDao {
      *
      * @param dateFrom The date to start searching.
      * @param dateTo The date to end searching.
-     * @param blacklist The blacklist for observed apps.
+     * @param filter The filter for observed apps.
      * @return The remaining app usage time.
      */
     @Query("SELECT (SELECT TOTAL(time_in_minutes * 60) FROM TimeCreditEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time_in_seconds) "
             + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) "
-            + "AND app_name IN (:blacklist)")
+            + "AND app_name IN (:filter)")
     LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
                                                            Date dateTo,
-                                                           Set<String> blacklist);
+                                                           Set<String> filter);
 }
