@@ -23,18 +23,17 @@ import com.orhanobut.logger.Logger;
 public class PackageAddedHandler extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        Logger.d("Package action received: " + intent);
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
             if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
-                Logger.d("This was an update from the play store ("
-                        + getPackageName(intent) + ")");
+                Logger.d("Package updated: " + getPackageName(intent));
                 context.startService(new Intent(context, AddBlacklistEntryService.class)
                         .putExtra(Intent.EXTRA_RETURN_RESULT, getPackageName(intent)));
             } else {
-                Logger.d("A new package was found (" + getPackageName(intent) + ")");
+                Logger.d("Package added: " + getPackageName(intent));
                 postNotification(context, intent);
             }
         } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
+            Logger.d("Package removed: " + getPackageName(intent));
             removePackageFromBlacklist(context, intent);
         }
     }
