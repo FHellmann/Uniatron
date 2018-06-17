@@ -19,6 +19,7 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -73,29 +74,44 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyMap();
         } else {
-            return Stream.of(installedApplications)
+            final Map<String, String> linkedElements = Stream.of(installedApplications)
                     .filter(item -> !item.packageName.equals(
                             context.getApplicationInfo().packageName
                     ))
-                    .sorted((appInfo1, appInfo2) -> {
-                        final String appName1 = packageManager.getApplicationLabel(appInfo1)
-                                .toString();
-                        final String appName2 = packageManager.getApplicationLabel(appInfo2)
-                                .toString();
-
-                        if (mHandler.getAppsBlacklist().contains(appName1)
-                                && mHandler.getAppsBlacklist().contains(appName2)) {
-                            return appName1.compareTo(appName2);
-                        } else if (mHandler.getAppsBlacklist().contains(appName1)
-                                || mHandler.getAppsBlacklist().contains(appName2)) {
-                            // Both or one of them are in the blacklist
-                            return -1;
-                        }
-                        return appName1.compareTo(appName2);
-                    })
                     .collect(Collectors.toMap(
                             key -> key.packageName,
-                            value -> packageManager.getApplicationLabel(value).toString(),
+                            value -> packageManager.getApplicationLabel(value).toString()
+                    ));
+
+            final Map<String, String> selectedItems = Stream
+                    .of(linkedElements.entrySet())
+                    .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (value1, value2) -> value1,
+                            LinkedHashMap::new
+                    ));
+
+            final Map<String, String> unselectedItems = Stream
+                    .of(linkedElements.entrySet())
+                    .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (value1, value2) -> value1,
+                            LinkedHashMap::new
+                    ));
+
+            return Stream.concat(
+                    Stream.of(selectedItems.entrySet()),
+                    Stream.of(unselectedItems.entrySet())
+            )
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
                             (value1, value2) -> value1,
                             LinkedHashMap::new
                     ));
