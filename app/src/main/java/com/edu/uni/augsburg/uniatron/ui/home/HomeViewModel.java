@@ -13,12 +13,14 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,7 +34,6 @@ public class HomeViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, Double>> mAppUsages;
     private final MediatorLiveData<Integer> mRemainingStepCount;
     private final MediatorLiveData<Integer> mRemainingAppUsageTime;
-
     /**
      * Ctr.
      *
@@ -42,6 +43,8 @@ public class HomeViewModel extends AndroidViewModel {
         super(application);
 
         final DataRepository repository = ((MainApplication) application).getRepository();
+        final SharedPreferencesHandler handler = new SharedPreferencesHandler(application.getBaseContext());
+        final Set<String> blacklist = handler.getAppsBlacklist();
 
         mAppUsages = new MediatorLiveData<>();
         mAppUsages.addSource(
@@ -57,13 +60,13 @@ public class HomeViewModel extends AndroidViewModel {
 
         mRemainingAppUsageTime = new MediatorLiveData<>();
         mRemainingAppUsageTime.addSource(
-                repository.getRemainingAppUsageTimeToday(),
+                repository.getRemainingAppUsageTimeToday(blacklist),
                 mRemainingAppUsageTime::setValue
         );
     }
 
     /**
-     * Get the app usage of the top 3 apps.
+     * Get the app usage of the top 5 apps.
      *
      * @param context The context.
      * @return The app usage.

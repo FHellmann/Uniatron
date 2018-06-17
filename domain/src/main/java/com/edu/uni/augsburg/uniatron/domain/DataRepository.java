@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
@@ -51,7 +52,7 @@ public final class DataRepository {
      * Add a new time credit.
      *
      * @param timeCredits The time credit will be generated out of this.
-     * @param factor The factor to multiply with.
+     * @param factor      The factor to multiply with.
      * @return The time credit.
      */
     public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits,
@@ -263,24 +264,28 @@ public final class DataRepository {
     /**
      * Get the remaining usage time for today.
      *
+     * @param filter The apps to filter.
      * @return The remaining usage time.
      */
     @NonNull
-    public LiveData<Integer> getRemainingAppUsageTimeToday() {
-        return getRemainingAppUsageTimeByDate(new Date());
+    public LiveData<Integer> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
+        return getRemainingAppUsageTimeByDate(new Date(), filter);
     }
 
     /**
      * Get the remaining usage time as sum.
      *
-     * @param date The date to get this data from.
+     * @param date   The date to get this data from.
+     * @param filter The apps to filter.
      * @return The remaining usage time.
      */
     @NonNull
-    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date) {
+    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date,
+                                                             @NonNull final Set<String> filter) {
         final Date dateFrom = extractMinTimeOfDate(date);
         final Date dateTo = extractMaxTimeOfDate(date);
-        return mDatabase.appUsageDao().loadRemainingAppUsageTime(dateFrom, dateTo);
+        return mDatabase.appUsageDao()
+                .loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }
 
     /**
