@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
-import com.edu.uni.augsburg.uniatron.service.AddBlacklistEntryService;
 import com.orhanobut.logger.Logger;
 
 /**
@@ -25,16 +24,18 @@ public class PackageAddedHandler extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
             if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
-                Logger.d("Package updated: " + getPackageName(intent));
-                context.startService(new Intent(context, AddBlacklistEntryService.class)
-                        .putExtra(Intent.EXTRA_RETURN_RESULT, getPackageName(intent)));
+                Logger.d("Package updated (added): " + getPackageName(intent));
             } else {
                 Logger.d("Package added: " + getPackageName(intent));
                 postNotification(context, intent);
             }
         } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
-            Logger.d("Package removed: " + getPackageName(intent));
-            removePackageFromBlacklist(context, intent);
+            if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
+                Logger.d("Package updated (removed): " + getPackageName(intent));
+            } else {
+                Logger.d("Package removed: " + getPackageName(intent));
+                removePackageFromBlacklist(context, intent);
+            }
         }
     }
 
