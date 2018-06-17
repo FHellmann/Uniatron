@@ -78,6 +78,8 @@ public class SettingViewModel extends AndroidViewModel {
                     .filter(item -> !item.packageName.equals(
                             context.getApplicationInfo().packageName
                     ))
+                    .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+                            | ApplicationInfo.FLAG_SYSTEM)) == 0)
                     .collect(Collectors.toMap(
                             key -> key.packageName,
                             value -> packageManager.getApplicationLabel(value).toString()
