@@ -83,32 +83,17 @@ public class SettingViewModel extends AndroidViewModel {
                             value -> packageManager.getApplicationLabel(value).toString()
                     ));
 
-            final Map<String, String> selectedItems = Stream
+            final Stream<Map.Entry<String, String>> selectedItems = Stream
                     .of(linkedElements.entrySet())
                     .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
-                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (value1, value2) -> value1,
-                            LinkedHashMap::new
-                    ));
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
 
-            final Map<String, String> unselectedItems = Stream
+            final Stream<Map.Entry<String, String>> unselectedItems = Stream
                     .of(linkedElements.entrySet())
                     .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
-                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (value1, value2) -> value1,
-                            LinkedHashMap::new
-                    ));
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
 
-            return Stream.concat(
-                    Stream.of(selectedItems.entrySet()),
-                    Stream.of(unselectedItems.entrySet())
-            )
+            return Stream.concat(selectedItems, unselectedItems)
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
