@@ -18,15 +18,13 @@ import static com.edu.uni.augsburg.uniatron.SharedPreferencesHandler.PREF_APP_BL
  */
 public class SettingFragment extends PreferenceFragmentCompat {
 
-    private SettingViewModel mModel;
-
     @Override
     public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        mModel = ViewModelProviders.of(this).get(SettingViewModel.class);
+        final SettingViewModel mModel = ViewModelProviders.of(this).get(SettingViewModel.class);
 
-        mModel.getInstalledApps(getContext()).observe(this, data -> {
+        mModel.getInstalledApps().observe(this, data -> {
             final String[] packageNames = Stream.of(data.keySet()).toArray(String[]::new);
             final String[] labelNames = Stream.of(data.values()).toArray(String[]::new);
 
@@ -35,12 +33,5 @@ public class SettingFragment extends PreferenceFragmentCompat {
             list.setEntries(labelNames);
             list.setEntryValues(packageNames);
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        mModel.updateInstalledApps(getContext());
     }
 }

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mScreenSlideAdapter);
         mViewPager.addOnPageChangeListener(this);
+        mViewPager.setOffscreenPageLimit(mScreenSlideAdapter.mFragments.size());
 
         mNavigation.setOnNavigationItemSelectedListener(this);
         mNavigation.setSelectedItemId(R.id.navigation_home);

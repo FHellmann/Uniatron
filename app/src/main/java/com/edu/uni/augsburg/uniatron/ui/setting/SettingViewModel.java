@@ -52,24 +52,12 @@ public class SettingViewModel extends AndroidViewModel {
     }
 
     /**
-     * Update the installed apps.
-     *
-     * @param context The context.
-     */
-    public void updateInstalledApps(@NonNull final Context context) {
-        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
-        observable.setValue(getAllInstalledApps(context));
-        mInstalledApps.addSource(observable, mInstalledApps::setValue);
-    }
-
-    /**
      * Get the installed apps.
      *
-     * @param context The context.
      * @return The app name/package name pairs.
      */
     @NonNull
-    public LiveData<Map<String, String>> getInstalledApps(@NonNull final Context context) {
+    public LiveData<Map<String, String>> getInstalledApps() {
         return Transformations.map(mInstalledApps,
                 data -> data == null ? Collections.emptyMap() : data);
     }
