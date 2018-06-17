@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mScreenSlideAdapter);
         mViewPager.addOnPageChangeListener(this);
-        mViewPager.setPageTransformer(true, new CrossFadeAnimation());
-        mViewPager.beginFakeDrag();
 
         mNavigation.setOnNavigationItemSelectedListener(this);
         mNavigation.setSelectedItemId(R.id.navigation_home);
@@ -171,22 +169,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         @Override
         public int getCount() {
             return mFragments.size();
-        }
-    }
-
-    static final class CrossFadeAnimation implements ViewPager.PageTransformer {
-        public void transformPage(@NonNull final View view, final float position) {
-            if(position <= -1.0F || position >= 1.0F) {
-                view.setTranslationX(view.getWidth() * position);
-                view.setAlpha(0.0F);
-            } else if( position == 0.0F ) {
-                view.setTranslationX(view.getWidth() * position);
-                view.setAlpha(1.0F);
-            } else {
-                // position is between -1.0F & 0.0F OR 0.0F & 1.0F
-                view.setTranslationX(view.getWidth() * -position);
-                view.setAlpha(1.0F - Math.abs(position));
-            }
         }
     }
 }
