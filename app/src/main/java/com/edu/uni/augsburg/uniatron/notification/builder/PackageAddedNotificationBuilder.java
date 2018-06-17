@@ -4,8 +4,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
@@ -21,18 +19,24 @@ import com.edu.uni.augsburg.uniatron.service.AddBlacklistEntryService;
  */
 public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;
-    private final Intent mIntent;
+    private final String packageName;
+    private final String appLabel;
+    private final int requestId;
 
     /**
      * Ctr.
      *
-     * @param context The context.
-     * @param intent  The intent of the event.
+     * @param context     The context.
+     * @param appLabel    The app name.
+     * @param packageName The app package name.
      */
     public PackageAddedNotificationBuilder(@NonNull final Context context,
-                                           @NonNull final Intent intent) {
+                                           @NonNull final String packageName,
+                                           @NonNull final String appLabel) {
         this.mContext = context;
-        this.mIntent = intent;
+        this.packageName = packageName;
+        this.appLabel = appLabel;
+        this.requestId = (int) System.currentTimeMillis();
     }
 
     @Override
@@ -42,16 +46,15 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
                 .setContentTitle(mContext.getString(R.string.notify_package_added))
                 .setContentText(mContext.getString(
                         R.string.notify_package_added_summary,
-                        getLastInstalledAppLabel()
+                        appLabel
                 ))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getService(
                         mContext,
-                        0,
+                        requestId,
                         new Intent(mContext, AddBlacklistEntryService.class)
-                                .putExtra(Intent.EXTRA_RETURN_RESULT, getLastInstalledAppLabel()),
-                        PendingIntent.FLAG_UPDATE_CURRENT))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                .putExtra(Intent.EXTRA_RETURN_RESULT, packageName),
+                        0))
                 .setAutoCancel(true)
                 .setOngoing(false)
                 .build();
@@ -59,32 +62,6 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public int getId() {
-        return APP_INSTALLATION_ID;
-    }
-
-    private String getLastInstalledAppLabel() {
-        final PackageManager packageManager = mContext.getPackageManager();
-        final String addedPackageName = getAddedPackageName();
-        try {
-            return packageManager.getApplicationLabel(
-                    packageManager.getApplicationInfo(
-                            addedPackageName,
-                            0
-                    )).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new IllegalStateException("Unable to find the added package '"
-                    + addedPackageName + "'", e);
-        }
-    }
-
-    private String getAddedPackageName() {
-        final Uri data = mIntent.getData();
-        if (data == null) {
-            // If the intent does not provide the installed package name
-            throw new IllegalStateException("The intent need's to contain the added package name");
-        } else {
-            // The intent provides the installed package name
-            return data.getEncodedSchemeSpecificPart();
-        }
+        return requestId;
     }
 }

@@ -31,7 +31,7 @@ public interface SummaryDao {
             + "TOTAL(step_count) as 'mSteps', "
             + "(SELECT TOTAL(usage_time_in_seconds) FROM AppUsageEntity "
             + "WHERE date(timestamp/1000, 'unixepoch') = date(sce.timestamp/1000, 'unixepoch')) "
-            + "as 'mAppUsageTime', (SELECT CASE WHEN AVG(value) IS NULL THEN 0.0 ELSE AVG(value) END "
+            + "as 'mAppUsageTime', (SELECT CASE WHEN AVG(value) IS NULL THEN -1.0 ELSE AVG(value) END "
             + "FROM EmotionEntity WHERE date(timestamp/1000, 'unixepoch') = "
             + "date(sce.timestamp/1000, 'unixepoch')) as 'mEmotionAvg' "
             + "FROM StepCountEntity sce "

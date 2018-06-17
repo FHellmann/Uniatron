@@ -1,5 +1,6 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -16,7 +17,7 @@ public class NonSwipeableViewPager extends ViewPager {
      *
      * @param context The context.
      */
-    public NonSwipeableViewPager(Context context) {
+    public NonSwipeableViewPager(final Context context) {
         super(context);
     }
 
@@ -26,17 +27,18 @@ public class NonSwipeableViewPager extends ViewPager {
      * @param context The context.
      * @param attrs   The attributes.
      */
-    public NonSwipeableViewPager(Context context, AttributeSet attrs) {
+    public NonSwipeableViewPager(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent event) {
+    public boolean onInterceptTouchEvent(final MotionEvent event) {
         return false;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(final MotionEvent event) {
         return false;
     }
 }
