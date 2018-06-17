@@ -17,8 +17,9 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
@@ -26,7 +27,8 @@ import java.util.List;
  * @author Fabio Hellmann
  */
 public class SettingViewModel extends AndroidViewModel {
-    private final MediatorLiveData<List<String>> mInstalledApps;
+    private final MediatorLiveData<Map<String, String>> mInstalledApps;
+    private final SharedPreferencesHandler mHandler;
 
     /**
      * Ctr.
@@ -36,31 +38,43 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        final MutableLiveData<List<String>> observable = new MutableLiveData<>();
-        observable.setValue(getAllInstalledApps(application.getBaseContext()));
+        mHandler = new SharedPreferencesHandler(application.getBaseContext());
+
+        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        observable.setValue(getAllInstalledApps(application));
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(observable, mInstalledApps::setValue);
 
-        final SharedPreferencesHandler handler =
-                new SharedPreferencesHandler(application.getBaseContext());
-        handler.setOnBlacklistChangeListener((packageName, added) -> {
-            observable.postValue(getAllInstalledApps(application.getBaseContext()));
+        mHandler.setOnBlacklistChangeListener((packageName, added) -> {
+            observable.postValue(getAllInstalledApps(application));
         });
+    }
+
+    /**
+     * Update the installed apps.
+     *
+     * @param context The context.
+     */
+    public void updateInstalledApps(@NonNull final Context context) {
+        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
+        observable.setValue(getAllInstalledApps(context));
+        mInstalledApps.addSource(observable, mInstalledApps::setValue);
     }
 
     /**
      * Get the installed apps.
      *
-     * @return The app-names.
+     * @param context The context.
+     * @return The app name/package name pairs.
      */
     @NonNull
-    public LiveData<List<String>> getInstalledApps() {
+    public LiveData<Map<String, String>> getInstalledApps(@NonNull final Context context) {
         return Transformations.map(mInstalledApps,
-                data -> data == null ? Collections.emptyList() : data);
+                data -> data == null ? Collections.emptyMap() : data);
     }
 
-    private List<String> getAllInstalledApps(final @NonNull Context context) {
+    private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -68,44 +82,35 @@ public class SettingViewModel extends AndroidViewModel {
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
 
-        final Intent intent = new Intent("android.intent.action.MAIN");
-        intent.addCategory("android.intent.category.HOME");
-        final String launcherPackageName = packageManager.resolveActivity(intent,
-                PackageManager.MATCH_DEFAULT_ONLY).activityInfo.packageName;
-
         if (installedApplications == null) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         } else {
-            final List<String> appNames =
-                    Stream.of(installedApplications)
-                            // filter our own app
-                            .filter(item -> !item.packageName.equals(
-                                    context.getApplicationInfo().packageName))
-                            // filter the default launcher
-                            .filter(item -> !item.packageName.equals(launcherPackageName))
-                            // don't fetch system apps or services
-                            .filter(info -> (info.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
-                                    | ApplicationInfo.FLAG_SYSTEM)) == 0)
-                            .map(item -> packageManager.getApplicationLabel(item).toString())
-                            .sorted()
-                            .collect(Collectors.toList());
+            return Stream.of(installedApplications)
+                    .filter(item -> !item.packageName.equals(
+                            context.getApplicationInfo().packageName
+                    ))
+                    .sorted((appInfo1, appInfo2) -> {
+                        final String appName1 = packageManager.getApplicationLabel(appInfo1)
+                                .toString();
+                        final String appName2 = packageManager.getApplicationLabel(appInfo2)
+                                .toString();
 
-
-            // grab the blacklist created by user, sort and attach the remaining apps
-            final SharedPreferencesHandler handler = new SharedPreferencesHandler(getApplication());
-            final List<String> appBlacklistList = Stream.of(handler.getAppsBlacklist())
-                    .sorted().toList();
-
-            final LinkedList<String> finalList = new LinkedList<>();
-
-            for (final String name : appBlacklistList) {
-                finalList.add(name);
-                appNames.remove(name);
-            }
-            for (final String name : appNames) {
-                finalList.add(name);
-            }
-            return finalList;
+                        if (mHandler.getAppsBlacklist().contains(appName1)
+                                && mHandler.getAppsBlacklist().contains(appName2)) {
+                            return appName1.compareTo(appName2);
+                        } else if (mHandler.getAppsBlacklist().contains(appName1)
+                                || mHandler.getAppsBlacklist().contains(appName2)) {
+                            // Both or one of them are in the blacklist
+                            return -1;
+                        }
+                        return appName1.compareTo(appName2);
+                    })
+                    .collect(Collectors.toMap(
+                            key -> key.packageName,
+                            value -> packageManager.getApplicationLabel(value).toString(),
+                            (value1, value2) -> value1,
+                            LinkedHashMap::new
+                    ));
         }
     }
 }

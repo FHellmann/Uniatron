@@ -18,20 +18,29 @@ import static com.edu.uni.augsburg.uniatron.SharedPreferencesHandler.PREF_APP_BL
  */
 public class SettingFragment extends PreferenceFragmentCompat {
 
+    private SettingViewModel mModel;
+
     @Override
     public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        final SettingViewModel model = ViewModelProviders.of(this).get(SettingViewModel.class);
+        mModel = ViewModelProviders.of(this).get(SettingViewModel.class);
 
-        model.getInstalledApps().observe(this, data -> {
-            //final String[] packageNames = Stream.of(data.keySet()).toArray(String[]::new);
-            final String[] labelNames = Stream.of(data).toArray(String[]::new);
+        mModel.getInstalledApps(getContext()).observe(this, data -> {
+            final String[] packageNames = Stream.of(data.keySet()).toArray(String[]::new);
+            final String[] labelNames = Stream.of(data.values()).toArray(String[]::new);
 
             final MultiSelectListPreference list =
                     (MultiSelectListPreference) findPreference(PREF_APP_BLACKLIST);
             list.setEntries(labelNames);
-            list.setEntryValues(labelNames);
+            list.setEntryValues(packageNames);
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mModel.updateInstalledApps(getContext());
     }
 }

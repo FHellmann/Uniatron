@@ -21,8 +21,7 @@ import com.orhanobut.logger.Logger;
 public class PackageAddedHandler extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())
-                && ! Intent.ACTION_PACKAGE_CHANGED.equals((intent.getAction()))) {
+        if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
             postNotification(context, intent);
         } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
             removePackageFromBlacklist(context, intent);
