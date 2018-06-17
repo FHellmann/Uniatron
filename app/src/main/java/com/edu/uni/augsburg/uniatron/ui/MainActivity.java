@@ -14,6 +14,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mScreenSlideAdapter);
         mViewPager.addOnPageChangeListener(this);
+        mViewPager.setPageTransformer(true, new CrossFadeAnimation());
+        mViewPager.beginFakeDrag();
 
         mNavigation.setOnNavigationItemSelectedListener(this);
         mNavigation.setSelectedItemId(R.id.navigation_home);
@@ -127,6 +131,27 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    private void startServices() {
+        startService(new Intent(getBaseContext(), BroadcastService.class));
+        startService(new Intent(getBaseContext(), StepCountService.class));
+        startService(new Intent(getBaseContext(), AppTrackingService.class));
+    }
+
+    private void requestUsageStatsPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && !hasUsageStatsPermission()) {
+            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private boolean hasUsageStatsPermission() {
+        final AppOpsManager appOps = (AppOpsManager) getSystemService(APP_OPS_SERVICE);
+        final int mode = appOps.checkOpNoThrow("android:get_usage_stats",
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
     static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         private final Map<Integer, Fragment> mFragments;
 
@@ -149,24 +174,19 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    private void startServices() {
-        startService(new Intent(getBaseContext(), BroadcastService.class));
-        startService(new Intent(getBaseContext(), StepCountService.class));
-        startService(new Intent(getBaseContext(), AppTrackingService.class));
-    }
-
-    private void requestUsageStatsPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !hasUsageStatsPermission()) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+    static final class CrossFadeAnimation implements ViewPager.PageTransformer {
+        public void transformPage(@NonNull final View view, final float position) {
+            if(position <= -1.0F || position >= 1.0F) {
+                view.setTranslationX(view.getWidth() * position);
+                view.setAlpha(0.0F);
+            } else if( position == 0.0F ) {
+                view.setTranslationX(view.getWidth() * position);
+                view.setAlpha(1.0F);
+            } else {
+                // position is between -1.0F & 0.0F OR 0.0F & 1.0F
+                view.setTranslationX(view.getWidth() * -position);
+                view.setAlpha(1.0F - Math.abs(position));
+            }
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private boolean hasUsageStatsPermission() {
-        final AppOpsManager appOps = (AppOpsManager) getSystemService(APP_OPS_SERVICE);
-        final int mode = appOps.checkOpNoThrow("android:get_usage_stats",
-                android.os.Process.myUid(), getPackageName());
-        return mode == AppOpsManager.MODE_ALLOWED;
     }
 }
