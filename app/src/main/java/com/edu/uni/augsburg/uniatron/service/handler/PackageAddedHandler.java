@@ -42,8 +42,8 @@ public class PackageAddedHandler extends BroadcastReceiver {
     private void postNotification(final Context context, final Intent intent) {
         final AppNotificationBuilder builder = new PackageAddedNotificationBuilder(
                 context,
-                getLastInstalledAppLabel(context, intent),
-                getPackageName(intent)
+                getPackageName(intent),
+                getLastInstalledAppLabel(context, intent)
         );
 
         final Notification notification = builder.build();
