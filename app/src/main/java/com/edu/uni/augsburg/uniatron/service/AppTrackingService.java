@@ -1,17 +1,21 @@
 package com.edu.uni.augsburg.uniatron.service;
 
+import android.app.Notification;
 import android.app.Service;
+import android.arch.lifecycle.MediatorLiveData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.orhanobut.logger.Logger;
 import com.rvalerio.fgchecker.AppChecker;
@@ -25,9 +29,18 @@ import java.util.concurrent.TimeUnit;
  * This service detects when the screen is activated/deactivated
  * and tracks the time of the currently opened application.
  * If there is no remaining app-usage-time, the MainActivity comes to foreground
+ *
  * @author Danilo Hoss
  */
 public class AppTrackingService extends Service {
+
+    private static boolean time1min = false;
+    private static boolean time5min = false;
+    private static int lastTime;
+    private static int currentTime;
+
+    final MainApplication mainApplication = (MainApplication) getApplicationContext();
+    final DataRepository repository = mainApplication.getRepository();
 
     private static final int DELAY = 1000; //milliseconds
     private static final List<String> FILTERS = Arrays.asList(
@@ -90,8 +103,6 @@ public class AppTrackingService extends Service {
 
     private void commitAppUsageTime(final String appName, final int timeMillis) {
         if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
-            final MainApplication mainApplication = (MainApplication) getApplicationContext();
-            final DataRepository repository = mainApplication.getRepository();
             final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
             repository.addAppUsage(appName, time);
         }
@@ -100,13 +111,22 @@ public class AppTrackingService extends Service {
     private void delegateAppUsage(final String appName, final int timeMillis) {
         commitAppUsageTime(appName, timeMillis);
         blockAppIfNecessary(appName);
-
+        showTimesUpNotification();
     }
 
-    private void showTimesUoNotification(){
-        if (true){ // TODO add remaining app usage time
-            //TODO create Notification
-        }
+    private void showTimesUpNotification() {
+
+            //if (true) { //TODO add remaining app usage time
+
+            //TODO create bool if time set and reset if time is increasing
+            //TODO get LiveData from DataRepository
+            final Context context = getApplicationContext();
+            final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context);
+            final Notification notification = builder.build();
+            final int notificationId = builder.getId();
+
+            NotificationManagerCompat.from(context).notify(notificationId, notification);
+       // }
     }
 
     private void blockAppIfNecessary(final String appName) {
@@ -115,10 +135,19 @@ public class AppTrackingService extends Service {
                 application.getSharedPreferencesHandler();
         final Set<String> blackList = sharedPreferencesHandler.getAppsBlacklist();
         if (blackList.contains(appName)) {
-            //TODO check if appUsageTime of Apps in Blacklist is 0 or not then lock App
             final Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
     }
+
+    private int getRemainingTimeBlacklist(){
+        final MediatorLiveData<Integer> mRemainingTime;
+        mRemainingTime = new MediatorLiveData<>();
+        mRemainingTime.addSource(
+                repository.getRemainingAppUsageTimeToday(),
+                mRemainingTime::setValue
+        );
+        return 1;
+}
 
 }

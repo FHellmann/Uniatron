@@ -18,6 +18,20 @@ import com.orhanobut.logger.Logger;
  * @author Fabio Hellmann
  */
 public class PackageAddedHandler extends BroadcastReceiver {
+    /**
+     * Get the intent filter for this broadcast receiver.
+     *
+     * @return The intent filter.
+     */
+    public static IntentFilter getIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+
+        intentFilter.addDataScheme("package");
+        return intentFilter;
+    }
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
@@ -46,19 +60,5 @@ public class PackageAddedHandler extends BroadcastReceiver {
             final SharedPreferencesHandler handler = new SharedPreferencesHandler(context);
             handler.removeAppFromBlacklist(data.getEncodedSchemeSpecificPart());
         }
-    }
-
-    /**
-     * Get the intent filter for this broadcast receiver.
-     *
-     * @return The intent filter.
-     */
-    public static IntentFilter getIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-
-        intentFilter.addDataScheme("package");
-        return intentFilter;
     }
 }

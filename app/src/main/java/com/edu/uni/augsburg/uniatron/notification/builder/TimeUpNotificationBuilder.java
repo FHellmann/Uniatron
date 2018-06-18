@@ -6,27 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.service.AddBlacklistEntryService;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 
 /**
- *  Notification is shown when the time is running out soon.
+ * Notification is shown when the time is running out soon.
  */
-public class TimeUpNotificationBuilder implements AppNotificationBuilder{
+public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;
-    private final Intent mIntent;
+
     /**
-     *
+     * Build Notification to inform user that times running out.
+     * @param context the context
      */
-    public TimeUpNotificationBuilder(@NonNull final Context context,
-                                     @NonNull final Intent intent) {
+    public TimeUpNotificationBuilder(@NonNull final Context context) {
         this.mContext = context;
-        this.mIntent = intent;
     }
 
 
@@ -42,10 +39,11 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder{
                         mContext,
                         0,
                         new Intent(mContext, MainActivity.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT))
+                        PendingIntent.FLAG_CANCEL_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setOngoing(false)
+                .setOnlyAlertOnce(true)
                 .build();
     }
 
