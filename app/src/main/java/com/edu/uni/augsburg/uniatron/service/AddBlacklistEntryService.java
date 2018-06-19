@@ -26,8 +26,10 @@ public class AddBlacklistEntryService extends Service {
         // Then we can not add the app automatically.
         if (intent != null && intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             final String packageName = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
-            final SharedPreferencesHandler preferencesHandler =
-                    ((MainApplication) getApplicationContext()).getSharedPreferencesHandler();
+
+            final MainApplication application = (MainApplication) getApplicationContext();
+            final SharedPreferencesHandler preferencesHandler = application
+                    .getSharedPreferencesHandler();
             preferencesHandler.addAppToBlacklist(packageName);
         }
         return super.onStartCommand(intent, flags, startId);
