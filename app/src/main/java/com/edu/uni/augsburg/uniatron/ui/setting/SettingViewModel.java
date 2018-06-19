@@ -34,7 +34,6 @@ public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final SharedPreferencesHandler mHandler;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
-    ;
 
     private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefsListener =
             (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()));
