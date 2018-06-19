@@ -8,9 +8,11 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -31,6 +33,11 @@ import java.util.Map;
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final SharedPreferencesHandler mHandler;
+    private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
+    ;
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefsListener =
+            (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()));
 
     /**
      * Ctr.
@@ -42,14 +49,17 @@ public class SettingViewModel extends AndroidViewModel {
 
         mHandler = ((MainApplication) application).getSharedPreferencesHandler();
 
-        final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
-        observable.setValue(getAllInstalledApps(application));
+        // the blacklist will be instantly updated upon saving the selection the user made
+        PreferenceManager.getDefaultSharedPreferences(application)
+                .registerOnSharedPreferenceChangeListener(mSharedPrefsListener);
+
+        mObservable.setValue(getAllInstalledApps(application));
 
         mInstalledApps = new MediatorLiveData<>();
-        mInstalledApps.addSource(observable, mInstalledApps::setValue);
+        mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
 
         mHandler.setOnBlacklistChangeListener((packageName, added) -> {
-            observable.postValue(getAllInstalledApps(application));
+            mObservable.postValue(getAllInstalledApps(application));
         });
     }
 
