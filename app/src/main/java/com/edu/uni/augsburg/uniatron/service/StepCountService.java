@@ -63,7 +63,6 @@ public class StepCountService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
-
         mYOffset = MULTIPLIER * HALF;
         mScale[0] = -(MULTIPLIER * HALF * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
         mScale[1] = -(MULTIPLIER * HALF * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
