@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
@@ -39,7 +40,7 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = new SharedPreferencesHandler(application.getBaseContext());
+        mHandler = ((MainApplication) application).getSharedPreferencesHandler();
 
         final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
         observable.setValue(getAllInstalledApps(application));

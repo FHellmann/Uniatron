@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 /**
@@ -26,7 +27,7 @@ public class AddBlacklistEntryService extends Service {
         if (intent != null && intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             final String packageName = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
             final SharedPreferencesHandler preferencesHandler =
-                    new SharedPreferencesHandler(getBaseContext());
+                    ((MainApplication) getApplicationContext()).getSharedPreferencesHandler();
             preferencesHandler.addAppToBlacklist(packageName);
         }
         return super.onStartCommand(intent, flags, startId);
