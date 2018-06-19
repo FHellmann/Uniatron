@@ -14,10 +14,13 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -27,6 +30,7 @@ import java.util.Map;
  */
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
+    private final SharedPreferencesHandler mHandler;
 
     /**
      * Ctr.
@@ -36,23 +40,23 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
+        mHandler = ((MainApplication) application).getSharedPreferencesHandler();
+
         final MutableLiveData<Map<String, String>> observable = new MutableLiveData<>();
-        observable.setValue(getAllInstalledApps(application.getBaseContext()));
+        observable.setValue(getAllInstalledApps(application));
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(observable, mInstalledApps::setValue);
 
-        final SharedPreferencesHandler handler =
-                new SharedPreferencesHandler(application.getBaseContext());
-        handler.setOnBlacklistChangeListener((packageName, added) -> {
-            observable.postValue(getAllInstalledApps(application.getBaseContext()));
+        mHandler.setOnBlacklistChangeListener((packageName, added) -> {
+            observable.postValue(getAllInstalledApps(application));
         });
     }
 
     /**
      * Get the installed apps.
      *
-     * @return The app-names.
+     * @return The app name/package name pairs.
      */
     @NonNull
     public LiveData<Map<String, String>> getInstalledApps() {
@@ -71,15 +75,33 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyMap();
         } else {
-            return Stream.of(installedApplications)
+            final Map<String, String> linkedElements = Stream.of(installedApplications)
                     .filter(item -> !item.packageName.equals(
                             context.getApplicationInfo().packageName
                     ))
-                    .sortBy(item -> item.packageName)
+                    .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+                            | ApplicationInfo.FLAG_SYSTEM)) == 0)
                     .collect(Collectors.toMap(
                             key -> key.packageName,
-                            value -> packageManager.getApplicationLabel(value)
-                                    .toString()
+                            value -> packageManager.getApplicationLabel(value).toString()
+                    ));
+
+            final Stream<Map.Entry<String, String>> selectedItems = Stream
+                    .of(linkedElements.entrySet())
+                    .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+
+            final Stream<Map.Entry<String, String>> unselectedItems = Stream
+                    .of(linkedElements.entrySet())
+                    .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
+                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+
+            return Stream.concat(selectedItems, unselectedItems)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (value1, value2) -> value1,
+                            LinkedHashMap::new
                     ));
         }
     }

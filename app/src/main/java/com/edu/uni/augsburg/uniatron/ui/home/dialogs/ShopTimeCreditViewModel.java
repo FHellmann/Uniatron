@@ -37,7 +37,7 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
     public ShopTimeCreditViewModel(@NonNull final Application application) {
         super(application);
 
-        mPrefHandler = new SharedPreferencesHandler(application);
+        mPrefHandler = ((MainApplication) application).getSharedPreferencesHandler();
 
         mRepository = ((MainApplication) application).getRepository();
         mShoppingCart = new ArrayList<>();

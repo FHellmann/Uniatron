@@ -16,6 +16,8 @@ import com.orhanobut.logger.Logger;
  */
 public class MainApplication extends Application {
     private DataRepository mDataRepository;
+    private SharedPreferencesHandler mSharedPreferencesHandler;
+
 
     @Override
     public void onCreate() {
@@ -28,6 +30,9 @@ public class MainApplication extends Application {
             }
         });
         mDataRepository = new DataRepository(AppDatabase.create(this));
+
+        mSharedPreferencesHandler = new SharedPreferencesHandler(this);
+
         NotificationChannels.setupChannels(this);
     }
 
@@ -38,6 +43,15 @@ public class MainApplication extends Application {
      */
     public DataRepository getRepository() {
         return mDataRepository;
+    }
+
+    /**
+     * Get the SharedPreferencesHandler.
+     *
+     * @return The SharedPreferencesHandler.
+     */
+    public SharedPreferencesHandler getSharedPreferencesHandler() {
+        return mSharedPreferencesHandler;
     }
 
 }
