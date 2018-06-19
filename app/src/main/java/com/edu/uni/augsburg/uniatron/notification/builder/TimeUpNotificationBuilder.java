@@ -17,13 +17,17 @@ import com.edu.uni.augsburg.uniatron.ui.MainActivity;
  */
 public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;
+    private final Integer remainingTime;
 
     /**
      * Build Notification to inform user that times running out.
+     *
      * @param context the context
+     * @param remainingTime remaining Time for apps in blacklist
      */
-    public TimeUpNotificationBuilder(@NonNull final Context context) {
+    public TimeUpNotificationBuilder(@NonNull final Context context, final Integer remainingTime) {
         this.mContext = context;
+        this.remainingTime = remainingTime;
     }
 
 
@@ -32,7 +36,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText("Your time is running out in x Minutes")
+                .setContentText("Your time is running out in " + remainingTime + " Minutes!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
                 .setContentIntent(PendingIntent.getService(

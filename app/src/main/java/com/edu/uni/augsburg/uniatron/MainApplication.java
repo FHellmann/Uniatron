@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -35,7 +36,7 @@ public class MainApplication extends Application {
         // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
         mSharedPreferencesHandler = new SharedPreferencesHandler(this);
-
+        NotificationChannels.setupChannels(this);
     }
 
     /**

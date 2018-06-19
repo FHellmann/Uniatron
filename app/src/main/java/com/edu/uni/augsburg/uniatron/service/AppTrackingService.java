@@ -2,11 +2,12 @@ package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.Notification;
 import android.app.Service;
-import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
@@ -20,7 +21,7 @@ import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.orhanobut.logger.Logger;
 import com.rvalerio.fgchecker.AppChecker;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -33,21 +34,15 @@ import java.util.concurrent.TimeUnit;
  * @author Danilo Hoss
  */
 public class AppTrackingService extends Service {
-
-    private static boolean time1min = false;
-    private static boolean time5min = false;
-    private static int lastTime;
-    private static int currentTime;
-
-    final MainApplication mainApplication = (MainApplication) getApplicationContext();
-    final DataRepository repository = mainApplication.getRepository();
-
     private static final int DELAY = 1000; //milliseconds
-    private static final List<String> FILTERS = Arrays.asList(
-            "com.edu.uni.augsburg.uniatron"
-    );
+    private static final List<String> FILTERS = new ArrayList();
+
+
+    private SharedPreferencesHandler mSharedPreferencesHandler;
+    private DataRepository mRepository;
 
     private final AppChecker mAppChecker = new AppChecker();
+
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -55,12 +50,15 @@ public class AppTrackingService extends Service {
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                 Logger.d("ScreenOFF");
                 stopAppChecker();
+                startService(new Intent(getBaseContext(), StepCountService.class));
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 Logger.d("ScreenON");
                 startAppChecker();
+                startService(new Intent(getBaseContext(), StepCountService.class));
             }
         }
     };
+
 
     @Nullable
     @Override
@@ -74,8 +72,22 @@ public class AppTrackingService extends Service {
         final IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.SCREEN_ON");
         filter.addAction("android.intent.action.SCREEN_OFF");
+
+        // get the default launcher
+        final PackageManager localPackageManager = getPackageManager();
+        final Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        final String launcherPackageName = localPackageManager.resolveActivity(intent,
+                PackageManager.MATCH_DEFAULT_ONLY).activityInfo.packageName;
+
+        FILTERS.add(launcherPackageName);
+        FILTERS.add("com.edu.uni.augsburg.uniatron");
+
         registerReceiver(mScreenEventReceiver, filter);
         Logger.d("Service created");
+        final MainApplication mainApplication = (MainApplication) getApplicationContext();
+        mSharedPreferencesHandler = mainApplication.getSharedPreferencesHandler();
+        mRepository = mainApplication.getRepository();
 
         startAppChecker();
     }
@@ -104,7 +116,7 @@ public class AppTrackingService extends Service {
     private void commitAppUsageTime(final String appName, final int timeMillis) {
         if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
             final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
-            repository.addAppUsage(appName, time);
+            mRepository.addAppUsage(appName, time);
         }
     }
 
@@ -116,38 +128,44 @@ public class AppTrackingService extends Service {
 
     private void showTimesUpNotification() {
 
-            //if (true) { //TODO add remaining app usage time
-
-            //TODO create bool if time set and reset if time is increasing
-            //TODO get LiveData from DataRepository
-            final Context context = getApplicationContext();
-            final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context);
-            final Notification notification = builder.build();
-            final int notificationId = builder.getId();
-
-            NotificationManagerCompat.from(context).notify(notificationId, notification);
-       // }
+        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
+        mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(remainingTime -> {
+            if (remainingTime == 5 || remainingTime == 1) {
+                final Context context = AppTrackingService.this.getApplicationContext();
+                final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingTime);
+                final Notification notification = builder.build();
+                final int notificationId = builder.getId();
+                NotificationManagerCompat.from(context).notify(notificationId, notification);
+            }
+            //TODO mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
+        });
     }
-
+/*
     private void blockAppIfNecessary(final String appName) {
-        final MainApplication application = (MainApplication) getApplicationContext();
-        final SharedPreferencesHandler sharedPreferencesHandler =
-                application.getSharedPreferencesHandler();
-        final Set<String> blackList = sharedPreferencesHandler.getAppsBlacklist();
+        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         if (blackList.contains(appName)) {
-            final Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            mRepository.getRemainingAppUsageTimeToday(blackList).observeForever((Integer integer) -> {
+                if (integer <= 0) {
+                    final Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                }
+                //mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
+            });
         }
     }
-
-    private int getRemainingTimeBlacklist(){
-        final MediatorLiveData<Integer> mRemainingTime;
-        mRemainingTime = new MediatorLiveData<>();
-        mRemainingTime.addSource(
-                repository.getRemainingAppUsageTimeToday(),
-                mRemainingTime::setValue
-        );
-        return 1;
+    */
+    private void blockAppIfNecessary(final String appName) {
+        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
+        if (blackList.contains(appName)) {
+            mRepository.getRemainingAppUsageTimeToday(blackList).observeForever((Integer integer) -> {
+                if (integer <= 0) {
+                    final Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                }
+                //mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
+            });
+    }
 }
+
 
 }
