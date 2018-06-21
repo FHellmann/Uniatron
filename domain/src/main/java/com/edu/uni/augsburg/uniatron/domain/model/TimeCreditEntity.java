@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
+import com.edu.uni.augsburg.uniatron.model.TimeCreditType;
 
 import java.util.Date;
 
@@ -27,6 +28,8 @@ public class TimeCreditEntity implements TimeCredit {
     private int mTime;
     @ColumnInfo(name = "steps")
     private int mStepCount;
+    @ColumnInfo(name = "type")
+    private TimeCreditType mType;
 
     public long getId() {
         return mId;
@@ -58,5 +61,13 @@ public class TimeCreditEntity implements TimeCredit {
 
     public void setStepCount(final int stepCount) {
         this.mStepCount = stepCount;
+    }
+
+    public TimeCreditType getType() {
+        return mType;
+    }
+
+    public void setType(final TimeCreditType type) {
+        this.mType = type;
     }
 }

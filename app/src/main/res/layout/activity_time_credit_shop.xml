@@ -16,7 +16,23 @@
         app:popupTheme="@style/Dark.Overlay.LightPopup"
         app:theme="@style/Dark.Overlay" />
 
+    <TextView
+        android:id="@+id/textLearningAidActive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:drawableTop="@drawable/ic_phonelink_lock_black_72dp"
+        android:drawablePadding="@dimen/activity_vertical_margin"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:visibility="gone" />
+
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -24,6 +40,72 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewHeaderEmotion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/emotion_title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupEmotion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:checkedButton="@+id/radioButton3"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioButton"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:foreground="@drawable/selector_emoticon_angry" />
+
+                <RadioButton
+                    android:id="@+id/radioButton2"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:foreground="@drawable/selector_emoticon_sad" />
+
+                <RadioButton
+                    android:id="@+id/radioButton3"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:foreground="@drawable/selector_emoticon_neutral" />
+
+                <RadioButton
+                    android:id="@+id/radioButton4"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:foreground="@drawable/selector_emoticon_happy" />
+
+                <RadioButton
+                    android:id="@+id/radioButton5"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:foreground="@drawable/selector_emoticon_fantastic" />
+            </RadioGroup>
 
             <TextView
                 android:id="@+id/textViewHeaderCreditList"
@@ -44,75 +126,6 @@
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textViewHeaderCreditList" />
 
-            <TextView
-                android:id="@+id/textViewHeaderEmotion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:text="@string/emotion_title"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
-
-            <RadioGroup
-                android:id="@+id/radioGroupEmotion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                android:checkedButton="@+id/radioButton3"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/radioButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_angry"
-                    android:padding="4dp" />
-
-                <RadioButton
-                    android:id="@+id/radioButton2"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_sad"
-                    android:padding="4dp" />
-
-                <RadioButton
-                    android:id="@+id/radioButton3"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_neutral"
-                    android:padding="4dp" />
-
-                <RadioButton
-                    android:id="@+id/radioButton4"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_happy"
-                    android:padding="4dp" />
-
-                <RadioButton
-                    android:id="@+id/radioButton5"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_fantastic"
-                    android:padding="4dp" />
-            </RadioGroup>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

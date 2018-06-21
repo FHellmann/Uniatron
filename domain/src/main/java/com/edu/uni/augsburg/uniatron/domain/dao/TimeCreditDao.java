@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 
 import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
+import com.edu.uni.augsburg.uniatron.domain.converter.TimeCreditTypeConverterUtil;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
  * @author Fabio Hellmann
  */
 @Dao
-@TypeConverters({DateConverterUtil.class})
+@TypeConverters({DateConverterUtil.class, TimeCreditTypeConverterUtil.class})
 public interface TimeCreditDao {
     /**
      * Persist a time credit.
@@ -33,7 +34,7 @@ public interface TimeCreditDao {
      * Query the sum of remaining time credits for the current date.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return the remaining time credits.
      */
     @Query("SELECT TOTAL(time_in_minutes) FROM TimeCreditEntity "
@@ -41,12 +42,16 @@ public interface TimeCreditDao {
     LiveData<Integer> loadTimeCredits(Date dateFrom, Date dateTo);
 
     /**
-     * Query whether the learning aid is active or not.<br>
-     * <b>Note</b>: A learning aid interval is 45 minutes long.
+     * Query whether the learning aid is active or not.
      *
-     * @return {@code true} if the learning aid is active, {@code false} otherwise.
+     * @param searchTimeRange The time range to search.
+     * @return The difference in time to the latest learning aid.
      */
-    @Query("SELECT TOTAL(time_in_minutes) > 0 FROM TimeCreditEntity "
-            + "WHERE timestamp >= strftime('%s', 'now') - 45 * 60 * 1000 AND steps = 0")
-    LiveData<Boolean> isLearningAidActive();
+    @Query("SELECT timestamp "
+            + "FROM TimeCreditEntity "
+            + "WHERE type = 'LEARNING_AID' "
+            + "AND timestamp >= strftime('%s', 'now') * 1000 - :searchTimeRange * 60 * 1000 "
+            + "ORDER BY timestamp DESC "
+            + "LIMIT 1")
+    LiveData<Long> getLatestLearningAid(int searchTimeRange);
 }

@@ -84,7 +84,7 @@ public class DataRepositoryTest {
 
         final TimeCredit liveDataValue = getLiveDataValue(timeCredit);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.getTime(), is(timeCredits.getTimeInMinutes()));
+        assertThat(liveDataValue.getTime(), is(timeCredits.getTime()));
         assertThat(liveDataValue.getStepCount(), is(timeCredits.getStepCount()));
     }
 

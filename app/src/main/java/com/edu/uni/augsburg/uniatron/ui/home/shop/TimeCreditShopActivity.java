@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.annimon.stream.Collectors;
@@ -23,6 +24,8 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +46,10 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     RecyclerView mRecyclerViewCreditList;
     @BindView(R.id.radioGroupEmotion)
     RadioGroup mRadioGroupEmotion;
+    @BindView(R.id.textLearningAidActive)
+    TextView mTextLearningAidInfo;
+    @BindView(R.id.scrollView)
+    ScrollView mScrollView;
 
     private TimeCreditShopViewModel mModel;
     private SharedPreferencesHandler mPrefHandler;
@@ -55,10 +62,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        setSupportActionBar(mToolbar);
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getString(R.string.time_credit_shop_title));
+        setupActionBar();
 
         mPrefHandler = new SharedPreferencesHandler(this);
 
@@ -66,6 +70,37 @@ public class TimeCreditShopActivity extends AppCompatActivity {
                 .get(TimeCreditShopViewModel.class);
         mModel.setShopChangeListener(empty -> mMenuTrade.setVisible(!empty));
 
+        setupRecyclerView();
+
+        final TimeCreditListAdapter adapter = new TimeCreditListAdapter();
+
+        mModel.getLatestLearningAidTimePassed().observe(this, timePassed -> {
+            final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                    - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
+            if (timePassed > 0 && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+                mScrollView.setVisibility(View.GONE);
+                mTextLearningAidInfo.setVisibility(View.VISIBLE);
+                mTextLearningAidInfo.setText(getString(R.string.learning_aid_active, timeLeft));
+            } else {
+                mScrollView.setVisibility(View.VISIBLE);
+                mTextLearningAidInfo.setVisibility(View.GONE);
+            }
+        });
+        mModel.getRemainingStepCountToday().observe(this, stepCount -> {
+            adapter.setStepCount(stepCount);
+            adapter.notifyDataSetChanged();
+        });
+        mRecyclerViewCreditList.setAdapter(adapter);
+    }
+
+    private void setupActionBar() {
+        setSupportActionBar(mToolbar);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.time_credit_shop_title));
+    }
+
+    private void setupRecyclerView() {
         final GridLayoutManager layout = new GridLayoutManager(this, 2);
         layout.setOrientation(GridLayoutManager.VERTICAL);
 
@@ -77,13 +112,6 @@ public class TimeCreditShopActivity extends AppCompatActivity {
         mRecyclerViewCreditList.getItemAnimator().setChangeDuration(ANIMATION_DURATION);
         mRecyclerViewCreditList.getItemAnimator().setMoveDuration(ANIMATION_DURATION);
         mRecyclerViewCreditList.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
-
-        final TimeCreditListAdapter adapter = new TimeCreditListAdapter();
-        mModel.getRemainingStepCountToday().observe(this, stepCount -> {
-            adapter.setStepCount(10000);
-            adapter.notifyDataSetChanged();
-        });
-        mRecyclerViewCreditList.setAdapter(adapter);
     }
 
     @Override
@@ -119,62 +147,62 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     }
 
     final class TimeCreditListAdapter extends
-            RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        private static final int VIEW_TYPE_LEARNING_AID = 0;
-        private static final int VIEW_TYPE_STEPS = 1;
-
+            RecyclerView.Adapter<TimeCreditListAdapter.ViewHolder> {
+        private static final int VIEW_TYPE_LEARNING_AID = 1;
         private int mStepCount;
 
         @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent,
-                                                          final int viewType) {
+        public TimeCreditListAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent,
+                                                                   final int viewType) {
+            return new TimeCreditListAdapter.ViewHolder(getViewByType(parent, viewType));
+        }
+
+        private View getViewByType(@NonNull final ViewGroup parent, final int viewType) {
             if (viewType == VIEW_TYPE_LEARNING_AID) {
-                final View view = LayoutInflater.from(getBaseContext())
-                        .inflate(R.layout.activity_time_credit_shop_card_learning_aid, parent, false);
-                return new ViewHolderSteps(view);
+                return LayoutInflater.from(getBaseContext())
+                        .inflate(R.layout.card_time_credit_shop_learning_aid, parent, false);
+            } else {
+                return LayoutInflater.from(getBaseContext())
+                        .inflate(R.layout.card_time_credit_shop_credit, parent, false);
             }
-            final View view = LayoutInflater.from(getBaseContext())
-                    .inflate(R.layout.activity_time_credit_shop_card_credit, parent, false);
-            return new ViewHolderSteps(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder,
+        public void onBindViewHolder(@NonNull final TimeCreditListAdapter.ViewHolder holder,
                                      final int position) {
             final TimeCredits timeCredits = Stream.of(TimeCredits.values())
                     .sortBy(TimeCredits::getStepCount)
                     .collect(Collectors.toList())
                     .get(position);
 
-            if(timeCredits == TimeCredits.CREDIT_LEARNING) {
-                final ViewHolderLearningAid holderLearningAid = (ViewHolderLearningAid) holder;
-
+            if (mModel.isInShoppingCart(timeCredits)) {
+                final int color = getResources().getColor(R.color.secondaryLightColor);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
             } else {
-                final ViewHolderSteps holderSteps = (ViewHolderSteps) holder;
+                final int color = getResources().getColor(android.R.color.transparent);
+                holder.mTextViewTradeOffer.setBackgroundColor(color);
+            }
+            holder.mValue = timeCredits;
 
-                if (mModel.isInShoppingCart(timeCredits)) {
-                    final int color = getResources().getColor(R.color.secondaryLightColor);
-                    holderSteps.mTextViewTradeOffer.setBackgroundColor(color);
-                } else {
-                    final int color = getResources().getColor(android.R.color.transparent);
-                    holderSteps.mTextViewTradeOffer.setBackgroundColor(color);
-                }
-                holderSteps.mValue = timeCredits;
-                holderSteps.mTextViewTradeOffer.setText(getString(
-                        R.string.card_time_credit_title,
-                        timeCredits.getTimeInMinutes(),
-                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()))
+            if (timeCredits == TimeCredits.CREDIT_LEARNING) {
+                holder.mTextViewTradeOffer.setText(getString(
+                        R.string.card_time_credit_learning,
+                        timeCredits.getTime(),
+                        timeCredits.getBlockedMinutes())
+                );
+            } else {
+                holder.mTextViewTradeOffer.setText(getString(
+                        R.string.card_time_credit_steps,
+                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()),
+                        timeCredits.getTime())
                 );
             }
         }
 
         @Override
         public int getItemViewType(final int position) {
-            if (position == 0) {
-                return VIEW_TYPE_LEARNING_AID;
-            }
-            return VIEW_TYPE_STEPS;
+            return position == 0 ? VIEW_TYPE_LEARNING_AID : 0;
         }
 
         @Override
@@ -189,12 +217,17 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             this.mStepCount = stepCount;
         }
 
-        private final class ViewHolderSteps extends RecyclerView.ViewHolder {
+        /**
+         * The view holder for the time credit item.
+         *
+         * @author Fabio Hellmann
+         */
+        public final class ViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.textViewTradeOffer)
             TextView mTextViewTradeOffer;
             private TimeCredits mValue;
 
-            ViewHolderSteps(final View itemView) {
+            ViewHolder(final View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
             }
@@ -207,14 +240,6 @@ public class TimeCreditShopActivity extends AppCompatActivity {
                     mModel.addToShoppingCart(mValue);
                 }
                 notifyDataSetChanged();
-            }
-        }
-
-        private final class ViewHolderLearningAid extends RecyclerView.ViewHolder {
-
-            public ViewHolderLearningAid(@NonNull final View itemView) {
-                super(itemView);
-                ButterKnife.bind(this, itemView);
             }
         }
     }

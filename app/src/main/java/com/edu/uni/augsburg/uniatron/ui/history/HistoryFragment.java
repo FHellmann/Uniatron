@@ -22,7 +22,6 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.github.marlonlom.utilities.timeago.TimeAgo;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -194,13 +193,7 @@ public class HistoryFragment extends Fragment {
             }
 
             Stream.of(newItems).forEach(item -> {
-                final String timestampFormatted = String.format(
-                        Locale.getDefault(),
-                        "%te. %tb %ty",
-                        item.getTimestamp(),
-                        item.getTimestamp(),
-                        item.getTimestamp()
-                );
+                final String timestampFormatted = formatTimestamp(item.getTimestamp());
                 mSummaryMap.put(timestampFormatted, item);
             });
             notifyDataSetChanged();
@@ -226,7 +219,7 @@ public class HistoryFragment extends Fragment {
             if (holder instanceof ItemViewHolder) {
                 final Summary summary = getItemByIndex(position);
 
-                final String timestampFormatted = TimeAgo.using(summary.getTimestamp().getTime());
+                final String timestampFormatted = formatTimestamp(summary.getTimestamp());
                 final String stepsFormatted = String.valueOf(summary.getSteps());
                 final String timeFormatted = String.format(
                         Locale.getDefault(),
@@ -268,6 +261,16 @@ public class HistoryFragment extends Fragment {
                     return mContext.getResources()
                             .getDrawable(R.drawable.ic_emoticon_neutral_selected);
             }
+        }
+
+        private String formatTimestamp(@NonNull final Date timestamp) {
+            return String.format(
+                    Locale.getDefault(),
+                    "%te. %tb %ty",
+                    timestamp,
+                    timestamp,
+                    timestamp
+            );
         }
 
         @Override

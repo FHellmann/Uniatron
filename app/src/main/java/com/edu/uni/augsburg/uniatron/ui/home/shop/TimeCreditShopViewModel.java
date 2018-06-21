@@ -28,6 +28,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
+    private final MediatorLiveData<Long> mLearningAid;
     private OnShopChangedListener mListener;
 
     /**
@@ -49,6 +50,22 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
                 mRepository.getRemainingStepCountsToday(),
                 mRemainingStepCount::setValue
         );
+
+        mLearningAid = new MediatorLiveData<>();
+        mLearningAid.addSource(
+                mRepository.getLatestLearningAidDiff(TimeCredits.CREDIT_LEARNING.getBlockedMinutes()),
+                mLearningAid::setValue
+        );
+    }
+
+    /**
+     * Check whether the learning aid is active or not.
+     *
+     * @return {@code true} if the learning aid is active {@code false} otherwise.
+     */
+    @NonNull
+    public LiveData<Long> getLatestLearningAidTimePassed() {
+        return mLearningAid;
     }
 
     /**

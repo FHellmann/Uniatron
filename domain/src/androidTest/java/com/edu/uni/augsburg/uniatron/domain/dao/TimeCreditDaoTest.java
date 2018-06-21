@@ -7,12 +7,15 @@ import android.support.test.InstrumentationRegistry;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
@@ -61,6 +64,41 @@ public class TimeCreditDaoTest {
                 .loadTimeCredits(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
 
         assertThat(getLiveDataValue(data), is(10));
+    }
+
+    @Test
+    public void getLatestLearningAidActiveTrue() throws Exception {
+        final TimeCreditEntity testData = new TimeCreditEntity();
+        testData.setType(TimeCredits.CREDIT_LEARNING.getType());
+        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
+        testData.setTimestamp(new Date());
+        mDao.add(testData);
+
+        final LiveData<Long> learningAidActive = mDao.getLatestLearningAid(
+                TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+        );
+
+        final Long liveDataValue = getLiveDataValue(learningAidActive);
+        assertThat(liveDataValue > 0, is(Boolean.TRUE));
+    }
+
+    @Test
+    public void getLatestLearningAidActiveFalse() throws Exception {
+        final TimeCreditEntity testData = new TimeCreditEntity();
+        testData.setType(TimeCredits.CREDIT_LEARNING.getType());
+        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.add(Calendar.MINUTE, -(TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + 1));
+        testData.setTimestamp(calendar.getTime());
+        mDao.add(testData);
+
+        final LiveData<Long> learningAidActive = mDao.getLatestLearningAid(
+                TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+        );
+
+        assertThat(getLiveDataValue(learningAidActive) > 0, is(Boolean.FALSE));
     }
 
     private TimeCreditEntity createTestData(int month) {

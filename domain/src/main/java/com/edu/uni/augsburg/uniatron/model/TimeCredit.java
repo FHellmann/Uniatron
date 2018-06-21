@@ -36,4 +36,11 @@ public interface TimeCredit {
      * @return The step count.
      */
     int getStepCount();
+
+    /**
+     * Get the type.
+     *
+     * @return The type.
+     */
+    TimeCreditType getType();
 }
