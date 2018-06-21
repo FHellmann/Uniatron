@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v7.preference.PreferenceManager;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -32,9 +31,8 @@ import java.util.Map;
  */
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
-    private final SharedPreferencesHandler mHandler;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
-
+    private SharedPreferencesHandler mHandler;
     private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefsListener =
             (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()));
 
@@ -46,11 +44,11 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = ((MainApplication) application).getSharedPreferencesHandler();
+        mHandler = MainApplication.getSharedPreferencesHandler(application);
 
         // the blacklist will be instantly updated upon saving the selection the user made
-        PreferenceManager.getDefaultSharedPreferences(application)
-                .registerOnSharedPreferenceChangeListener(mSharedPrefsListener);
+        MainApplication.getSharedPreferencesHandler(application).
+                registerOnPreferenceChangeListener(mSharedPrefsListener);
 
         mObservable.setValue(getAllInstalledApps(application));
 

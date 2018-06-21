@@ -27,7 +27,7 @@ public class EmotionDialogViewModel extends AndroidViewModel {
     public EmotionDialogViewModel(@NonNull final Application application) {
         super(application);
 
-        mRepository = ((MainApplication) application).getRepository();
+        mRepository = MainApplication.getRepository(application);
     }
 
     /**

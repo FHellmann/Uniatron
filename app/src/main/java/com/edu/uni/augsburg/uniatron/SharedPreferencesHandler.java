@@ -7,6 +7,8 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.orhanobut.logger.Logger;
 
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -96,5 +98,9 @@ public final class SharedPreferencesHandler {
         } else {
             return STEP_FACTOR_EASY;
         }
+    }
+
+    public void registerOnPreferenceChangeListener (OnSharedPreferenceChangeListener listener) {
+        mPrefs.registerOnSharedPreferenceChangeListener(listener);
     }
 }

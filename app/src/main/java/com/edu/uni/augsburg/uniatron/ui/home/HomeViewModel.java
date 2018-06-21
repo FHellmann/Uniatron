@@ -42,10 +42,10 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull final Application application) {
         super(application);
 
-        final DataRepository repository = ((MainApplication) application).getRepository();
+        final DataRepository repository = MainApplication.getRepository(application);
 
-        final SharedPreferencesHandler handler = ((MainApplication) application)
-                .getSharedPreferencesHandler();
+        final SharedPreferencesHandler handler = MainApplication.
+                getSharedPreferencesHandler(application);
 
         final Set<String> blacklist = handler.getAppsBlacklist();
 
