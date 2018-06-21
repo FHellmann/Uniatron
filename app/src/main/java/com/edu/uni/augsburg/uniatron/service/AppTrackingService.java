@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
@@ -119,13 +120,11 @@ public class AppTrackingService extends Service {
 
     private void delegateAppUsage(final String appName, final int timeMillis) {
         //Log.d(getClass().toString(), "delegateAppUsage");
-        commitAppUsageTime(appName, timeMillis);
-        blockAppIfNecessary(appName);
+        blockAppIfNecessary(appName, timeMillis);
         showTimesUpNotification();
     }
 
     private void showTimesUpNotification() {
-
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
             @Override
@@ -143,21 +142,25 @@ public class AppTrackingService extends Service {
         });
     }
 
-    private void blockAppIfNecessary(final String appName) {
+    private void blockAppIfNecessary(final String appName, final Integer timeMillis) {
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         if (blackList.contains(appName)) {
             mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
                 @Override
                 public void onChanged(@Nullable final Integer integer) {
                     if (integer <= 0) {
-                        // Log.d(getClass().toString(), "Integer: " +  integer);
+                        Log.d(getClass().toString(), "Integer: " + integer);
                         // TODO Integer geht unter 0
                         final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
-                        AppTrackingService.this.startActivity(intent);
-                        mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
+                        startActivity(intent);
+                    } else {
+                        commitAppUsageTime(appName, timeMillis);
                     }
+                    mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
                 }
             });
+        } else {
+            commitAppUsageTime(appName, timeMillis);
         }
     }
 }
