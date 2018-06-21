@@ -1,7 +1,5 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
-import android.annotation.TargetApi;
-import android.app.AppOpsManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
@@ -22,6 +21,7 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingFragment;
+import com.rvalerio.fgchecker.Utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mScreenSlideAdapter);
         mViewPager.addOnPageChangeListener(this);
+        mViewPager.setOffscreenPageLimit(mScreenSlideAdapter.mFragments.size());
+        mViewPager.setPageTransformer(true, new CrossFadePageTransformer());
 
         mNavigation.setOnNavigationItemSelectedListener(this);
         mNavigation.setSelectedItemId(R.id.navigation_home);
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             super.onBackPressed();
         } else {
             // Otherwise, select the home screen.
-            mViewPager.setCurrentItem(NAV_POSITION_HOME);
+            mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
         }
     }
 
@@ -114,13 +116,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.navigation_home:
-                mViewPager.setCurrentItem(NAV_POSITION_HOME);
+                mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
                 return true;
             case R.id.navigation_history:
-                mViewPager.setCurrentItem(NAV_POSITION_HISTORY);
+                mViewPager.setCurrentItem(NAV_POSITION_HISTORY, false);
                 return true;
             case R.id.navigation_settings:
-                mViewPager.setCurrentItem(NAV_POSITION_SETTING);
+                mViewPager.setCurrentItem(NAV_POSITION_SETTING, false);
                 return true;
             default:
                 return false;
@@ -134,18 +136,31 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     private void requestUsageStatsPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !hasUsageStatsPermission()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private boolean hasUsageStatsPermission() {
-        final AppOpsManager appOps = (AppOpsManager) getSystemService(APP_OPS_SERVICE);
-        final int mode = appOps.checkOpNoThrow("android:get_usage_stats",
-                android.os.Process.myUid(), getPackageName());
-        return mode == AppOpsManager.MODE_ALLOWED;
+    private static final class CrossFadePageTransformer implements ViewPager.PageTransformer {
+        private static final float ZERO = 0.0f;
+        private static final float MINUS_ONE = -1.0f;
+        private static final float PLUS_ONE = 1.0f;
+
+        @Override
+        public void transformPage(@NonNull final View view, final float position) {
+            if (position <= MINUS_ONE || position >= PLUS_ONE) {
+                view.setTranslationX(view.getWidth() * position);
+                view.setAlpha(ZERO);
+            } else if (position == ZERO) {
+                view.setTranslationX(view.getWidth() * position);
+                view.setAlpha(PLUS_ONE);
+            } else {
+                // position is between -1.0F & 0.0F OR 0.0F & 1.0F
+                view.setTranslationX(view.getWidth() * -position);
+                view.setAlpha(PLUS_ONE - Math.abs(position));
+            }
+        }
     }
 
     static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

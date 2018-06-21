@@ -100,8 +100,9 @@ public class AppTrackingService extends Service {
 
     private void commitAppUsageTime(final String appName, final int timeMillis) {
         if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
-            final MainApplication mainApplication = (MainApplication) getApplicationContext();
-            final DataRepository repository = mainApplication.getRepository();
+
+            final DataRepository repository = MainApplication.getRepository(getBaseContext());
+
             final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
             repository.addAppUsage(appName, time);
         }

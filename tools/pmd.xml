@@ -52,7 +52,7 @@ Severity: HARD
     </rule>
 
     <rule ref="category/java/multithreading.xml">
-        <!-- <exclude name="..." /> -->
+        <exclude name="UseConcurrentHashMap" />
     </rule>
 
     <rule ref="category/java/performance.xml">
