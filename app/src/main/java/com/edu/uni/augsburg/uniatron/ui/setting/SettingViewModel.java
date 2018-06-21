@@ -56,10 +56,6 @@ public class SettingViewModel extends AndroidViewModel {
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
-
-        mHandler.setOnBlacklistChangeListener((packageName, added) -> {
-            mObservable.postValue(getAllInstalledApps(application));
-        });
     }
 
     /**

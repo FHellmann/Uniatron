@@ -29,7 +29,6 @@ public final class SharedPreferencesHandler {
     private static final float STEP_FACTOR_EASY = 1.0f;
 
     private final SharedPreferences mPrefs;
-    private OnBlacklistChangeListener mBlacklistListener;
 
     /**
      * Ctr.
@@ -63,10 +62,6 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
-
-        if (mBlacklistListener != null) {
-            mBlacklistListener.onChanged(packageName, true);
-        }
     }
 
     /**
@@ -83,10 +78,6 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
-
-        if (mBlacklistListener != null) {
-            mBlacklistListener.onChanged(packageName, false);
-        }
     }
 
     /**
@@ -105,40 +96,5 @@ public final class SharedPreferencesHandler {
         } else {
             return STEP_FACTOR_EASY;
         }
-    }
-
-    /**
-     * Get the on blacklist change listener.
-     *
-     * @return The listener.
-     */
-    public OnBlacklistChangeListener getOnBlacklistChangeListener() {
-        return mBlacklistListener;
-    }
-
-    /**
-     * Set the on blacklist change listener.
-     *
-     * @param listener The listener.
-     */
-    public void setOnBlacklistChangeListener(
-            final OnBlacklistChangeListener listener) {
-        this.mBlacklistListener = listener;
-    }
-
-    /**
-     * The listener for on blacklist change events.
-     *
-     * @author Fabio Hellmann
-     */
-    public interface OnBlacklistChangeListener {
-        /**
-         * Will be called when the blacklist is changed by the amount of entries.
-         *
-         * @param packageName The package name.
-         * @param added       {@code true} if the package was installed,
-         *                    {@code false} otherwise
-         */
-        void onChanged(String packageName, boolean added);
     }
 }
