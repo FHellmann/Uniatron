@@ -28,6 +28,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
+    private OnShopChangedListener mListener;
 
     /**
      * Ctr.
@@ -68,6 +69,9 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     public void addToShoppingCart(@NonNull final TimeCredits timeCredits) {
         mShoppingCart.clear(); // We only want one entry
         mShoppingCart.add(timeCredits);
+        if (mListener != null) {
+            mListener.onChange(mShoppingCart.isEmpty());
+        }
     }
 
     /**
@@ -77,6 +81,9 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
      */
     public void removeFromShoppingCart(@NonNull final TimeCredits timeCredits) {
         mShoppingCart.remove(timeCredits);
+        if (mListener != null) {
+            mListener.onChange(mShoppingCart.isEmpty());
+        }
     }
 
     /**
@@ -87,15 +94,6 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
      */
     public boolean isInShoppingCart(@NonNull final TimeCredits timeCredits) {
         return mShoppingCart.contains(timeCredits);
-    }
-
-    /**
-     * Check whether the shopping cart is empty or not.
-     *
-     * @return <code>true</code> if the shopping cart is not empty.
-     */
-    public boolean isShoppingCartNotEmpty() {
-        return !mShoppingCart.isEmpty();
     }
 
     /**
@@ -111,5 +109,28 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
             });
             mRepository.addEmotion(emotion);
         }
+    }
+
+    /**
+     * Set the listener.
+     *
+     * @param listener The listener.
+     */
+    public void setShopChangeListener(@NonNull final OnShopChangedListener listener) {
+        mListener = listener;
+    }
+
+    /**
+     * A listener which will be notified when the shop state changed.
+     *
+     * @author Fabio Hellmann
+     */
+    public interface OnShopChangedListener {
+        /**
+         * Is called when the shop state changed.
+         *
+         * @param empty If the shop is empty or not.
+         */
+        void onChange(boolean empty);
     }
 }
