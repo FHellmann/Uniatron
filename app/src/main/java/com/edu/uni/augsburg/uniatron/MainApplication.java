@@ -22,6 +22,8 @@ public class MainApplication extends Application {
     /**
      * Get the data repository.
      *
+     * @param context The current context of the callee
+     *
      * @return The data repository.
      */
     public static DataRepository getRepository(final Context context) {
@@ -31,6 +33,8 @@ public class MainApplication extends Application {
     /**
      * Get the SharedPreferencesHandler.
      *
+     * @param context The current context of the callee
+
      * @return The SharedPreferencesHandler.
      */
     public static SharedPreferencesHandler getSharedPreferencesHandler(final Context context) {

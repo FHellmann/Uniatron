@@ -100,7 +100,12 @@ public final class SharedPreferencesHandler {
         }
     }
 
-    public void registerOnPreferenceChangeListener (OnSharedPreferenceChangeListener listener) {
+    /**
+     * Register a listener for the SharedPreferences.
+     *
+     * @param listener the listener to register
+     */
+    public void registerOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.registerOnSharedPreferenceChangeListener(listener);
     }
 }
