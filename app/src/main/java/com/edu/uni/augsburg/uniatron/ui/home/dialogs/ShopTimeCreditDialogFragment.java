@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
@@ -66,7 +67,7 @@ public class ShopTimeCreditDialogFragment extends DialogFragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPrefHandler = new SharedPreferencesHandler(getContext());
+        mPrefHandler = MainApplication.getSharedPreferencesHandler(getContext());
 
         mModel = ViewModelProviders.of(this).get(ShopTimeCreditViewModel.class);
 

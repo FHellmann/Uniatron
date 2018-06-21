@@ -42,8 +42,11 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull final Application application) {
         super(application);
 
-        final DataRepository repository = ((MainApplication) application).getRepository();
-        final SharedPreferencesHandler handler = new SharedPreferencesHandler(application.getBaseContext());
+        final DataRepository repository = MainApplication.getRepository(application);
+
+        final SharedPreferencesHandler handler = MainApplication.
+                getSharedPreferencesHandler(application);
+
         final Set<String> blacklist = handler.getAppsBlacklist();
 
         mAppUsages = new MediatorLiveData<>();

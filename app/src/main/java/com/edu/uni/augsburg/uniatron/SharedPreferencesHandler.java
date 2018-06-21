@@ -7,6 +7,8 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.orhanobut.logger.Logger;
 
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,7 +31,6 @@ public final class SharedPreferencesHandler {
     private static final float STEP_FACTOR_EASY = 1.0f;
 
     private final SharedPreferences mPrefs;
-    private OnBlacklistChangeListener mBlacklistListener;
 
     /**
      * Ctr.
@@ -63,10 +64,6 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
-
-        if (mBlacklistListener != null) {
-            mBlacklistListener.onChanged(packageName, true);
-        }
     }
 
     /**
@@ -83,10 +80,6 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
-
-        if (mBlacklistListener != null) {
-            mBlacklistListener.onChanged(packageName, false);
-        }
     }
 
     /**
@@ -108,37 +101,11 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Get the on blacklist change listener.
+     * Register a listener for the SharedPreferences.
      *
-     * @return The listener.
+     * @param listener the listener to register
      */
-    public OnBlacklistChangeListener getOnBlacklistChangeListener() {
-        return mBlacklistListener;
-    }
-
-    /**
-     * Set the on blacklist change listener.
-     *
-     * @param listener The listener.
-     */
-    public void setOnBlacklistChangeListener(
-            final OnBlacklistChangeListener listener) {
-        this.mBlacklistListener = listener;
-    }
-
-    /**
-     * The listener for on blacklist change events.
-     *
-     * @author Fabio Hellmann
-     */
-    public interface OnBlacklistChangeListener {
-        /**
-         * Will be called when the blacklist is changed by the amount of entries.
-         *
-         * @param packageName The package name.
-         * @param added       {@code true} if the package was installed,
-         *                    {@code false} otherwise
-         */
-        void onChanged(String packageName, boolean added);
+    public void registerOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
+        mPrefs.registerOnSharedPreferenceChangeListener(listener);
     }
 }

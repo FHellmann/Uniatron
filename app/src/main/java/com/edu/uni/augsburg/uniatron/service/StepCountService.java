@@ -75,8 +75,7 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     private void commitSteps(final int detectedSteps) {
-        final MainApplication application = (MainApplication) getApplicationContext();
-        final DataRepository dataRepository = application.getRepository();
+        final DataRepository dataRepository = MainApplication.getRepository(getBaseContext());
 
         dataRepository.addStepCount(detectedSteps);
     }
