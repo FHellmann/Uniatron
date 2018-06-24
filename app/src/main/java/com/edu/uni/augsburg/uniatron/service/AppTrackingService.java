@@ -40,6 +40,7 @@ public class AppTrackingService extends Service {
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
+    private Boolean commitStatus = true;
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -120,11 +121,20 @@ public class AppTrackingService extends Service {
 
     private void delegateAppUsage(final String appName, final int timeMillis) {
         //Log.d(getClass().toString(), "delegateAppUsage");
-        blockAppIfNecessary(appName, timeMillis);
+        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
+        blockAppIfNecessary(appName);
+        if(blackList.contains(appName)){
+            if(commitStatus){
+                commitAppUsageTime(appName, timeMillis);
+            }
+        }else{
+            commitAppUsageTime(appName, timeMillis);
+        }
         showTimesUpNotification();
     }
 
     private void showTimesUpNotification() {
+
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
             @Override
@@ -142,25 +152,23 @@ public class AppTrackingService extends Service {
         });
     }
 
-    private void blockAppIfNecessary(final String appName, final Integer timeMillis) {
+    private void blockAppIfNecessary(final String appName) {
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         if (blackList.contains(appName)) {
             mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
                 @Override
                 public void onChanged(@Nullable final Integer integer) {
-                    if (integer <= 0) {
-                        Log.d(getClass().toString(), "Integer: " + integer);
-                        // TODO Integer geht unter 0
+                    if (integer == 0) {
+                        commitStatus = false;
+                        Log.d(getClass().toString(), "Integer: " +  integer); //TODO Integer geht unter 0
                         final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
-                        startActivity(intent);
-                    } else {
-                        commitAppUsageTime(appName, timeMillis);
+                        AppTrackingService.this.startActivity(intent);
+                    }else{
+                        commitStatus = true;
                     }
                     mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
                 }
             });
-        } else {
-            commitAppUsageTime(appName, timeMillis);
         }
     }
 }
