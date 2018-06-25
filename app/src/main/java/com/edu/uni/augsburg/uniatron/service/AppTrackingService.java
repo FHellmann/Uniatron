@@ -130,24 +130,23 @@ public class AppTrackingService extends Service {
         }else{
             commitAppUsageTime(appName, timeMillis);
         }
-        showTimesUpNotification();
+        showTimesUpNotificationIfNecessary();
     }
 
-    private void showTimesUpNotification() {
+    private void showTimesUpNotificationIfNecessary() {
 
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable final Integer remainingTime) {
-                if (remainingTime == 5 || remainingTime == 1) {
+                if (remainingTime == 1000 || remainingTime == 5000 || remainingTime == 10000) {
                     final Context context = AppTrackingService.this.getApplicationContext();
                     final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingTime);
                     final Notification notification = builder.build();
                     final int notificationId = builder.getId();
                     NotificationManagerCompat.from(context).notify(notificationId, notification);
-                    mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
                 }
-
+                mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this::onChanged);
             }
         });
     }
@@ -166,7 +165,7 @@ public class AppTrackingService extends Service {
                     }else{
                         commitStatus = true;
                     }
-                    mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this);
+                    mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this::onChanged);
                 }
             });
         }
