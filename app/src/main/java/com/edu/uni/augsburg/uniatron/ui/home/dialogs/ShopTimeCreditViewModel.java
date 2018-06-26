@@ -37,9 +37,10 @@ public class ShopTimeCreditViewModel extends AndroidViewModel {
     public ShopTimeCreditViewModel(@NonNull final Application application) {
         super(application);
 
-        mPrefHandler = new SharedPreferencesHandler(application);
+        mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
 
-        mRepository = ((MainApplication) application).getRepository();
+        mRepository = MainApplication.getRepository(application);
+
         mShoppingCart = new ArrayList<>();
 
         mRemainingStepCount = new MediatorLiveData<>();

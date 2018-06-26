@@ -38,7 +38,7 @@ public class StepCountService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        commitSteps(5000);
+        commitSteps(200);
         // grab step detector and register the listener
         final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -64,6 +64,7 @@ public class StepCountService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+
         mYOffset = MULTIPLIER * HALF;
         mScale[0] = -(MULTIPLIER * HALF * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
         mScale[1] = -(MULTIPLIER * HALF * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
@@ -75,8 +76,8 @@ public class StepCountService extends Service implements SensorEventListener {
     }
 
     private void commitSteps(final int detectedSteps) {
-        final MainApplication application = (MainApplication) getApplicationContext();
-        final DataRepository dataRepository = application.getRepository();
+        final DataRepository dataRepository = MainApplication.getRepository(getBaseContext());
+
         dataRepository.addStepCount(detectedSteps);
     }
 

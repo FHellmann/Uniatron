@@ -22,7 +22,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     /**
      * Build Notification to inform user that times running out.
      *
-     * @param context the context
+     * @param context       the context
      * @param remainingTime remaining Time for apps in blacklist
      */
     public TimeUpNotificationBuilder(@NonNull final Context context, final Integer remainingTime) {
@@ -36,9 +36,8 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText("Your time is running out in " + remainingTime + " Minutes!")
+                .setContentText("Your time is running out in " + remainingTime / 60 + " Minutes!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
                 .setContentIntent(PendingIntent.getService(
                         mContext,
                         0,

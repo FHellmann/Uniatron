@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
@@ -53,7 +54,8 @@ public class PackageAddedHandler extends BroadcastReceiver {
     }
 
     private void removePackageFromBlacklist(final Context context, final Intent intent) {
-        final SharedPreferencesHandler handler = new SharedPreferencesHandler(context);
+        final SharedPreferencesHandler handler = MainApplication.
+                getSharedPreferencesHandler(context);
         handler.removeAppFromBlacklist(getPackageName(intent));
     }
 

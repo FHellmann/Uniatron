@@ -35,12 +35,15 @@ import java.util.concurrent.TimeUnit;
  * @author Danilo Hoss
  */
 public class AppTrackingService extends Service {
+
     private static final int DELAY = 1000; //milliseconds
     private static final List<String> FILTERS = new ArrayList();
+
+
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
-    private Boolean commitStatus = true;
+    private Boolean commitStatus = false;
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -56,7 +59,6 @@ public class AppTrackingService extends Service {
             }
         }
     };
-
 
     @Nullable
     @Override
@@ -84,9 +86,8 @@ public class AppTrackingService extends Service {
 
         registerReceiver(mScreenEventReceiver, filter);
         Logger.d("Service created");
-        final MainApplication mainApplication = (MainApplication) getApplicationContext();
-        mSharedPreferencesHandler = mainApplication.getSharedPreferencesHandler();
-        mRepository = mainApplication.getRepository();
+        mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
+        mRepository = MainApplication.getRepository(getBaseContext());
 
         startAppChecker();
     }
@@ -123,11 +124,11 @@ public class AppTrackingService extends Service {
         //Log.d(getClass().toString(), "delegateAppUsage");
         final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         blockAppIfNecessary(appName);
-        if(blackList.contains(appName)){
-            if(commitStatus){
+        if (blackList.contains(appName)) {
+            if (commitStatus) {
                 commitAppUsageTime(appName, timeMillis);
             }
-        }else{
+        } else {
             commitAppUsageTime(appName, timeMillis);
         }
         showTimesUpNotificationIfNecessary();
@@ -139,7 +140,8 @@ public class AppTrackingService extends Service {
         mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable final Integer remainingTime) {
-                if (remainingTime == 1000 || remainingTime == 5000 || remainingTime == 10000) {
+                Log.d(getClass().toString(), "Remaining Time: " + remainingTime);
+                if (remainingTime == 60 * 1 || remainingTime == 60 * 5 || remainingTime == 60 * 10) {
                     final Context context = AppTrackingService.this.getApplicationContext();
                     final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingTime);
                     final Notification notification = builder.build();
@@ -159,12 +161,13 @@ public class AppTrackingService extends Service {
                 public void onChanged(@Nullable final Integer integer) {
                     if (integer == 0) {
                         commitStatus = false;
-                        Log.d(getClass().toString(), "Integer: " +  integer); //TODO Integer geht unter 0
                         final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
                         AppTrackingService.this.startActivity(intent);
-                    }else{
+                    } else {
                         commitStatus = true;
                     }
+                    Log.d(getClass().toString(), "Integer: " + integer); //TODO Integer geht unter 0
+                    Log.d(getClass().toString(), "CommitSatus: " +  commitStatus);
                     mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this::onChanged);
                 }
             });

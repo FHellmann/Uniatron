@@ -30,7 +30,7 @@ public class HistoryViewModel extends AndroidViewModel {
     public HistoryViewModel(@NonNull final Application application) {
         super(application);
 
-        mRepository = ((MainApplication) application).getRepository();
+        mRepository = MainApplication.getRepository(application);
 
         mObservableDaySummary = new MediatorLiveData<>();
     }
