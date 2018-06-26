@@ -38,7 +38,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
                 .setContentText("Your time is running out in " + remainingTime / 60 + " Minutes!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(PendingIntent.getService(
+                .setContentIntent(PendingIntent.getActivity(
                         mContext,
                         0,
                         new Intent(mContext, MainActivity.class),
