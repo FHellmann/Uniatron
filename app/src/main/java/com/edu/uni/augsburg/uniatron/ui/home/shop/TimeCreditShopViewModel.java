@@ -53,7 +53,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mLearningAid = new MediatorLiveData<>();
         mLearningAid.addSource(
-                mRepository.getLatestLearningAidDiff(TimeCredits.CREDIT_LEARNING.getBlockedMinutes()),
+                mRepository.getLatestLearningAidDiff(),
                 mLearningAid::setValue
         );
     }

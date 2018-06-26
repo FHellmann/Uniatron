@@ -75,15 +75,14 @@ public final class DataRepository {
     /**
      * Check whether the learning aid is active or not.
      *
-     * @param searchTimeRange The time range to search.
      * @return The difference in time to the latest learning aid.
-     * @see TimeCreditDao#getLatestLearningAid(int)
+     * @see TimeCreditDao#getLatestLearningAid()
      */
     @NonNull
-    public LiveData<Long> getLatestLearningAidDiff(final int searchTimeRange) {
+    public LiveData<Long> getLatestLearningAidDiff() {
         return Transformations.map(
-                mDatabase.timeCreditDao().getLatestLearningAid(searchTimeRange),
-                data -> data == null ? 0 : System.currentTimeMillis() - data
+                mDatabase.timeCreditDao().getLatestLearningAid(),
+                data -> data == null ? 0 : System.currentTimeMillis() - data.getTime()
         );
     }
 

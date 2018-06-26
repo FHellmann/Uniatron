@@ -44,14 +44,12 @@ public interface TimeCreditDao {
     /**
      * Query whether the learning aid is active or not.
      *
-     * @param searchTimeRange The time range to search.
      * @return The difference in time to the latest learning aid.
      */
     @Query("SELECT timestamp "
             + "FROM TimeCreditEntity "
             + "WHERE type = 'LEARNING_AID' "
-            + "AND timestamp >= strftime('%s', 'now') * 1000 - :searchTimeRange * 60 * 1000 "
             + "ORDER BY timestamp DESC "
             + "LIMIT 1")
-    LiveData<Long> getLatestLearningAid(int searchTimeRange);
+    LiveData<Date> getLatestLearningAid();
 }
