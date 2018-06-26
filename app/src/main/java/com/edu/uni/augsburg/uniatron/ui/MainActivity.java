@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
         requestUsageStatsPermission();
+        requestAccuOptimizationDisablePermission();
 
         NotificationChannels.setupChannels(this);
         startServices();
@@ -141,6 +142,12 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                 && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
+    }
+
+    private void requestAccuOptimizationDisablePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
         }
     }
 
