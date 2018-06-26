@@ -21,6 +21,7 @@ import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeO
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -67,38 +68,24 @@ public class TimeCreditDaoTest {
     }
 
     @Test
-    public void getLatestLearningAidActiveTrue() throws Exception {
+    public void getLatestLearningAidActive() throws Exception {
         final TimeCreditEntity testData = new TimeCreditEntity();
         testData.setType(TimeCredits.CREDIT_LEARNING.getType());
         testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
         testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData.setTimestamp(new Date());
         mDao.add(testData);
+        final TimeCreditEntity testData2 = new TimeCreditEntity();
+        testData2.setType(TimeCredits.CREDIT_LEARNING.getType());
+        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData2.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
+        testData2.setTimestamp(new Date());
+        mDao.add(testData2);
 
-        final LiveData<Long> learningAidActive = mDao.getLatestLearningAid(
-                TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-        );
+        final LiveData<Date> learningAidActive = mDao.getLatestLearningAid();
 
-        final Long liveDataValue = getLiveDataValue(learningAidActive);
-        assertThat(liveDataValue > 0, is(Boolean.TRUE));
-    }
-
-    @Test
-    public void getLatestLearningAidActiveFalse() throws Exception {
-        final TimeCreditEntity testData = new TimeCreditEntity();
-        testData.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
-        testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.MINUTE, -(TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + 1));
-        testData.setTimestamp(calendar.getTime());
-        mDao.add(testData);
-
-        final LiveData<Long> learningAidActive = mDao.getLatestLearningAid(
-                TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-        );
-
-        assertThat(getLiveDataValue(learningAidActive) > 0, is(Boolean.FALSE));
+        final Date liveDataValue = getLiveDataValue(learningAidActive);
+        assertThat(liveDataValue, is(equalTo(testData2.getTimestamp())));
     }
 
     private TimeCreditEntity createTestData(int month) {
