@@ -5,9 +5,11 @@ import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -16,20 +18,19 @@ public final class TestUtils {
     }
 
     public static <T> T getLiveDataValue(@NonNull final LiveData<T> liveData) throws InterruptedException {
-        final Object[] data = new Object[1];
-        CountDownLatch latch = new CountDownLatch(1);
+        final List<T> data = new ArrayList<>();
+        final CountDownLatch latch = new CountDownLatch(1);
         Observer<T> observer = new Observer<T>() {
             @Override
             public void onChanged(@Nullable T o) {
-                data[0] = o;
+                data.add(o);
                 latch.countDown();
                 liveData.removeObserver(this);
             }
         };
         liveData.observeForever(observer);
         latch.await(2, TimeUnit.SECONDS);
-        //noinspection unchecked
-        return (T) data[0];
+        return data.get(0);
     }
 
     @NonNull

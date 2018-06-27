@@ -2,7 +2,9 @@ package com.edu.uni.augsburg.uniatron.domain.util;
 
 import org.junit.Test;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -15,9 +17,12 @@ public class DateUtilTest {
 
         final Date date = DateUtil.extractMinTimeOfDate(now);
 
-        assertThat(date.getHours(), is(0));
-        assertThat(date.getMinutes(), is(0));
-        assertThat(date.getSeconds(), is(0));
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+
+        assertThat(calendar.get(Calendar.HOUR_OF_DAY), is(0));
+        assertThat(calendar.get(Calendar.MINUTE), is(0));
+        assertThat(calendar.get(Calendar.SECOND), is(0));
     }
 
     @Test
@@ -26,8 +31,11 @@ public class DateUtilTest {
 
         final Date date = DateUtil.extractMaxTimeOfDate(now);
 
-        assertThat(date.getHours(), is(23));
-        assertThat(date.getMinutes(), is(59));
-        assertThat(date.getSeconds(), is(59));
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+
+        assertThat(calendar.get(Calendar.HOUR_OF_DAY), is(23));
+        assertThat(calendar.get(Calendar.MINUTE), is(59));
+        assertThat(calendar.get(Calendar.SECOND), is(59));
     }
 }
