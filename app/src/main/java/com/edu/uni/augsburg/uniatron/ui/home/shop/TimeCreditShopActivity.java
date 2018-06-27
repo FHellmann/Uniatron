@@ -195,8 +195,8 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             } else {
                 holder.mTextViewTradeOffer.setText(getString(
                         R.string.card_time_credit_steps,
-                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()),
-                        timeCredits.getTime())
+                        timeCredits.getTime(),
+                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()))
                 );
             }
         }

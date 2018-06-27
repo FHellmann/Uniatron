@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,10 +105,8 @@ public class HomeFragment extends Fragment {
         mAppUsagePieChart.setHighlightPerTapEnabled(false);
         mAppUsagePieChart.setNoDataText(getString(R.string.home_chart_no_data));
         mAppUsagePieChart.setCenterTextColor(getResources().getColor(R.color.secondaryTextColor));
-        mAppUsagePieChart.setCenterTextSize(getResources()
-                .getDimension(R.dimen.chart_title_text_size));
-        mAppUsagePieChart.setEntryLabelTextSize(getResources()
-                .getDimension(R.dimen.chart_value_text_size));
+        mAppUsagePieChart.setCenterTextSize(
+                getResources().getDimension(R.dimen.chart_title_text_size));
         mAppUsagePieChart.setEntryLabelColor(getResources().getColor(R.color.primaryTextColor));
 
         final PieDataSet pieDataSet = new PieDataSet(new ArrayList<>(), "");
@@ -126,6 +125,9 @@ public class HomeFragment extends Fragment {
      */
     @OnClick(R.id.stepButton)
     public void onStepButtonClick() {
-        startActivity(new Intent(getContext(), TimeCreditShopActivity.class));
+        final Intent nextIntent = new Intent(getContext(), TimeCreditShopActivity.class);
+        TaskStackBuilder.create(getContext())
+                .addNextIntentWithParentStack(nextIntent)
+                .startActivities();
     }
 }
