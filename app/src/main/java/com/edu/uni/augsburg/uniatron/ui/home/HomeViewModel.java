@@ -29,11 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Fabio Hellmann
  */
 public class HomeViewModel extends AndroidViewModel {
-    /** The maximum count of apps shown as top n apps. */
+    /**
+     * The maximum count of apps shown as top n apps.
+     */
     public static final int MAX_COUNT = 5;
     private final MediatorLiveData<Map<String, Double>> mAppUsages;
     private final MediatorLiveData<Integer> mRemainingStepCount;
     private final MediatorLiveData<Integer> mRemainingAppUsageTime;
+
     /**
      * Ctr.
      *

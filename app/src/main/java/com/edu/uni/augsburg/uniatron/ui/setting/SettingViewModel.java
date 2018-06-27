@@ -7,7 +7,6 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -32,8 +31,6 @@ public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;
-    private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefsListener =
-            (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()));
 
     /**
      * Ctr.
@@ -46,8 +43,9 @@ public class SettingViewModel extends AndroidViewModel {
         mHandler = MainApplication.getSharedPreferencesHandler(application);
 
         // the blacklist will be instantly updated upon saving the selection the user made
-        MainApplication.getSharedPreferencesHandler(application).
-                registerOnPreferenceChangeListener(mSharedPrefsListener);
+        MainApplication.getSharedPreferencesHandler(application).registerOnPreferenceChangeListener(
+                (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()))
+        );
 
         mObservable.setValue(getAllInstalledApps(application));
 
