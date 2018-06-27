@@ -46,6 +46,8 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     RecyclerView mRecyclerViewCreditList;
     @BindView(R.id.radioGroupEmotion)
     RadioGroup mRadioGroupEmotion;
+    @BindView(R.id.layoutLearningAidActive)
+    View mLayoutLearningAid;
     @BindView(R.id.textLearningAidActive)
     TextView mTextLearningAidInfo;
     @BindView(R.id.scrollView)
@@ -79,11 +81,11 @@ public class TimeCreditShopActivity extends AppCompatActivity {
                     - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
             if (timePassed > 0 && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
                 mScrollView.setVisibility(View.GONE);
-                mTextLearningAidInfo.setVisibility(View.VISIBLE);
+                mLayoutLearningAid.setVisibility(View.VISIBLE);
                 mTextLearningAidInfo.setText(getString(R.string.learning_aid_active, timeLeft));
             } else {
                 mScrollView.setVisibility(View.VISIBLE);
-                mTextLearningAidInfo.setVisibility(View.GONE);
+                mLayoutLearningAid.setVisibility(View.GONE);
             }
         });
         mModel.getRemainingStepCountToday().observe(this, stepCount -> {

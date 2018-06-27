@@ -130,9 +130,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     private void startServices() {
-        startService(new Intent(getBaseContext(), BroadcastService.class));
-        startService(new Intent(getBaseContext(), StepCountService.class));
-        startService(new Intent(getBaseContext(), AppTrackingService.class));
+        startService(new Intent(this, BroadcastService.class));
+        startService(new Intent(this, StepCountService.class));
+        startService(new Intent(this, AppTrackingService.class));
     }
 
     private void requestUsageStatsPermission() {
