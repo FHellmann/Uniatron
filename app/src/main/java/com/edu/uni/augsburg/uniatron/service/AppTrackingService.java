@@ -141,7 +141,7 @@ public class AppTrackingService extends Service {
             @Override
             public void onChanged(@Nullable final Integer remainingTime) {
                 Log.d(getClass().toString(), "Remaining Time: " + remainingTime);
-                if (remainingTime == 60 * 1 || remainingTime == 60 * 5 || remainingTime == 60 * 10) {
+                if (remainingTime == (60 * 1)-1 || remainingTime == (60 * 5)-1 || remainingTime == (60 * 10)-1) {
                     final Context context = AppTrackingService.this.getApplicationContext();
                     final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingTime);
                     final Notification notification = builder.build();
