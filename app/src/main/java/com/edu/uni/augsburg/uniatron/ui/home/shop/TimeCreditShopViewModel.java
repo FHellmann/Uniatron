@@ -16,6 +16,7 @@ import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -64,8 +65,18 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
      * @return {@code true} if the learning aid is active {@code false} otherwise.
      */
     @NonNull
-    public LiveData<Long> getLatestLearningAidTimePassed() {
-        return mLearningAid;
+    public LiveData<LearningAid> getLatestLearningAidTimePassed() {
+        return Transformations.map(
+                mLearningAid,
+                timePassed -> {
+                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                            - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
+                    if (timeLeft > 0
+                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+                        return new LearningAid(timePassed > 0, timeLeft);
+                    }
+                    return new LearningAid(false, 0);
+                });
     }
 
     /**

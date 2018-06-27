@@ -25,8 +25,6 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
-import java.util.concurrent.TimeUnit;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -76,13 +74,14 @@ public class TimeCreditShopActivity extends AppCompatActivity {
 
         final TimeCreditListAdapter adapter = new TimeCreditListAdapter();
 
-        mModel.getLatestLearningAidTimePassed().observe(this, timePassed -> {
-            final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-                    - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
-            if (timePassed > 0 && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+        mModel.getLatestLearningAidTimePassed().observe(this, learningAid -> {
+            if (learningAid.isActive()) {
                 mScrollView.setVisibility(View.GONE);
                 mLayoutLearningAid.setVisibility(View.VISIBLE);
-                mTextLearningAidInfo.setText(getString(R.string.learning_aid_active, timeLeft));
+                mTextLearningAidInfo.setText(getString(
+                        R.string.learning_aid_active,
+                        learningAid.getLeftTime()
+                ));
             } else {
                 mScrollView.setVisibility(View.VISIBLE);
                 mLayoutLearningAid.setVisibility(View.GONE);
