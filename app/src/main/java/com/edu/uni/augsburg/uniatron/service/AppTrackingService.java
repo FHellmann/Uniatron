@@ -2,6 +2,7 @@ package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.Notification;
 import android.arch.lifecycle.LifecycleService;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,8 +17,10 @@ import android.util.Log;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.LearningAid;
 import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
@@ -39,6 +42,8 @@ public class AppTrackingService extends LifecycleService {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
     private Boolean commitStatus = false;
+    private int remainingUsageTime = 10;
+    private Long timePassedLearningAid;
 
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
@@ -55,22 +60,22 @@ public class AppTrackingService extends LifecycleService {
             }
         }
     };
-    private int remainingUsageTime= 10;
     private Observer<Integer> remainingUsageTimeObserver = new Observer<Integer>() {
         @Override
         public void onChanged(@Nullable Integer integer) {
-            Log.d(getClass().toString(), "onchanged");
+            //Log.d(getClass().toString(), "onchanged");
             remainingUsageTime = integer;
-
-            if (integer == 59 || integer == 299 || integer == 599) {
-                final Context context = AppTrackingService.this.getApplicationContext();
-                final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, integer + 1);
-                final Notification notification = builder.build();
-                final int notificationId = builder.getId();
-                NotificationManagerCompat.from(context).notify(notificationId, notification);
-            }
         }
     };
+
+    private Observer<Long> learningAidObserver = new Observer<Long>() {
+        @Override
+        public void onChanged(@Nullable Long learningAidDiff) {
+            timePassedLearningAid = learningAidDiff;
+        }
+    };
+
+
 
     @Override
     public void onCreate() {
@@ -99,6 +104,8 @@ public class AppTrackingService extends LifecycleService {
 
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
                 .observe(this, remainingUsageTimeObserver);
+
+        mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
         startAppChecker();
     }
@@ -134,15 +141,23 @@ public class AppTrackingService extends LifecycleService {
 
     private void delegateAppUsage(final String appName, final int timeMillis) {
         Log.d(getClass().toString(), "delegateAppUsage");
-
-
         blockAppIfNecessary(appName);
-
+        blockLearningAid(appName);
+        showNotificationIfNecessary();
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
     }
 
+    private void showNotificationIfNecessary() {
+        if (remainingUsageTime == 59 || remainingUsageTime == 299 || remainingUsageTime == 599) {
+            final Context context = AppTrackingService.this.getApplicationContext();
+            final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingUsageTime + 1);
+            final Notification notification = builder.build();
+            final int notificationId = builder.getId();
+            NotificationManagerCompat.from(context).notify(notificationId, notification);
+        }
+    }
 
     private void blockAppIfNecessary(final String appName) {
         Log.d(getClass().toString(), "Remaining Time: " + remainingUsageTime);
@@ -157,6 +172,20 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
+    private void blockLearningAid(final String appName) {
+        final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                - TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS);
+        if (timeLeft > 0
+                && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+            commitStatus = false;
+            final Intent blockIntent = new Intent(AppTrackingService.this, MainActivity.class);
+            blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            AppTrackingService.this.startActivity(blockIntent);
+        }else{
+            commitStatus = true;
+        }
+    }
 
 
 }
