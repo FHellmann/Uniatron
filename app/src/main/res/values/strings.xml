@@ -4,10 +4,10 @@
     <string name="title_history">History</string>
     <string name="title_settings">Settings</string>
     <string name="app_others">Others</string>
-    <string name="dialog_time_credit_item">%d steps to %d minutes</string>
+    <string name="card_time_credit_steps">%d minutes\nfor %d steps</string>
+    <string name="card_time_credit_learning">%d minutes\nfor %d minutes blocking</string>
     <string name="cancel">Cancel</string>
-    <string name="dialog_time_credit_error_steps_missing">You have no credits available. Just go for a walk and get your credit soon!</string>
-    <string name="dialog_time_credit_shop_title">Time Credit Shop</string>
+    <string name="time_credit_shop_title">Time Credit Shop</string>
     <string name="home_chart_no_data">Have you already used some apps today?</string>
     <string name="pie_chart_center_text">%1$d:%2$02d minute(s)\nremaining</string>
     <string name="trade">Trade</string>
@@ -15,7 +15,7 @@
     <string name="pref_category_general">General</string>
     <string name="pref_dialog_app_selection_title">Blacklist</string>
     <string name="pref_dialog_app_selection_message">Choose the apps you want to block.</string>
-    <string name="dialog_emotion_title">How do you feel?</string>
+    <string name="emotion_title">How do you feel?</string>
     <string name="pref_app_blacklist">Blacklist</string>
     <string name="pref_app_blacklist_summary">Choose which apps to block.</string>
     <string name="pref_fitness_level">Fitness</string>
@@ -26,4 +26,6 @@
     <string name="channel_blacklist">Blacklist</string>
     <string name="notify_package_added">New app installed</string>
     <string name="notify_package_added_summary">Press to add %1$s to the blacklist.</string>
+    <string name="time_credits_header">Choose your time credit!</string>
+    <string name="learning_aid_active">The learning aid is active, you still have to wait %d minutes.</string>
 </resources>

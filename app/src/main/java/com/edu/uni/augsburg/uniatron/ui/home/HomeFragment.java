@@ -1,11 +1,12 @@
 package com.edu.uni.augsburg.uniatron.ui.home;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,7 @@ import android.widget.Button;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.home.dialogs.EmotionDialogFragment;
-import com.edu.uni.augsburg.uniatron.ui.home.dialogs.ShopTimeCreditDialogFragment;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -105,10 +105,8 @@ public class HomeFragment extends Fragment {
         mAppUsagePieChart.setHighlightPerTapEnabled(false);
         mAppUsagePieChart.setNoDataText(getString(R.string.home_chart_no_data));
         mAppUsagePieChart.setCenterTextColor(getResources().getColor(R.color.secondaryTextColor));
-        mAppUsagePieChart.setCenterTextSize(getResources()
-                .getDimension(R.dimen.chart_title_text_size));
-        mAppUsagePieChart.setEntryLabelTextSize(getResources()
-                .getDimension(R.dimen.chart_value_text_size));
+        mAppUsagePieChart.setCenterTextSize(
+                getResources().getDimension(R.dimen.chart_title_text_size));
         mAppUsagePieChart.setEntryLabelColor(getResources().getColor(R.color.primaryTextColor));
 
         final PieDataSet pieDataSet = new PieDataSet(new ArrayList<>(), "");
@@ -127,14 +125,9 @@ public class HomeFragment extends Fragment {
      */
     @OnClick(R.id.stepButton)
     public void onStepButtonClick() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager != null) {
-            final ShopTimeCreditDialogFragment dialogFragment = new ShopTimeCreditDialogFragment();
-            dialogFragment.setOnBuyButtonClickedListener(() -> {
-                final EmotionDialogFragment dialog = new EmotionDialogFragment();
-                dialog.show(fragmentManager, EmotionDialogFragment.NAME);
-            });
-            dialogFragment.show(fragmentManager, ShopTimeCreditDialogFragment.NAME);
-        }
+        final Intent nextIntent = new Intent(getContext(), TimeCreditShopActivity.class);
+        TaskStackBuilder.create(getContext())
+                .addNextIntentWithParentStack(nextIntent)
+                .startActivities();
     }
 }

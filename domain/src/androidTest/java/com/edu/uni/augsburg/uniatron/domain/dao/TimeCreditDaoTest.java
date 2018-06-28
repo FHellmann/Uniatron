@@ -7,17 +7,21 @@ import android.support.test.InstrumentationRegistry;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -61,6 +65,27 @@ public class TimeCreditDaoTest {
                 .loadTimeCredits(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
 
         assertThat(getLiveDataValue(data), is(10));
+    }
+
+    @Test
+    public void getLatestLearningAidActive() throws Exception {
+        final TimeCreditEntity testData = new TimeCreditEntity();
+        testData.setType(TimeCredits.CREDIT_LEARNING.getType());
+        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
+        testData.setTimestamp(new Date());
+        mDao.add(testData);
+        final TimeCreditEntity testData2 = new TimeCreditEntity();
+        testData2.setType(TimeCredits.CREDIT_LEARNING.getType());
+        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData2.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
+        testData2.setTimestamp(new Date());
+        mDao.add(testData2);
+
+        final LiveData<Date> learningAidActive = mDao.getLatestLearningAid();
+
+        final Date liveDataValue = getLiveDataValue(learningAidActive);
+        assertThat(liveDataValue, is(equalTo(testData2.getTimestamp())));
     }
 
     private TimeCreditEntity createTestData(int month) {

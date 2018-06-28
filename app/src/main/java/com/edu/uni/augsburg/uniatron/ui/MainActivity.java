@@ -142,28 +142,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    private static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final Map<Integer, Fragment> mFragments;
-
-        ScreenSlidePagerAdapter(@NonNull final FragmentManager fragmentManager) {
-            super(fragmentManager);
-            mFragments = new LinkedHashMap<>();
-            mFragments.put(NAV_POSITION_HISTORY, new HistoryFragment());
-            mFragments.put(NAV_POSITION_HOME, new HomeFragment());
-            mFragments.put(NAV_POSITION_SETTING, new SettingFragment());
-        }
-
-        @Override
-        public Fragment getItem(final int position) {
-            return mFragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragments.size();
-        }
-    }
-
     private static final class CrossFadePageTransformer implements ViewPager.PageTransformer {
         private static final float ZERO = 0.0f;
         private static final float MINUS_ONE = -1.0f;
@@ -182,6 +160,28 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 view.setTranslationX(view.getWidth() * -position);
                 view.setAlpha(PLUS_ONE - Math.abs(position));
             }
+        }
+    }
+
+    static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        private final Map<Integer, Fragment> mFragments;
+
+        ScreenSlidePagerAdapter(@NonNull final FragmentManager fragmentManager) {
+            super(fragmentManager);
+            mFragments = new LinkedHashMap<>();
+            mFragments.put(NAV_POSITION_HISTORY, new HistoryFragment());
+            mFragments.put(NAV_POSITION_HOME, new HomeFragment());
+            mFragments.put(NAV_POSITION_SETTING, new SettingFragment());
+        }
+
+        @Override
+        public Fragment getItem(final int position) {
+            return mFragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
         }
     }
 }

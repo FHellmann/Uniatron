@@ -21,6 +21,7 @@ import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -84,7 +86,7 @@ public class DataRepositoryTest {
 
         final TimeCredit liveDataValue = getLiveDataValue(timeCredit);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.getTime(), is(timeCredits.getTimeInMinutes()));
+        assertThat(liveDataValue.getTime(), is(timeCredits.getTime()));
         assertThat(liveDataValue.getStepCount(), is(timeCredits.getStepCount()));
     }
 
@@ -101,6 +103,30 @@ public class DataRepositoryTest {
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue, is(value));
         verify(timeCreditDao, atLeastOnce()).loadTimeCredits(any(), any());
+    }
+
+    @Test
+    public void getLatestLearningAidDiffEmpty() throws InterruptedException {
+        final MutableLiveData<Date> liveData = new MutableLiveData<>();
+        liveData.setValue(null);
+        when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
+
+        final LiveData<Long> latestLearningAidDiff = mRepository.getLatestLearningAidDiff();
+
+        final Long liveDataValue = getLiveDataValue(latestLearningAidDiff);
+        assertThat(liveDataValue, is(equalTo(0L)));
+    }
+
+    @Test
+    public void getLatestLearningAidDiff() throws InterruptedException {
+        final MutableLiveData<Date> liveData = new MutableLiveData<>();
+        liveData.setValue(new Date());
+        when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
+
+        final LiveData<Long> latestLearningAidDiff = mRepository.getLatestLearningAidDiff();
+
+        final Long liveDataValue = getLiveDataValue(latestLearningAidDiff);
+        assertThat(liveDataValue > 0, is(true));
     }
 
     @Test
@@ -280,6 +306,20 @@ public class DataRepositoryTest {
         final List<Emotion> liveDataValue = getLiveDataValue(allEmotions);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue.size(), is(emotionEntities.size()));
+    }
+
+    @Test
+    public void getAllEmotionsEmpty() throws InterruptedException {
+        final MutableLiveData<List<EmotionEntity>> mutableLiveData = new MutableLiveData<>();
+        mutableLiveData.setValue(new ArrayList<>());
+
+        when(emotionDao.getAll(any(), any())).thenReturn(mutableLiveData);
+
+        final LiveData<List<Emotion>> allEmotions = mRepository.getAllEmotions(new Date());
+
+        final List<Emotion> liveDataValue = getLiveDataValue(allEmotions);
+        assertThat(liveDataValue, is(notNullValue()));
+        assertThat(liveDataValue.isEmpty(), is(true));
     }
 
     @Test

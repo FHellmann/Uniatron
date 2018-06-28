@@ -65,7 +65,7 @@ public final class DatabaseUtil {
 
         final TimeCredits timeCredits = TimeCredits.CREDIT_100;
 
-        timeCreditEntity.setTime(timeCredits.getTimeInMinutes());
+        timeCreditEntity.setTime(timeCredits.getTime());
         timeCreditEntity.setTimestamp(getRandomDate(index));
         timeCreditEntity.setStepCount(timeCredits.getStepCount());
 

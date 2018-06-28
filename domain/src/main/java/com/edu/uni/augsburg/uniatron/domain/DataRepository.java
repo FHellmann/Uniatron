@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -18,7 +19,6 @@ import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.StepCount;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.Collections;
 import java.util.Date;
@@ -50,25 +50,40 @@ public final class DataRepository {
     /**
      * Add a new time credit.
      *
-     * @param timeCredits The time credit will be generated out of this.
-     * @param factor      The factor to multiply with.
+     * @param timeCredit The time credit will be generated out of this.
+     * @param factor     The factor to multiply with.
      * @return The time credit.
      */
-    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredits timeCredits,
+    public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredit timeCredit,
                                               final double factor) {
         final MutableLiveData<TimeCredit> observable = new MutableLiveData<>();
         new AsyncTaskWrapper<>(
                 () -> {
                     final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-                    timeCreditEntity.setTime(timeCredits.getTimeInMinutes());
-                    timeCreditEntity.setStepCount((int) (timeCredits.getStepCount() * factor));
+                    timeCreditEntity.setTime(timeCredit.getTime());
+                    timeCreditEntity.setStepCount((int) (timeCredit.getStepCount() * factor));
                     timeCreditEntity.setTimestamp(new Date());
+                    timeCreditEntity.setType(timeCredit.getType());
                     mDatabase.timeCreditDao().add(timeCreditEntity);
                     return timeCreditEntity;
                 },
                 observable::setValue
         ).execute();
         return observable;
+    }
+
+    /**
+     * Check whether the learning aid is active or not.
+     *
+     * @return The difference in time to the latest learning aid.
+     * @see TimeCreditDao#getLatestLearningAid()
+     */
+    @NonNull
+    public LiveData<Long> getLatestLearningAidDiff() {
+        return Transformations.map(
+                mDatabase.timeCreditDao().getLatestLearningAid(),
+                data -> data == null ? 0 : System.currentTimeMillis() - data.getTime()
+        );
     }
 
     /**
