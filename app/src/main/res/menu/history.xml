@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/setting"
-        app:showAsAction="never"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/settings" />
+        android:title="@string/settings"
+        app:showAsAction="never" />
 
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/group_by_day"
+            android:checked="true"
             android:title="@string/group_by_day" />
         <item
             android:id="@+id/group_by_month"

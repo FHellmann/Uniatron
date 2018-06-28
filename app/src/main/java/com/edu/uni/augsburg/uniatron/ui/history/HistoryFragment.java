@@ -20,19 +20,22 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.SummaryGroupBy;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
-import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +59,7 @@ public class HistoryFragment extends Fragment {
 
     private Date mDateTo;
     private Date mDateFrom;
+    private ItemAdapter mHistoryItemAdapter;
 
     @Nullable
     @Override
@@ -88,16 +92,17 @@ public class HistoryFragment extends Fragment {
         mRecyclerViewHistory.getItemAnimator().setMoveDuration(ANIMATION_DURATION);
         mRecyclerViewHistory.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
 
-        final ItemAdapter itemAdapter = new ItemAdapter(mRecyclerViewHistory);
-        mRecyclerViewHistory.setAdapter(itemAdapter);
+        mHistoryItemAdapter = new ItemAdapter(mRecyclerViewHistory);
+        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
+        mRecyclerViewHistory.setAdapter(mHistoryItemAdapter);
 
         mDateTo = new Date();
         mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
         model.registerDateRange(mDateFrom, mDateTo);
 
-        model.getSummary().observe(this, itemAdapter::addItems);
+        model.getSummary().observe(this, mHistoryItemAdapter::addItems);
 
-        itemAdapter.setOnLoadMoreListener(() -> {
+        mHistoryItemAdapter.setOnLoadMoreListener(() -> {
             // define next interval to load
             mDateTo = mDateFrom;
             mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
@@ -121,10 +126,16 @@ public class HistoryFragment extends Fragment {
                                 .startActivities();
                         return true;
                     case R.id.group_by_day:
+                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
+                        menuItem.setChecked(true);
                         return true;
                     case R.id.group_by_month:
+                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.MONTH);
+                        menuItem.setChecked(true);
                         return true;
                     case R.id.group_by_year:
+                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.YEAR);
+                        menuItem.setChecked(true);
                         return true;
                     default:
                         return false;
@@ -182,12 +193,14 @@ public class HistoryFragment extends Fragment {
         private static final int VIEW_TYPE_LOADING = 1;
         private static final int VISIBLE_THRESHOLD = 5;
 
-        private final Map<String, Summary> mSummaryMap = new ConcurrentHashMap<>();
+        private final Map<Date, Summary> mSummaryMap = new ConcurrentHashMap<>();
+        private List<Summary> mContentList = new ArrayList<>();
         private final Context mContext;
 
         private OnLoadMoreListener mOnLoadMoreListener;
 
         private boolean isLoading;
+        private SummaryGroupBy mGroupByOrder;
 
         ItemAdapter(@NonNull final RecyclerView recyclerView) {
             super();
@@ -217,6 +230,11 @@ public class HistoryFragment extends Fragment {
             });
         }
 
+        private void setGroupByOrder(@NonNull final SummaryGroupBy groupByOrder) {
+            mGroupByOrder = groupByOrder;
+            addItems(Collections.emptyList());
+        }
+
         private void setOnLoadMoreListener(@NonNull final OnLoadMoreListener onLoadMoreListener) {
             this.mOnLoadMoreListener = onLoadMoreListener;
         }
@@ -226,11 +244,14 @@ public class HistoryFragment extends Fragment {
                 notifyItemRemoved(getItemCount());
                 isLoading = false;
             }
-
+            // Add the new items to the map, if their not already existing
             Stream.of(newItems).forEach(item -> {
-                final String timestampFormatted = formatTimestamp(item.getTimestamp());
-                mSummaryMap.put(timestampFormatted, item);
+                final Date date = DateUtil.extractMinTimeOfDate(item.getTimestamp());
+                mSummaryMap.put(date, item);
             });
+            // Group all the entries by the selected group by rule
+            mContentList = mGroupByOrder.groupBy(mSummaryMap.values());
+            // Notify the view to update
             notifyDataSetChanged();
         }
 
@@ -252,11 +273,11 @@ public class HistoryFragment extends Fragment {
         public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder,
                                      final int position) {
             if (holder instanceof ItemViewHolder) {
-                final Summary summary = getItemByIndex(position);
+                final Summary summary = mContentList.get(position);
 
-                final String timestampFormatted = formatTimestamp(summary.getTimestamp());
-                final String stepsFormatted = String.valueOf(summary.getSteps());
-                final String timeFormatted = String.format(
+                final String timestamp = mGroupByOrder.formatTimestamp(summary.getTimestamp());
+                final String steps = String.valueOf(summary.getSteps());
+                final String usageTime = String.format(
                         Locale.getDefault(),
                         "%d:%02d",
                         summary.getAppUsageTime() / 60,
@@ -264,9 +285,9 @@ public class HistoryFragment extends Fragment {
                 );
 
                 final ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-                itemViewHolder.mTextViewDate.setText(timestampFormatted);
-                itemViewHolder.mTextViewSteps.setText(stepsFormatted);
-                itemViewHolder.mTextViewUsageTime.setText(timeFormatted);
+                itemViewHolder.mTextViewDate.setText(timestamp);
+                itemViewHolder.mTextViewSteps.setText(steps);
+                itemViewHolder.mTextViewUsageTime.setText(usageTime);
 
                 final Emotions emotion = Emotions.getAverage(summary.getEmotionAvg());
                 final Drawable drawable = getEmoticonDrawable(emotion);
@@ -298,32 +319,14 @@ public class HistoryFragment extends Fragment {
             }
         }
 
-        private String formatTimestamp(@NonNull final Date timestamp) {
-            return String.format(
-                    Locale.getDefault(),
-                    "%te. %tb %ty",
-                    timestamp,
-                    timestamp,
-                    timestamp
-            );
-        }
-
         @Override
         public int getItemCount() {
-            return mSummaryMap.size() + (isLoading ? 1 : 0);
+            return mContentList.size() + (isLoading ? 1 : 0);
         }
 
         @Override
         public int getItemViewType(final int position) {
             return getItemCount() - 1 == position && isLoading ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
-        }
-
-        private Summary getItemByIndex(final int position) {
-            return Stream.of(mSummaryMap.entrySet())
-                    .sorted((item1, item2) -> item2.getKey().compareTo(item1.getKey()))
-                    .collect(Collectors.toList())
-                    .get(position)
-                    .getValue();
         }
     }
 
