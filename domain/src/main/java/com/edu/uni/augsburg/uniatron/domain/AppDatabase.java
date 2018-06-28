@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
 import com.edu.uni.augsburg.uniatron.domain.converter.EmotionConverterUtil;
+import com.edu.uni.augsburg.uniatron.domain.converter.TimeCreditTypeConverterUtil;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.EmotionDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
@@ -30,7 +31,11 @@ import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
         TimeCreditEntity.class,
         EmotionEntity.class
 })
-@TypeConverters({DateConverterUtil.class, EmotionConverterUtil.class})
+@TypeConverters({
+        DateConverterUtil.class,
+        EmotionConverterUtil.class,
+        TimeCreditTypeConverterUtil.class
+})
 public abstract class AppDatabase extends RoomDatabase {
 
     /**

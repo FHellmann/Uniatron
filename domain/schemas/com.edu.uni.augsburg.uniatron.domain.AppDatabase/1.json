@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "775fd66688c4ef01224d0099dd240198",
+    "identityHash": "356972e7326a26c0d32a6b2e25b1561c",
     "entities": [
       {
         "tableName": "StepCountEntity",
@@ -85,7 +85,7 @@
       },
       {
         "tableName": "TimeCreditEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER, `time_in_minutes` INTEGER NOT NULL, `steps` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER, `time_in_minutes` INTEGER NOT NULL, `steps` INTEGER NOT NULL, `type` TEXT)",
         "fields": [
           {
             "fieldPath": "mId",
@@ -110,6 +110,12 @@
             "columnName": "steps",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "mType",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -156,7 +162,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"775fd66688c4ef01224d0099dd240198\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"356972e7326a26c0d32a6b2e25b1561c\")"
     ]
   }
 }

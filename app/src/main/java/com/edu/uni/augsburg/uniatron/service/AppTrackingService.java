@@ -36,10 +36,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class AppTrackingService extends Service {
 
-    private static final int DELAY = 1000; //milliseconds
-    private static final List<String> FILTERS = new ArrayList();
-
-
+    private static final int DELAY_IN_MILLISECONDS = 1000;
+    private static final List<String> FILTERS = new ArrayList<>();
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
@@ -144,8 +142,8 @@ public class AppTrackingService extends Service {
     }
 
     private void startAppChecker() {
-        mAppChecker.whenAny((String process) -> delegateAppUsage(process, DELAY))
-                .timeout(DELAY)
+        mAppChecker.whenAny(process -> commitAppUsageTime(process, DELAY_IN_MILLISECONDS))
+                .timeout(DELAY_IN_MILLISECONDS)
                 .start(getBaseContext());
     }
 
@@ -213,4 +211,3 @@ public class AppTrackingService extends Service {
         }
     }
 }
-

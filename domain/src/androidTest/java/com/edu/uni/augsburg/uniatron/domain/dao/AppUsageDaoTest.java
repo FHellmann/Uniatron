@@ -131,7 +131,7 @@ public class AppUsageDaoTest {
 
         final TimeCredits credits = TimeCredits.CREDIT_1000;
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(credits.getTimeInMinutes());
+        timeCreditEntity.setTime(credits.getTime());
         timeCreditEntity.setStepCount(credits.getStepCount());
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
@@ -146,7 +146,7 @@ public class AppUsageDaoTest {
 
         final Integer liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(credits.getTimeInMinutes() * 60 - test.getTime()));
+        assertThat(liveDataValue, is(credits.getTime() * 60 - test.getTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {
