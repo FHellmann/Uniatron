@@ -96,6 +96,10 @@ public class AppTrackingService extends LifecycleService {
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
         mRepository = MainApplication.getRepository(getBaseContext());
 
+
+        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                .observe(this, remainingUsageTimeObserver);
+
         startAppChecker();
     }
 
@@ -131,8 +135,6 @@ public class AppTrackingService extends LifecycleService {
     private void delegateAppUsage(final String appName, final int timeMillis) {
         Log.d(getClass().toString(), "delegateAppUsage");
 
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                .observe(this, remainingUsageTimeObserver);
 
         blockAppIfNecessary(appName);
 
