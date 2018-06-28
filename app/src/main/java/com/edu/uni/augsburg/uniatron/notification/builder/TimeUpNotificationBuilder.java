@@ -33,10 +33,13 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
+        final String detailedText = "Your time is running out in " +
+                (int) Math.round(remainingTime / 60.0f) +
+                " Minute" + (Math.round(remainingTime / 60.0f) == 1 ? "!" : "s!" );
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText("Your time is running out in " + remainingTime / 60 + " Minutes!")
+                .setContentText(detailedText)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
