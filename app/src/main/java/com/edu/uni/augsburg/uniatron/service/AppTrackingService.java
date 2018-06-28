@@ -204,7 +204,9 @@ public class AppTrackingService extends Service {
         Log.d(getClass().toString(), "Remaining Time: " + lastRecordedAppUsageTime);
         if (lastRecordedAppUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
+
             final Intent blockIntent = new Intent(AppTrackingService.this, MainActivity.class);
+            blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             AppTrackingService.this.startActivity(blockIntent);
         } else {
             commitStatus = true;
