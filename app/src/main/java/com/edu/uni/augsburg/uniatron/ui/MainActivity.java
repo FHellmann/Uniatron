@@ -1,50 +1,64 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
+import android.support.design.bottomappbar.BottomAppBar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
-import com.edu.uni.augsburg.uniatron.ui.setting.SettingFragment;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * The main activity is the entry point of the app.
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener,
-        BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements TabLayout
+        .BaseOnTabSelectedListener, ViewPager.OnPageChangeListener {
 
-    private static final int NAV_POSITION_HISTORY = 0;
-    private static final int NAV_POSITION_HOME = 1;
-    private static final int NAV_POSITION_SETTING = 2;
+    private static final int NAV_POSITION_HOME = 0;
+    private static final int NAV_POSITION_HISTORY = 1;
 
     @BindView(R.id.viewPager)
     ViewPager mViewPager;
-    @BindView(R.id.navigation)
-    BottomNavigationView mNavigation;
+    @BindView(R.id.bar)
+    BottomAppBar mBottomAppBar;
+    @BindView(R.id.tabs)
+    TabLayout mTabLayout;
+    @BindView(R.id.textNavSteps)
+    TextView mTextNavSteps;
+    @BindView(R.id.textNavMinutes)
+    TextView mTextNavMinutes;
+
+    private final Map<Fragment, OnTabSelectedListener> mListeners = new ConcurrentHashMap<>();
+    private ScreenSlidePagerAdapter mScreenSlideAdapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -52,51 +66,79 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        setSupportActionBar(mBottomAppBar);
 
-        final ScreenSlidePagerAdapter mScreenSlideAdapter =
-                new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mScreenSlideAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mScreenSlideAdapter);
-        mViewPager.addOnPageChangeListener(this);
-        mViewPager.setOffscreenPageLimit(mScreenSlideAdapter.mFragments.size());
         mViewPager.setPageTransformer(true, new CrossFadePageTransformer());
-
-        mNavigation.setOnNavigationItemSelectedListener(this);
-        mNavigation.setSelectedItemId(R.id.navigation_home);
+        mViewPager.addOnPageChangeListener(this);
+        mTabLayout.addOnTabSelectedListener(this);
+        mViewPager.setCurrentItem(NAV_POSITION_HOME);
 
         requestUsageStatsPermission();
 
         startServices();
+
+        final MainActivityViewModel model = ViewModelProviders.of(this)
+                .get(MainActivityViewModel.class);
+        model.getRemainingAppUsageTime().observe(this,
+                data -> mTextNavMinutes.setText(
+                        getString(R.string.nav_text_minutes, data, data % 60)));
+        model.getRemainingStepCountToday().observe(this,
+                data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
+    }
+
+    /**
+     * Get the bottom app bar.
+     *
+     * @return the bottom app bar.
+     */
+    public BottomAppBar getBottomAppBar() {
+        return mBottomAppBar;
+    }
+
+    /**
+     * Adds a tab listener.
+     *
+     * @param fragment The fragment to register.
+     * @param listener The listener.
+     */
+    public void addTabListener(@NonNull final Fragment fragment,
+                               @NonNull final OnTabSelectedListener listener) {
+        mListeners.put(fragment, listener);
+        // Select initial start position
+        onPageSelected(NAV_POSITION_HOME);
+    }
+
+    /**
+     * Is called when the fab is clicked.
+     */
+    @OnClick(R.id.fab)
+    public void onFabClicked() {
+        final Intent nextIntent = new Intent(this, TimeCreditShopActivity.class);
+        TaskStackBuilder.create(this)
+                .addNextIntentWithParentStack(nextIntent)
+                .startActivities();
     }
 
     @Override
-    public void onPageScrolled(final int position,
-                               final float positionOffset,
-                               final int positionOffsetPixels) {
-        // can be ignored
+    public void onPageScrolled(final int i, final float v, final int i1) {
+        // ignored
     }
 
     @Override
-    public void onPageSelected(final int position) {
-        switch (position) {
-            case NAV_POSITION_HISTORY:
-                mNavigation.setSelectedItemId(R.id.navigation_history);
-                break;
-            case NAV_POSITION_SETTING:
-                mNavigation.setSelectedItemId(R.id.navigation_settings);
-                break;
-            case NAV_POSITION_HOME:
-            default:
-                mNavigation.setSelectedItemId(R.id.navigation_home);
-                break;
-        }
+    public void onPageSelected(final int i) {
+        final Fragment fragment = mScreenSlideAdapter.mFragments.get(i);
+        Stream.of(mListeners.entrySet())
+                .filter(entry -> entry.getKey().equals(fragment))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .ifPresent(OnTabSelectedListener::onTabSelected);
     }
 
     @Override
-    public void onPageScrollStateChanged(final int state) {
-        // can be ignored
+    public void onPageScrollStateChanged(final int i) {
+        // ignored
     }
 
     @Override
@@ -112,23 +154,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.navigation_home:
-                mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
-                return true;
-            case R.id.navigation_history:
-                mViewPager.setCurrentItem(NAV_POSITION_HISTORY, false);
-                return true;
-            case R.id.navigation_settings:
-                mViewPager.setCurrentItem(NAV_POSITION_SETTING, false);
-                return true;
-            default:
-                return false;
-        }
-    }
-
     private void startServices() {
         startService(new Intent(this, BroadcastService.class));
         startService(new Intent(this, StepCountService.class));
@@ -140,6 +165,28 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
+    }
+
+    @Override
+    public void onTabSelected(final TabLayout.Tab tab) {
+        switch (tab.getPosition()) {
+            case NAV_POSITION_HOME:
+                mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
+                break;
+            case NAV_POSITION_HISTORY:
+                mViewPager.setCurrentItem(NAV_POSITION_HISTORY, false);
+                break;
+        }
+    }
+
+    @Override
+    public void onTabUnselected(final TabLayout.Tab tab) {
+        // not relevant
+    }
+
+    @Override
+    public void onTabReselected(final TabLayout.Tab tab) {
+        // not relevant
     }
 
     private static final class CrossFadePageTransformer implements ViewPager.PageTransformer {
@@ -171,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             mFragments = new LinkedHashMap<>();
             mFragments.put(NAV_POSITION_HISTORY, new HistoryFragment());
             mFragments.put(NAV_POSITION_HOME, new HomeFragment());
-            mFragments.put(NAV_POSITION_SETTING, new SettingFragment());
         }
 
         @Override
@@ -183,5 +229,17 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         public int getCount() {
             return mFragments.size();
         }
+    }
+
+    /**
+     * A tab selection listener.
+     *
+     * @author Fabio Hellmann
+     */
+    public interface OnTabSelectedListener {
+        /**
+         * Called when a tab is selected.
+         */
+        void onTabSelected();
     }
 }

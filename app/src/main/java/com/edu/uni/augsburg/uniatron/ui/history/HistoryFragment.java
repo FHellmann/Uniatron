@@ -2,11 +2,14 @@ package com.edu.uni.augsburg.uniatron.ui.history;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.bottomappbar.BottomAppBar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +25,9 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
+import com.edu.uni.augsburg.uniatron.ui.MainActivity;
+import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
+import com.orhanobut.logger.Logger;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -66,6 +72,8 @@ public class HistoryFragment extends Fragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setupBottomNavigation();
+
         final HistoryViewModel model = ViewModelProviders.of(this).get(HistoryViewModel.class);
 
         final LinearLayoutManager layout = new LinearLayoutManager(getContext());
@@ -95,6 +103,33 @@ public class HistoryFragment extends Fragment {
             mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
 
             model.registerDateRange(mDateFrom, mDateTo);
+        });
+    }
+
+    private void setupBottomNavigation() {
+        final MainActivity activity = (MainActivity) getActivity();
+        activity.addTabListener(this, () -> {
+            final BottomAppBar bottomAppBar = activity.getBottomAppBar();
+            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
+            bottomAppBar.replaceMenu(R.menu.history);
+            bottomAppBar.setOnMenuItemClickListener(menuItem -> {
+                switch (menuItem.getItemId()) {
+                    case R.id.setting:
+                        final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
+                        TaskStackBuilder.create(getContext())
+                                .addNextIntentWithParentStack(nextIntent)
+                                .startActivities();
+                        return true;
+                    case R.id.group_by_day:
+                        return true;
+                    case R.id.group_by_month:
+                        return true;
+                    case R.id.group_by_year:
+                        return true;
+                    default:
+                        return false;
+                }
+            });
         });
     }
 
