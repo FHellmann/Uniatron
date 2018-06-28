@@ -2,24 +2,19 @@ package com.edu.uni.augsburg.uniatron.ui.home;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -28,13 +23,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * The {@link HomeFragment} is the first screen the user will be seen.
@@ -63,7 +56,6 @@ public class HomeFragment extends Fragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupBottomNavigation();
         final PieDataSet pieDataSet = setupChart();
 
         final HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
@@ -86,24 +78,28 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupBottomNavigation();
+    }
+
     private void setupBottomNavigation() {
         final MainActivity activity = (MainActivity) getActivity();
-        activity.addTabListener(this, () -> {
-            final BottomAppBar bottomAppBar = activity.getBottomAppBar();
-            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
-            bottomAppBar.replaceMenu(R.menu.home);
-            bottomAppBar.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.setting:
-                        final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
-                        TaskStackBuilder.create(getContext())
-                                .addNextIntentWithParentStack(nextIntent)
-                                .startActivities();
-                        return true;
-                    default:
-                        return false;
-                }
-            });
+        final BottomAppBar bottomAppBar = activity.getBottomAppBar();
+        bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
+        bottomAppBar.replaceMenu(R.menu.home);
+        bottomAppBar.setOnMenuItemClickListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.setting:
+                    final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
+                    TaskStackBuilder.create(getContext())
+                            .addNextIntentWithParentStack(nextIntent)
+                            .startActivities();
+                    return true;
+                default:
+                    return false;
+            }
         });
     }
 

@@ -76,8 +76,6 @@ public class HistoryFragment extends Fragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupBottomNavigation();
-
         final HistoryViewModel model = ViewModelProviders.of(this).get(HistoryViewModel.class);
 
         final LinearLayoutManager layout = new LinearLayoutManager(getContext());
@@ -111,36 +109,40 @@ public class HistoryFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupBottomNavigation();
+    }
+
     private void setupBottomNavigation() {
         final MainActivity activity = (MainActivity) getActivity();
-        activity.addTabListener(this, () -> {
-            final BottomAppBar bottomAppBar = activity.getBottomAppBar();
-            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
-            bottomAppBar.replaceMenu(R.menu.history);
-            bottomAppBar.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.setting:
-                        final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
-                        TaskStackBuilder.create(getContext())
-                                .addNextIntentWithParentStack(nextIntent)
-                                .startActivities();
-                        return true;
-                    case R.id.group_by_day:
-                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
-                        menuItem.setChecked(true);
-                        return true;
-                    case R.id.group_by_month:
-                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.MONTH);
-                        menuItem.setChecked(true);
-                        return true;
-                    case R.id.group_by_year:
-                        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.YEAR);
-                        menuItem.setChecked(true);
-                        return true;
-                    default:
-                        return false;
-                }
-            });
+        final BottomAppBar bottomAppBar = activity.getBottomAppBar();
+        bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
+        bottomAppBar.replaceMenu(R.menu.history);
+        bottomAppBar.setOnMenuItemClickListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.setting:
+                    final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
+                    TaskStackBuilder.create(getContext())
+                            .addNextIntentWithParentStack(nextIntent)
+                            .startActivities();
+                    return true;
+                case R.id.group_by_day:
+                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
+                    menuItem.setChecked(true);
+                    return true;
+                case R.id.group_by_month:
+                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.MONTH);
+                    menuItem.setChecked(true);
+                    return true;
+                case R.id.group_by_year:
+                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.YEAR);
+                    menuItem.setChecked(true);
+                    return true;
+                default:
+                    return false;
+            }
         });
     }
 

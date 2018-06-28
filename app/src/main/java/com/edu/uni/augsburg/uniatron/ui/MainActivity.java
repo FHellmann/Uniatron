@@ -10,14 +10,11 @@ import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.TextView;
 
-import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
@@ -29,7 +26,6 @@ import com.rvalerio.fgchecker.Utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,14 +36,11 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements TabLayout
-        .BaseOnTabSelectedListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnTabSelectedListener {
 
     private static final int NAV_POSITION_HOME = 0;
     private static final int NAV_POSITION_HISTORY = 1;
 
-    @BindView(R.id.viewPager)
-    ViewPager mViewPager;
     @BindView(R.id.bar)
     BottomAppBar mBottomAppBar;
     @BindView(R.id.tabs)
@@ -57,8 +50,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout
     @BindView(R.id.textNavMinutes)
     TextView mTextNavMinutes;
 
-    private final Map<Fragment, OnTabSelectedListener> mListeners = new ConcurrentHashMap<>();
-    private ScreenSlidePagerAdapter mScreenSlideAdapter;
+    private FragmentViewChanger mFragmentViewChanger;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -68,12 +60,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout
 
         setSupportActionBar(mBottomAppBar);
 
-        mScreenSlideAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mScreenSlideAdapter);
-        mViewPager.setPageTransformer(true, new CrossFadePageTransformer());
-        mViewPager.addOnPageChangeListener(this);
+        mFragmentViewChanger = new FragmentViewChanger(getSupportFragmentManager());
+        mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
         mTabLayout.addOnTabSelectedListener(this);
-        mViewPager.setCurrentItem(NAV_POSITION_HOME);
 
         requestUsageStatsPermission();
 
@@ -98,19 +87,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout
     }
 
     /**
-     * Adds a tab listener.
-     *
-     * @param fragment The fragment to register.
-     * @param listener The listener.
-     */
-    public void addTabListener(@NonNull final Fragment fragment,
-                               @NonNull final OnTabSelectedListener listener) {
-        mListeners.put(fragment, listener);
-        // Select initial start position
-        onPageSelected(NAV_POSITION_HOME);
-    }
-
-    /**
      * Is called when the fab is clicked.
      */
     @OnClick(R.id.fab)
@@ -122,35 +98,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout
     }
 
     @Override
-    public void onPageScrolled(final int i, final float v, final int i1) {
-        // ignored
-    }
-
-    @Override
-    public void onPageSelected(final int i) {
-        final Fragment fragment = mScreenSlideAdapter.mFragments.get(i);
-        Stream.of(mListeners.entrySet())
-                .filter(entry -> entry.getKey().equals(fragment))
-                .findFirst()
-                .map(Map.Entry::getValue)
-                .ifPresent(OnTabSelectedListener::onTabSelected);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(final int i) {
-        // ignored
-    }
-
-    @Override
     public void onBackPressed() {
-        if (mViewPager.getCurrentItem() == NAV_POSITION_HOME) {
+        if (mTabLayout.getSelectedTabPosition() == NAV_POSITION_HOME) {
             // If the user is currently looking at the home screen,
             // allow the system to handle the Back button. This
             // calls finish() on this activity and pops the back stack.
             super.onBackPressed();
         } else {
             // Otherwise, select the home screen.
-            mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
+            mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
         }
     }
 
@@ -171,10 +127,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout
     public void onTabSelected(final TabLayout.Tab tab) {
         switch (tab.getPosition()) {
             case NAV_POSITION_HOME:
-                mViewPager.setCurrentItem(NAV_POSITION_HOME, false);
+                mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
                 break;
             case NAV_POSITION_HISTORY:
-                mViewPager.setCurrentItem(NAV_POSITION_HISTORY, false);
+                mFragmentViewChanger.setContentFragment(NAV_POSITION_HISTORY);
                 break;
         }
     }
@@ -189,57 +145,23 @@ public class MainActivity extends AppCompatActivity implements TabLayout
         // not relevant
     }
 
-    private static final class CrossFadePageTransformer implements ViewPager.PageTransformer {
-        private static final float ZERO = 0.0f;
-        private static final float MINUS_ONE = -1.0f;
-        private static final float PLUS_ONE = 1.0f;
+    private static final class FragmentViewChanger {
+        @NonNull
+        private final FragmentManager mFragmentManager;
+        private final Map<Integer, Fragment> mFragmentMap;
 
-        @Override
-        public void transformPage(@NonNull final View view, final float position) {
-            if (position <= MINUS_ONE || position >= PLUS_ONE) {
-                view.setTranslationX(view.getWidth() * position);
-                view.setAlpha(ZERO);
-            } else if (position == ZERO) {
-                view.setTranslationX(view.getWidth() * position);
-                view.setAlpha(PLUS_ONE);
-            } else {
-                // position is between -1.0F & 0.0F OR 0.0F & 1.0F
-                view.setTranslationX(view.getWidth() * -position);
-                view.setAlpha(PLUS_ONE - Math.abs(position));
-            }
-        }
-    }
-
-    static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final Map<Integer, Fragment> mFragments;
-
-        ScreenSlidePagerAdapter(@NonNull final FragmentManager fragmentManager) {
-            super(fragmentManager);
-            mFragments = new LinkedHashMap<>();
-            mFragments.put(NAV_POSITION_HISTORY, new HistoryFragment());
-            mFragments.put(NAV_POSITION_HOME, new HomeFragment());
+        private FragmentViewChanger(@NonNull final FragmentManager fragmentManager) {
+            mFragmentManager = fragmentManager;
+            mFragmentMap = new LinkedHashMap<>();
+            mFragmentMap.put(NAV_POSITION_HOME, new HomeFragment());
+            mFragmentMap.put(NAV_POSITION_HISTORY, new HistoryFragment());
         }
 
-        @Override
-        public Fragment getItem(final int position) {
-            return mFragments.get(position);
+        private void setContentFragment(final int position) {
+            final FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(android.R.id.content, mFragmentMap.get(position));
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         }
-
-        @Override
-        public int getCount() {
-            return mFragments.size();
-        }
-    }
-
-    /**
-     * A tab selection listener.
-     *
-     * @author Fabio Hellmann
-     */
-    public interface OnTabSelectedListener {
-        /**
-         * Called when a tab is selected.
-         */
-        void onTabSelected();
     }
 }
