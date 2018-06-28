@@ -142,7 +142,7 @@ public class AppTrackingService extends Service {
     }
 
     private void startAppChecker() {
-        mAppChecker.whenAny(process -> commitAppUsageTime(process, DELAY_IN_MILLISECONDS))
+        mAppChecker.whenAny(process -> delegateAppUsage(process, DELAY_IN_MILLISECONDS))
                 .timeout(DELAY_IN_MILLISECONDS)
                 .start(getBaseContext());
     }
@@ -196,7 +196,6 @@ public class AppTrackingService extends Service {
             NotificationManagerCompat.from(context).notify(notificationId, notification);
         }
     }
-
 
     private void blockAppIfNecessary(final String appName) {
         Log.d(getClass().toString(), "Remaining Time: " + lastRecordedAppUsageTime);
