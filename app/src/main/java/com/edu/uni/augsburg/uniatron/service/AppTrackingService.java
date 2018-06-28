@@ -1,15 +1,13 @@
 package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.Notification;
-import android.app.Service;
+import android.arch.lifecycle.LifecycleService;
 import android.arch.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
@@ -20,7 +18,6 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
-import com.orhanobut.logger.Logger;
 import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
@@ -34,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Danilo Hoss
  */
-public class AppTrackingService extends Service {
+public class AppTrackingService extends LifecycleService {
 
     private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final List<String> FILTERS = new ArrayList<>();
@@ -42,72 +39,38 @@ public class AppTrackingService extends Service {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
     private Boolean commitStatus = false;
-    private int lastRecordedAppUsageTime;
-    private final Observer<Integer> appUsageTimeObserver = new Observer<Integer>() {
-        @Override
-        public void onChanged(@Nullable final Integer remainingTime) {
-            Logger.d("in onChanged");
-            if (remainingTime == null) {
-                Logger.d("nullpointerexc");
-            }
-            else {
-                lastRecordedAppUsageTime = remainingTime;
-            }
-        }
-    };
 
-
-    //TODO hier wird die Blacklist noch nicht
-    // aktualisiert außer man startet die App neu
-    private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener
-            = new SharedPreferences.OnSharedPreferenceChangeListener() {
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                    .removeObserver(appUsageTimeObserver);
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                    .observeForever(appUsageTimeObserver);
-        }
-    };
-    /*
-        private final Observer<Integer> observerAppUsage = new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable final Integer remainingTime) {
-                final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
-                if (remainingTime == 0) {
-                    commitStatus = false;
-                    final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
-                    AppTrackingService.this.startActivity(intent);
-                } else {
-                    commitStatus = true;
-                }
-                Log.d(getClass().toString(), "Integer: " + remainingTime); //TODO Integer geht unter 0
-                Log.d(getClass().toString(), "CommitSatus: " + commitStatus);
-            }
-        };
-    */
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                Logger.d("ScreenOFF");
+                //Logger.d("ScreenOFF");
                 stopAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
-                Logger.d("ScreenON");
+                //Logger.d("ScreenON");
                 startAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             }
         }
     };
+    private int remainingUsageTime= 10;
+    private Observer<Integer> remainingUsageTimeObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(@Nullable Integer integer) {
+            Log.d(getClass().toString(), "onchanged");
+            remainingUsageTime = integer;
 
-    @Nullable
-    @Override
-    public IBinder onBind(final Intent intent) {
-        return null;
-    }
+            if (integer == 59 || integer == 299 || integer == 599) {
+                final Context context = AppTrackingService.this.getApplicationContext();
+                final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, integer + 1);
+                final Notification notification = builder.build();
+                final int notificationId = builder.getId();
+                NotificationManagerCompat.from(context).notify(notificationId, notification);
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -128,15 +91,10 @@ public class AppTrackingService extends Service {
         FILTERS.add("com.edu.uni.augsburg.uniatron");
 
         registerReceiver(mScreenEventReceiver, filter);
-        Logger.d("Service created");
+        //Logger.d("Service created");
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
         mRepository = MainApplication.getRepository(getBaseContext());
-
-        mSharedPreferencesHandler.registerOnPreferenceChangeListener(onSharedPreferenceChangeListener);
-
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                .observeForever(appUsageTimeObserver);
 
         startAppChecker();
     }
@@ -151,22 +109,15 @@ public class AppTrackingService extends Service {
         mAppChecker.stop();
     }
 
-    @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        Logger.d("onDestroy");
+        //Log.d(getClass().toString(), "onDestroy");
         unregisterReceiver(mScreenEventReceiver);
-
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                .removeObserver(appUsageTimeObserver);
-
-        mSharedPreferencesHandler.
-                unRegisterOnPreferenceChangeListener(onSharedPreferenceChangeListener);
-
         super.onDestroy();
     }
 
@@ -178,28 +129,22 @@ public class AppTrackingService extends Service {
     }
 
     private void delegateAppUsage(final String appName, final int timeMillis) {
-        //Log.d(getClass().toString(), "delegateAppUsage");
+        Log.d(getClass().toString(), "delegateAppUsage");
+
+        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                .observe(this, remainingUsageTimeObserver);
+
         blockAppIfNecessary(appName);
-        showTimesUpNotificationIfNecessary();
 
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
     }
 
-    private void showTimesUpNotificationIfNecessary() {
-        if (lastRecordedAppUsageTime == 59 || lastRecordedAppUsageTime == 299 || lastRecordedAppUsageTime == 599) {
-            final Context context = AppTrackingService.this.getApplicationContext();
-            final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, lastRecordedAppUsageTime + 1);
-            final Notification notification = builder.build();
-            final int notificationId = builder.getId();
-            NotificationManagerCompat.from(context).notify(notificationId, notification);
-        }
-    }
 
     private void blockAppIfNecessary(final String appName) {
-        Log.d(getClass().toString(), "Remaining Time: " + lastRecordedAppUsageTime);
-        if (lastRecordedAppUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        Log.d(getClass().toString(), "Remaining Time: " + remainingUsageTime);
+        if (remainingUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
 
             final Intent blockIntent = new Intent(AppTrackingService.this, MainActivity.class);
@@ -209,4 +154,7 @@ public class AppTrackingService extends Service {
             commitStatus = true;
         }
     }
+
+
+
 }
