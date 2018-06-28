@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -24,7 +25,6 @@ import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,6 +44,51 @@ public class AppTrackingService extends Service {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
     private Boolean commitStatus = false;
+    private int lastRecordedAppUsageTime;
+    private final Observer<Integer> appUsageTimeObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(@Nullable final Integer remainingTime) {
+            Logger.d("in onChanged");
+            if (remainingTime == null) {
+                Logger.d("nullpointerexc");
+            }
+            else {
+                lastRecordedAppUsageTime = remainingTime;
+            }
+        }
+    };
+
+
+    //TODO hier wird die Blacklist noch nicht
+    // aktualisiert außer man startet die App neu
+    private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener
+            = new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .removeObserver(appUsageTimeObserver);
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .observeForever(appUsageTimeObserver);
+        }
+    };
+    /*
+        private final Observer<Integer> observerAppUsage = new Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable final Integer remainingTime) {
+                final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
+                if (remainingTime == 0) {
+                    commitStatus = false;
+                    final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
+                    AppTrackingService.this.startActivity(intent);
+                } else {
+                    commitStatus = true;
+                }
+                Log.d(getClass().toString(), "Integer: " + remainingTime); //TODO Integer geht unter 0
+                Log.d(getClass().toString(), "CommitSatus: " + commitStatus);
+            }
+        };
+    */
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -86,8 +131,14 @@ public class AppTrackingService extends Service {
 
         registerReceiver(mScreenEventReceiver, filter);
         Logger.d("Service created");
+
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
         mRepository = MainApplication.getRepository(getBaseContext());
+
+        mSharedPreferencesHandler.registerOnPreferenceChangeListener(onSharedPreferenceChangeListener);
+
+        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                .observeForever(appUsageTimeObserver);
 
         startAppChecker();
     }
@@ -109,7 +160,15 @@ public class AppTrackingService extends Service {
 
     @Override
     public void onDestroy() {
+        Logger.d("onDestroy");
         unregisterReceiver(mScreenEventReceiver);
+
+        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                .removeObserver(appUsageTimeObserver);
+
+        mSharedPreferencesHandler.
+                unRegisterOnPreferenceChangeListener(onSharedPreferenceChangeListener);
+
         super.onDestroy();
     }
 
@@ -122,55 +181,34 @@ public class AppTrackingService extends Service {
 
     private void delegateAppUsage(final String appName, final int timeMillis) {
         //Log.d(getClass().toString(), "delegateAppUsage");
-        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
         blockAppIfNecessary(appName);
-        if (blackList.contains(appName)) {
-            if (commitStatus) {
-                commitAppUsageTime(appName, timeMillis);
-            }
-        } else {
+        showTimesUpNotificationIfNecessary();
+
+        if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
-        showTimesUpNotificationIfNecessary();
     }
 
     private void showTimesUpNotificationIfNecessary() {
-
-        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
-        mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable final Integer remainingTime) {
-                Log.d(getClass().toString(), "Remaining Time: " + remainingTime);
-                if (remainingTime == (60 * 1)-1 || remainingTime == (60 * 5)-1 || remainingTime == (60 * 10)-1) {
-                    final Context context = AppTrackingService.this.getApplicationContext();
-                    final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingTime);
-                    final Notification notification = builder.build();
-                    final int notificationId = builder.getId();
-                    NotificationManagerCompat.from(context).notify(notificationId, notification);
-                }
-                mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this::onChanged);
-            }
-        });
+        if (lastRecordedAppUsageTime == 59 || lastRecordedAppUsageTime == 299 || lastRecordedAppUsageTime == 599) {
+            final Context context = AppTrackingService.this.getApplicationContext();
+            final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, lastRecordedAppUsageTime + 1);
+            final Notification notification = builder.build();
+            final int notificationId = builder.getId();
+            NotificationManagerCompat.from(context).notify(notificationId, notification);
+        }
     }
 
+
     private void blockAppIfNecessary(final String appName) {
-        final Set<String> blackList = mSharedPreferencesHandler.getAppsBlacklist();
-        if (blackList.contains(appName)) {
-            mRepository.getRemainingAppUsageTimeToday(blackList).observeForever(new Observer<Integer>() {
-                @Override
-                public void onChanged(@Nullable final Integer integer) {
-                    if (integer == 0) {
-                        commitStatus = false;
-                        final Intent intent = new Intent(AppTrackingService.this, MainActivity.class);
-                        AppTrackingService.this.startActivity(intent);
-                    } else {
-                        commitStatus = true;
-                    }
-                    Log.d(getClass().toString(), "Integer: " + integer); //TODO Integer geht unter 0
-                    Log.d(getClass().toString(), "CommitSatus: " +  commitStatus);
-                    mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(this::onChanged);
-                }
-            });
+        Log.d(getClass().toString(), "Remaining Time: " + lastRecordedAppUsageTime);
+        if (lastRecordedAppUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+            commitStatus = false;
+            final Intent blockIntent = new Intent(AppTrackingService.this, MainActivity.class);
+            AppTrackingService.this.startActivity(blockIntent);
+        } else {
+            commitStatus = true;
         }
     }
 }
+

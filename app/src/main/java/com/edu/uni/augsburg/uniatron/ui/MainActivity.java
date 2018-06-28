@@ -1,8 +1,10 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         mNavigation.setSelectedItemId(R.id.navigation_home);
 
         requestUsageStatsPermission();
-        requestAccuOptimizationDisablePermission();
+        requestBatteryOptimizationDisablePermission();
 
         NotificationChannels.setupChannels(this);
         startServices();
@@ -145,10 +147,22 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    private void requestAccuOptimizationDisablePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    private void requestBatteryOptimizationDisablePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
             startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
         }
+    }
+
+    private boolean checkBatteryOptimized() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final Context context = this.getApplicationContext();
+            final String name = context.getPackageName();
+            final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (powerManager.isIgnoringBatteryOptimizations(name)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static final class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

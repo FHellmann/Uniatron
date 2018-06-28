@@ -38,6 +38,7 @@ public class StepCountService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        commitSteps(100);
         // grab step detector and register the listener
         final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
