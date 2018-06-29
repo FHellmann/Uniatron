@@ -11,6 +11,7 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 
 /**
  * Notification is shown when the time is running out soon.
@@ -33,9 +34,10 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
-        final String detailedText = "Your time is running out in "
+        final String detailedText =
                 + (int) Math.round(remainingTime / 60.0f)
-                + " Minute" + (Math.round(remainingTime / 60.0f) == 1 ? "!" : "s!");
+                + " Minute" + (Math.round(remainingTime / 60.0f) == 1 ? "" : "s") +
+                        " left! Tap to get more time";
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
@@ -44,7 +46,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
                         0,
-                        new Intent(mContext, MainActivity.class),
+                        new Intent(mContext, TimeCreditShopActivity.class),
                         PendingIntent.FLAG_CANCEL_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
