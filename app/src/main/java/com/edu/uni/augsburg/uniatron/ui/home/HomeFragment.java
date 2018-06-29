@@ -79,27 +79,25 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setupBottomNavigation();
-    }
-
-    private void setupBottomNavigation() {
+    public void onStart() {
+        super.onStart();
         final MainActivity activity = (MainActivity) getActivity();
         final BottomAppBar bottomAppBar = activity.getBottomAppBar();
+        bottomAppBar.post(() -> setupBottomAppBar(bottomAppBar));
+    }
+
+    private void setupBottomAppBar(@NonNull final BottomAppBar bottomAppBar) {
         bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
         bottomAppBar.replaceMenu(R.menu.home);
         bottomAppBar.setOnMenuItemClickListener(menuItem -> {
-            switch (menuItem.getItemId()) {
-                case R.id.setting:
-                    final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
-                    TaskStackBuilder.create(getContext())
-                            .addNextIntentWithParentStack(nextIntent)
-                            .startActivities();
-                    return true;
-                default:
-                    return false;
+            if (R.id.setting == menuItem.getItemId()) {
+                final Intent nextIntent = new Intent(getContext(), SettingActivity.class);
+                TaskStackBuilder.create(getContext())
+                        .addNextIntentWithParentStack(nextIntent)
+                        .startActivities();
+                return true;
             }
+            return false;
         });
     }
 

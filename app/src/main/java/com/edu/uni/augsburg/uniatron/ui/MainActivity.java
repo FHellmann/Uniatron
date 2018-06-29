@@ -61,12 +61,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         setSupportActionBar(mBottomAppBar);
 
         mFragmentViewChanger = new FragmentViewChanger(getSupportFragmentManager());
-        mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
+        mFragmentViewChanger.selectHome();
         mTabLayout.addOnTabSelectedListener(this);
-
-        requestUsageStatsPermission();
-
-        startServices();
 
         final MainActivityViewModel model = ViewModelProviders.of(this)
                 .get(MainActivityViewModel.class);
@@ -75,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                         getString(R.string.nav_text_minutes, data, data % 60)));
         model.getRemainingStepCountToday().observe(this,
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
+
+        requestUsageStatsPermission();
+        startServices();
     }
 
     /**
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
             super.onBackPressed();
         } else {
             // Otherwise, select the home screen.
-            mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
+            mFragmentViewChanger.selectHome();
         }
     }
 
@@ -125,13 +124,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
     @Override
     public void onTabSelected(final TabLayout.Tab tab) {
-        switch (tab.getPosition()) {
-            case NAV_POSITION_HOME:
-                mFragmentViewChanger.setContentFragment(NAV_POSITION_HOME);
-                break;
-            case NAV_POSITION_HISTORY:
-                mFragmentViewChanger.setContentFragment(NAV_POSITION_HISTORY);
-                break;
+        if (NAV_POSITION_HOME == tab.getPosition()) {
+            mFragmentViewChanger.selectHome();
+        } else if (NAV_POSITION_HISTORY == tab.getPosition()) {
+            mFragmentViewChanger.selectHistory();
         }
     }
 
@@ -150,16 +146,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         private final FragmentManager mFragmentManager;
         private final Map<Integer, Fragment> mFragmentMap;
 
-        private FragmentViewChanger(@NonNull final FragmentManager fragmentManager) {
+        FragmentViewChanger(@NonNull final FragmentManager fragmentManager) {
             mFragmentManager = fragmentManager;
             mFragmentMap = new LinkedHashMap<>();
             mFragmentMap.put(NAV_POSITION_HOME, new HomeFragment());
             mFragmentMap.put(NAV_POSITION_HISTORY, new HistoryFragment());
         }
 
+        private void selectHome() {
+            setContentFragment(NAV_POSITION_HOME);
+        }
+
+        private void selectHistory() {
+            setContentFragment(NAV_POSITION_HISTORY);
+        }
+
         private void setContentFragment(final int position) {
             final FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(android.R.id.content, mFragmentMap.get(position));
+            final Fragment fragment = mFragmentMap.get(position);
+            fragmentTransaction.replace(R.id.content_fragment, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }

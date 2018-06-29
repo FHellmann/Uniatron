@@ -110,14 +110,14 @@ public class HistoryFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setupBottomNavigation();
-    }
-
-    private void setupBottomNavigation() {
+    public void onStart() {
+        super.onStart();
         final MainActivity activity = (MainActivity) getActivity();
         final BottomAppBar bottomAppBar = activity.getBottomAppBar();
+        bottomAppBar.post(() -> setupBottomAppBar(bottomAppBar));
+    }
+
+    private void setupBottomAppBar(@NonNull final BottomAppBar bottomAppBar) {
         bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
         bottomAppBar.replaceMenu(R.menu.history);
         bottomAppBar.setOnMenuItemClickListener(menuItem -> {

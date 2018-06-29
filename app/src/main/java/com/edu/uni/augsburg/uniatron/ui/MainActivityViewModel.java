@@ -14,7 +14,8 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import java.util.Set;
 
 /**
- * The {@link MainActivityViewModel} provides the data for the {@link MainActivity}.
+ * The {@link MainActivityViewModel} provides the data for
+ * the {@link MainActivity}.
  *
  * @author Fabio Hellmann
  */

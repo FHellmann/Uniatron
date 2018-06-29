@@ -13,9 +13,10 @@
         android:layout_weight="1">
 
         <FrameLayout
-            android:id="@android:id/content"
+            android:id="@+id/content_fragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_marginBottom="?attr/actionBarSize" />
 
         <android.support.design.bottomappbar.BottomAppBar
             android:id="@+id/bar"
@@ -25,7 +26,8 @@
             app:backgroundTint="@color/primaryColor"
             app:fabAlignmentMode="center"
             app:fabAttached="true"
-            app:fabCradleVerticalOffset="12dp"
+            app:fabCradleMargin="8dp"
+            app:fabCradleRoundedCornerRadius="6dp"
             app:hideOnScroll="true"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />

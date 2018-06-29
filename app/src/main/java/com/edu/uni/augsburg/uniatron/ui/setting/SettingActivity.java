@@ -38,28 +38,30 @@ public class SettingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setOnMenuItemClickListener(menuItem -> {
-            switch (menuItem.getItemId()) {
-                case android.R.id.home:
-                    finish();
-                    return true;
-                default:
-                    return false;
+            if (android.R.id.home == menuItem.getItemId()) {
+                finish();
+                return true;
             }
+            return false;
         });
 
         // Display the fragment as the main content.
         getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new GeneralPreferences())
+                .replace(R.id.setting_content, new GeneralPreferences())
                 .commit();
     }
 
+    /**
+     * The preference fragment for the general part.
+     *
+     * @author Fabio Hellmann
+     */
     public static class GeneralPreferences extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(final Bundle bundle, final String root) {
             setPreferencesFromResource(R.xml.preferences, root);
 
-            final SettingViewModel mModel = ViewModelProviders.of(this).get
-                    (SettingViewModel.class);
+            final SettingViewModel mModel = ViewModelProviders.of(this).get(SettingViewModel.class);
 
             mModel.getInstalledApps().observe(this, data -> {
                 final String[] packageNames = Stream.of(data.keySet()).toArray(String[]::new);
