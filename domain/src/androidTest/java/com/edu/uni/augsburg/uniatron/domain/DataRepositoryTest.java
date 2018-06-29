@@ -368,10 +368,10 @@ public class DataRepositoryTest {
         final MutableLiveData<List<SummaryEntity>> mutableLiveData = new MutableLiveData<>();
         mutableLiveData.setValue(summaryEntities);
 
-        when(summaryDao.getSummaries(any(), any())).thenReturn(mutableLiveData);
+        when(summaryDao.getSummariesByDate(any(), any())).thenReturn(mutableLiveData);
 
         final Date date = new Date();
-        final LiveData<List<Summary>> summary = mRepository.getSummary(date, date);
+        final LiveData<List<Summary>> summary = mRepository.getSummaryByDate(date, date);
 
         final List<Summary> liveDataValue = getLiveDataValue(summary);
         assertThat(liveDataValue, is(notNullValue()));

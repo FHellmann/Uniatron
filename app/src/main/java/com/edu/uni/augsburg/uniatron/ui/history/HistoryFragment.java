@@ -20,29 +20,26 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
-import com.edu.uni.augsburg.uniatron.domain.util.SummaryGroupBy;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator;
 
 /**
  * This displays a history of all the previous data.
@@ -51,7 +48,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
  */
 public class HistoryFragment extends Fragment {
 
-    private static final int DAYS_TO_LOAD = 7;
+    private static final int TIME_RANGE_TO_LOAD = 7;
     private static final int ANIMATION_DURATION = 500;
 
     @BindView(R.id.recyclerViewHistory)
@@ -59,7 +56,9 @@ public class HistoryFragment extends Fragment {
 
     private Date mDateTo;
     private Date mDateFrom;
+    private int mDateRangeType;
     private ItemAdapter mHistoryItemAdapter;
+    private HistoryViewModel mModel;
 
     @Nullable
     @Override
@@ -76,7 +75,7 @@ public class HistoryFragment extends Fragment {
                               @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final HistoryViewModel model = ViewModelProviders.of(this).get(HistoryViewModel.class);
+        mModel = ViewModelProviders.of(this).get(HistoryViewModel.class);
 
         final LinearLayoutManager layout = new LinearLayoutManager(getContext());
         layout.setOrientation(LinearLayoutManager.VERTICAL);
@@ -84,29 +83,51 @@ public class HistoryFragment extends Fragment {
                 new DividerItemDecoration(getContext(), layout.getOrientation())
         );
         mRecyclerViewHistory.setLayoutManager(layout);
-        mRecyclerViewHistory.setItemAnimator(new SlideInLeftAnimator());
+        mRecyclerViewHistory.setItemAnimator(new ScaleInAnimator());
         mRecyclerViewHistory.getItemAnimator().setAddDuration(ANIMATION_DURATION);
         mRecyclerViewHistory.getItemAnimator().setChangeDuration(ANIMATION_DURATION);
         mRecyclerViewHistory.getItemAnimator().setMoveDuration(ANIMATION_DURATION);
         mRecyclerViewHistory.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
 
-        mHistoryItemAdapter = new ItemAdapter(mRecyclerViewHistory);
-        mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
+        mHistoryItemAdapter = new ItemAdapter(mRecyclerViewHistory, () -> {
+            if (mDateTo == null || mHistoryItemAdapter.isTimeRangeLoaded(mDateTo)) {
+                registerForLoadMore(mDateFrom);
+                return true;
+            }
+            return false;
+        });
         mRecyclerViewHistory.setAdapter(mHistoryItemAdapter);
 
-        mDateTo = new Date();
-        mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
-        model.registerDateRange(mDateFrom, mDateTo);
+        newRegisterForSummaryGroup(Calendar.DATE);
 
-        model.getSummary().observe(this, mHistoryItemAdapter::addItems);
+        mModel.getSummary().observe(this, mHistoryItemAdapter::addItems);
+    }
 
-        mHistoryItemAdapter.setOnLoadMoreListener(() -> {
-            // define next interval to load
-            mDateTo = mDateFrom;
-            mDateFrom = getPreviousDate(mDateTo, DAYS_TO_LOAD);
+    private void newRegisterForSummaryGroup(final int calendarField) {
+        mHistoryItemAdapter.clear();
+        mModel.clear();
+        mDateRangeType = calendarField;
+        mDateTo = null;
+        registerForLoadMore(new Date());
+    }
 
-            model.registerDateRange(mDateFrom, mDateTo);
-        });
+    private void registerForLoadMore(@NonNull final Date dateEnd) {
+        mDateTo = dateEnd;
+        mDateFrom = getPreviousDate(mDateTo, mDateRangeType);
+        if (mDateRangeType == Calendar.YEAR) {
+            mModel.registerForYearRange(mDateFrom, mDateTo);
+        } else if (mDateRangeType == Calendar.MONTH) {
+            mModel.registerForMonthRange(mDateFrom, mDateTo);
+        } else {
+            mModel.registerForDateRange(mDateFrom, mDateTo);
+        }
+    }
+
+    private static Date getPreviousDate(final Date date, final int calendarField) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(calendarField, -TIME_RANGE_TO_LOAD);
+        return calendar.getTime();
     }
 
     @Override
@@ -129,28 +150,21 @@ public class HistoryFragment extends Fragment {
                             .startActivities();
                     return true;
                 case R.id.group_by_day:
-                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.DAY);
+                    newRegisterForSummaryGroup(Calendar.DATE);
                     menuItem.setChecked(true);
                     return true;
                 case R.id.group_by_month:
-                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.MONTH);
+                    newRegisterForSummaryGroup(Calendar.MONTH);
                     menuItem.setChecked(true);
                     return true;
                 case R.id.group_by_year:
-                    mHistoryItemAdapter.setGroupByOrder(SummaryGroupBy.YEAR);
+                    newRegisterForSummaryGroup(Calendar.YEAR);
                     menuItem.setChecked(true);
                     return true;
                 default:
                     return false;
             }
         });
-    }
-
-    private static Date getPreviousDate(final Date date, final int days) {
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE, -days);
-        return calendar.getTime();
     }
 
     /**
@@ -189,22 +203,20 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    private static final class ItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final class ItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private static final int VIEW_TYPE_ITEM = 0;
         private static final int VIEW_TYPE_LOADING = 1;
         private static final int VISIBLE_THRESHOLD = 5;
 
-        private final Map<Date, Summary> mSummaryMap = new ConcurrentHashMap<>();
-        private List<Summary> mContentList = new ArrayList<>();
+        private final Map<Date, Summary> mSummaryMap = new TreeMap<>(
+                (date1, date2) -> date2.compareTo(date1)
+        );
         private final Context mContext;
-
-        private OnLoadMoreListener mOnLoadMoreListener;
-
         private boolean isLoading;
-        private SummaryGroupBy mGroupByOrder;
 
-        ItemAdapter(@NonNull final RecyclerView recyclerView) {
+        ItemAdapter(@NonNull final RecyclerView recyclerView,
+                    @NonNull final OnLoadMoreListener onLoadMoreListener) {
             super();
             mContext = recyclerView.getContext();
             final LinearLayoutManager linearLayoutManager =
@@ -221,10 +233,8 @@ public class HistoryFragment extends Fragment {
                     final int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
                     if (getItemCount() > 0 && !isLoading
-                            && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)) {
-                        if (mOnLoadMoreListener != null) {
-                            mOnLoadMoreListener.onLoadMore();
-                        }
+                            && totalItemCount <= (lastVisibleItem + VISIBLE_THRESHOLD)
+                            && onLoadMoreListener.onLoadMore()) {
                         isLoading = true;
                         recyclerView.post(() -> notifyItemInserted(getItemCount()));
                     }
@@ -232,13 +242,8 @@ public class HistoryFragment extends Fragment {
             });
         }
 
-        private void setGroupByOrder(@NonNull final SummaryGroupBy groupByOrder) {
-            mGroupByOrder = groupByOrder;
-            addItems(Collections.emptyList());
-        }
-
-        private void setOnLoadMoreListener(@NonNull final OnLoadMoreListener onLoadMoreListener) {
-            this.mOnLoadMoreListener = onLoadMoreListener;
+        private void clear() {
+            mSummaryMap.clear();
         }
 
         private void addItems(@NonNull final Collection<Summary> newItems) {
@@ -246,15 +251,29 @@ public class HistoryFragment extends Fragment {
                 notifyItemRemoved(getItemCount());
                 isLoading = false;
             }
+            final int size = mSummaryMap.size();
             // Add the new items to the map, if their not already existing
             Stream.of(newItems).forEach(item -> {
-                final Date date = DateUtil.extractMinTimeOfDate(item.getTimestamp());
-                mSummaryMap.put(date, item);
+                switch (mDateRangeType) {
+                    case Calendar.MONTH:
+                        mSummaryMap.put(DateUtil.extractMinDateOfMonth(item.getTimestamp()), item);
+                        break;
+                    case Calendar.YEAR:
+                        mSummaryMap.put(DateUtil.extractMinMonthOfYear(item.getTimestamp()), item);
+                        break;
+                    case Calendar.DATE:
+                    default:
+                        mSummaryMap.put(DateUtil.extractMinTimeOfDate(item.getTimestamp()), item);
+                        break;
+                }
             });
-            // Group all the entries by the selected group by rule
-            mContentList = mGroupByOrder.groupBy(mSummaryMap.values());
             // Notify the view to update
+            notifyItemRangeInserted(size, mSummaryMap.size() - size);
             notifyDataSetChanged();
+        }
+
+        private boolean isTimeRangeLoaded(@NonNull final Date dateEnd) {
+            return Stream.of(mSummaryMap.keySet()).anyMatch(dateEnd::after);
         }
 
         @NonNull
@@ -275,9 +294,11 @@ public class HistoryFragment extends Fragment {
         public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder,
                                      final int position) {
             if (holder instanceof ItemViewHolder) {
-                final Summary summary = mContentList.get(position);
+                final Summary summary = Stream.of(mSummaryMap.values())
+                        .collect(Collectors.toList())
+                        .get(position);
 
-                final String timestamp = mGroupByOrder.formatTimestamp(summary.getTimestamp());
+                final String timestamp = getTimestampFormat(summary.getTimestamp());
                 final String steps = String.valueOf(summary.getSteps());
                 final String usageTime = String.format(
                         Locale.getDefault(),
@@ -297,6 +318,18 @@ public class HistoryFragment extends Fragment {
             } else if (holder instanceof LoadingViewHolder) {
                 final LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
                 loadingViewHolder.mProgressBar.setIndeterminate(true);
+            }
+        }
+
+        private String getTimestampFormat(@NonNull final Date timestamp) {
+            switch (mDateRangeType) {
+                case Calendar.MONTH:
+                    return DateUtil.formatForMonth(timestamp);
+                case Calendar.YEAR:
+                    return DateUtil.formatForYear(timestamp);
+                case Calendar.DATE:
+                default:
+                    return DateUtil.formatForDate(timestamp);
             }
         }
 
@@ -323,7 +356,7 @@ public class HistoryFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return mContentList.size() + (isLoading ? 1 : 0);
+            return mSummaryMap.size() + (isLoading ? 1 : 0);
         }
 
         @Override
@@ -333,6 +366,6 @@ public class HistoryFragment extends Fragment {
     }
 
     private interface OnLoadMoreListener {
-        void onLoadMore();
+        boolean onLoadMore();
     }
 }

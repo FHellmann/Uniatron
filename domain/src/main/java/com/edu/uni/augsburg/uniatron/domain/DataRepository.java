@@ -357,12 +357,48 @@ public final class DataRepository {
      * @param dateTo   The date to end searching.
      * @return The summaries.
      */
-    public LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
-                                              @NonNull final Date dateTo) {
+    public LiveData<List<Summary>> getSummaryByDate(@NonNull final Date dateFrom,
+                                                    @NonNull final Date dateTo) {
         final Date dateFromMin = extractMinTimeOfDate(dateFrom);
         final Date dateToMax = extractMaxTimeOfDate(dateTo);
         return Transformations.map(
-                mDatabase.summaryDao().getSummaries(dateFromMin, dateToMax),
+                mDatabase.summaryDao().getSummariesByDate(dateFromMin, dateToMax),
+                data -> data == null ? Collections.emptyList()
+                        : Stream.of(data).collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * Get the summaries for a specified date range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     * @return The summaries.
+     */
+    public LiveData<List<Summary>> getSummaryByMonth(@NonNull final Date dateFrom,
+                                                     @NonNull final Date dateTo) {
+        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
+        final Date dateToMax = extractMaxTimeOfDate(dateTo);
+        return Transformations.map(
+                mDatabase.summaryDao().getSummariesByMonth(dateFromMin, dateToMax),
+                data -> data == null ? Collections.emptyList()
+                        : Stream.of(data).collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * Get the summaries for a specified date range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     * @return The summaries.
+     */
+    public LiveData<List<Summary>> getSummaryByYear(@NonNull final Date dateFrom,
+                                                    @NonNull final Date dateTo) {
+        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
+        final Date dateToMax = extractMaxTimeOfDate(dateTo);
+        return Transformations.map(
+                mDatabase.summaryDao().getSummariesByYear(dateFromMin, dateToMax),
                 data -> data == null ? Collections.emptyList()
                         : Stream.of(data).collect(Collectors.toList())
         );

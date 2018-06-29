@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * This is a helper class for date specific actions.
@@ -76,5 +77,38 @@ public final class DateUtil {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
+    }
+
+    /**
+     * Format the date to a date specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForDate(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%te. %tb %tY", date, date, date);
+    }
+
+    /**
+     * Format the date to a month specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForMonth(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%tB %tY", date, date);
+    }
+
+    /**
+     * Format the date to a year specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForYear(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%tY", date);
     }
 }
