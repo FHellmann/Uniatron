@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
@@ -40,85 +39,69 @@ public class AppTrackingService extends LifecycleService {
     private static final int ONE_MINUTE = 60;
     private static final int FIVE_MINUTES = 300;
     private static final int TEN_MINUTES = 600;
+
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
+
     private Boolean commitStatus = false;
-    private int remainingUsageTime = 10;
-    private final Observer<Integer> usageTimeObserver = new Observer<Integer>() {
+
+    private Long timePassedLearningAid;
+    private final Observer<Long> learningAidObserver = new Observer<Long>() {
         @Override
-        public void onChanged(@Nullable final Integer integer) {
-            //Log.d(getClass().toString(), "onchanged");
-            remainingUsageTime = integer;
+        public void onChanged(@Nullable final Long learningAidDiff) {
+            if (learningAidDiff == null) {
+                timePassedLearningAid = 0L;
+            } else {
+                timePassedLearningAid = learningAidDiff;
+            }
         }
     };
-    private Long timePassedLearningAid;
+    // initialize with a value > 0
+    // in case we use the value before the observer reports it
+    private int remainingUsageTime = 10;
+    private final Observer<Integer> usageTimeObserver = remainingUsageTimeDB -> {
+        if (remainingUsageTimeDB == null) {
+            remainingUsageTime = 10;
+        } else {
+            remainingUsageTime = remainingUsageTimeDB;
+        }
+    };
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                //Logger.d("ScreenOFF");
                 stopAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
-                //Logger.d("ScreenON");
                 startAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             }
         }
     };
-    private final Observer<Long> learningAidObserver = new Observer<Long>() {
-        @Override
-        public void onChanged(@Nullable final Long learningAidDiff) {
-            timePassedLearningAid = learningAidDiff;
-        }
-    };
-
 
     @Override
     public void onCreate() {
         super.onCreate();
-        //Log.d(getClass().toString(), "AppTrackingService Created");
+
+        FILTERS.add(getDefaultLauncherPackageName());
+        FILTERS.add("com.edu.uni.augsburg.uniatron");
+
         final IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.SCREEN_ON");
         filter.addAction("android.intent.action.SCREEN_OFF");
-
-        // get the default launcher
-        final PackageManager localPackageManager = getPackageManager();
-        final Intent intent = new Intent("android.intent.action.MAIN");
-        intent.addCategory("android.intent.category.HOME");
-        final String launcherPackageName = localPackageManager.resolveActivity(intent,
-                PackageManager.MATCH_DEFAULT_ONLY).activityInfo.packageName;
-
-        FILTERS.add(launcherPackageName);
-        FILTERS.add("com.edu.uni.augsburg.uniatron");
-
         registerReceiver(mScreenEventReceiver, filter);
-        //Logger.d("Service created");
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
         mRepository = MainApplication.getRepository(getBaseContext());
 
-
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
                 .observe(this, usageTimeObserver);
-
         mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
         startAppChecker();
     }
-
-    private void startAppChecker() {
-        mAppChecker.whenAny(process -> delegateAppUsage(process, DELAY_IN_MILLISECONDS))
-                .timeout(DELAY_IN_MILLISECONDS)
-                .start(getBaseContext());
-    }
-
-    private void stopAppChecker() {
-        mAppChecker.stop();
-    }
-
 
     /**
      * Executes the start of the service.
@@ -135,31 +118,28 @@ public class AppTrackingService extends LifecycleService {
 
     @Override
     public void onDestroy() {
-        //Log.d(getClass().toString(), "onDestroy");
         unregisterReceiver(mScreenEventReceiver);
+
+        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                .removeObserver(usageTimeObserver);
+        mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
+
         super.onDestroy();
     }
 
-    private void commitAppUsageTime(final String appName, final int timeMillis) {
-        if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
-            final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
-            mRepository.addAppUsage(appName, time);
-        }
-    }
-
+    // is being called periodically and handles all logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
-        Log.d(getClass().toString(), "delegateAppUsage");
         blockAppIfNecessary(appName);
-        blockLearningAid(appName);
+        blockLearningAidIfNecessary(appName);
         showNotificationIfNecessary();
+
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
     }
 
     private void showNotificationIfNecessary() {
-
-        if (remainingUsageTime == ONE_MINUTE - NOTIFICATION_TIME_OFFSET
+        if (remainingUsageTime + 1 == ONE_MINUTE
                 || remainingUsageTime == FIVE_MINUTES - NOTIFICATION_TIME_OFFSET
                 || remainingUsageTime == TEN_MINUTES - NOTIFICATION_TIME_OFFSET) {
             final Context context = getApplicationContext();
@@ -171,7 +151,6 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void blockAppIfNecessary(final String appName) {
-        Log.d(getClass().toString(), "Remaining Time: " + remainingUsageTime);
         if (remainingUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
 
@@ -183,7 +162,7 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private void blockLearningAid(final String appName) {
+    private void blockLearningAidIfNecessary(final String appName) {
         final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
                 - TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS);
         if (timeLeft > 0
@@ -198,5 +177,28 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
+    private void commitAppUsageTime(final String appName, final int timeMillis) {
+        if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
+            final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
+            mRepository.addAppUsage(appName, time);
+        }
+    }
 
+    private String getDefaultLauncherPackageName() {
+        final PackageManager localPackageManager = getPackageManager();
+        final Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        return localPackageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                .activityInfo.packageName;
+    }
+
+    private void startAppChecker() {
+        mAppChecker.whenAny(process -> delegateAppUsage(process, DELAY_IN_MILLISECONDS))
+                .timeout(DELAY_IN_MILLISECONDS)
+                .start(getBaseContext());
+    }
+
+    private void stopAppChecker() {
+        mAppChecker.stop();
+    }
 }
