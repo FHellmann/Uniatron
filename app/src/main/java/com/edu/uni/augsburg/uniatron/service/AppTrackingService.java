@@ -2,7 +2,6 @@ package com.edu.uni.augsburg.uniatron.service;
 
 import android.app.Notification;
 import android.arch.lifecycle.LifecycleService;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,7 +19,6 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.LearningAid;
 import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
@@ -60,21 +58,20 @@ public class AppTrackingService extends LifecycleService {
             }
         }
     };
-    private Observer<Integer> remainingUsageTimeObserver = new Observer<Integer>() {
+    private final Observer<Integer> usageTimeObserver = new Observer<Integer>() {
         @Override
-        public void onChanged(@Nullable Integer integer) {
+        public void onChanged(@Nullable final Integer integer) {
             //Log.d(getClass().toString(), "onchanged");
             remainingUsageTime = integer;
         }
     };
 
-    private Observer<Long> learningAidObserver = new Observer<Long>() {
+    private final Observer<Long> learningAidObserver = new Observer<Long>() {
         @Override
-        public void onChanged(@Nullable Long learningAidDiff) {
+        public void onChanged(@Nullable final Long learningAidDiff) {
             timePassedLearningAid = learningAidDiff;
         }
     };
-
 
 
     @Override
@@ -103,7 +100,7 @@ public class AppTrackingService extends LifecycleService {
 
 
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                .observe(this, remainingUsageTimeObserver);
+                .observe(this, usageTimeObserver);
 
         mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
@@ -120,6 +117,13 @@ public class AppTrackingService extends LifecycleService {
         mAppChecker.stop();
     }
 
+
+    /**
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -150,7 +154,10 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void showNotificationIfNecessary() {
-        if (remainingUsageTime == 59 || remainingUsageTime == 299 || remainingUsageTime == 599) {
+        int oneMinute = 59;
+        int fiveMinutes = 299;
+        int tenMinutes = 599;
+        if (remainingUsageTime == oneMinute || remainingUsageTime == fiveMinutes || remainingUsageTime == tenMinutes) {
             final Context context = AppTrackingService.this.getApplicationContext();
             final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingUsageTime + 1);
             final Notification notification = builder.build();
@@ -182,10 +189,10 @@ public class AppTrackingService extends LifecycleService {
             final Intent blockIntent = new Intent(AppTrackingService.this, MainActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             AppTrackingService.this.startActivity(blockIntent);
-        }else{
+        } else {
             commitStatus = true;
         }
-    }
+    } 
 
 
 }
