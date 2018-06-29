@@ -24,7 +24,7 @@
     <string name="pref_fitness_level_medium">Medium</string>
     <string name="pref_fitness_level_hard">Hard</string>
     <string name="channel_blacklist">Blacklist</string>
-    <string name="channel_time_up">Time up</string>
+    <string name="channel_time_up">Time almost up</string>
     <string name="notify_package_added">New app installed</string>
     <string name="notify_package_added_summary">Press to add %1$s to the blacklist.</string>
     <string name="time_credits_header">Choose your time credit!</string>
