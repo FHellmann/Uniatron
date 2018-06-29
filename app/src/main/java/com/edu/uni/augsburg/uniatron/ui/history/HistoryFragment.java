@@ -90,7 +90,7 @@ public class HistoryFragment extends Fragment {
         mRecyclerViewHistory.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
 
         mHistoryItemAdapter = new ItemAdapter(mRecyclerViewHistory, () -> {
-            if (mDateTo == null || mHistoryItemAdapter.isTimeRangeLoaded(mDateTo)) {
+            if (mHistoryItemAdapter.isTimeRangeLoaded(mDateTo)) {
                 registerForLoadMore(mDateFrom);
                 return true;
             }
@@ -107,7 +107,6 @@ public class HistoryFragment extends Fragment {
         mHistoryItemAdapter.clear();
         mModel.clear();
         mDateRangeType = calendarField;
-        mDateTo = null;
         registerForLoadMore(new Date());
     }
 
