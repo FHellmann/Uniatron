@@ -7,10 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
@@ -18,6 +20,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ public class AppTrackingService extends LifecycleService {
     private DataRepository mRepository;
 
     private Boolean commitStatus = false;
+    private Boolean lastCommitStatus = false;
 
     private Long timePassedLearningAid;
     private final Observer<Long> learningAidObserver = new Observer<Long>() {
@@ -60,21 +64,29 @@ public class AppTrackingService extends LifecycleService {
     // initialize with a value > 0
     // in case we use the value before the observer reports it
     private int remainingUsageTime = 10;
-    private final Observer<Integer> usageTimeObserver = remainingUsageTimeDB -> {
-        if (remainingUsageTimeDB == null) {
-            remainingUsageTime = 10;
-        } else {
-            remainingUsageTime = remainingUsageTimeDB;
+    private final Observer<Integer> usageTimeObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(@Nullable Integer remainingUsageTimeDB) {
+            if (remainingUsageTimeDB == null) {
+                remainingUsageTime = 10;
+            } else {
+                remainingUsageTime = remainingUsageTimeDB;
+                Log.d(getClass().toString(), "observer = " + remainingUsageTime);
+            }
         }
     };
+
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                lastCommitStatus = commitStatus;
+                commitStatus = false;
                 stopAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                commitStatus = lastCommitStatus;
                 startAppChecker();
                 startService(new Intent(getBaseContext(), StepCountService.class));
             }
@@ -94,6 +106,14 @@ public class AppTrackingService extends LifecycleService {
         registerReceiver(mScreenEventReceiver, filter);
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
+
+        mSharedPreferencesHandler.registerOnPreferenceChangeListener((sharedPreferences, s) -> {
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .removeObserver(usageTimeObserver);
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .observe(AppTrackingService.this, usageTimeObserver);
+        });
+
         mRepository = MainApplication.getRepository(getBaseContext());
 
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
@@ -129,8 +149,10 @@ public class AppTrackingService extends LifecycleService {
 
     // is being called periodically and handles all logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
-        blockAppIfNecessary(appName);
-        blockLearningAidIfNecessary(appName);
+
+        if (!blockByLearningAidIfNecessary(appName)){
+            blockAppIfNecessary(appName);
+        }
         showNotificationIfNecessary();
 
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
@@ -150,30 +172,37 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private void blockAppIfNecessary(final String appName) {
-        if (remainingUsageTime == 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+    private boolean blockAppIfNecessary(final String appName) {
+        if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
 
+            Log.d(getClass().toString(), "bloacking app. time remaining = " + remainingUsageTime);
             final Intent blockIntent = new Intent(getApplicationContext(), MainActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(blockIntent);
+            return true;
         } else {
             commitStatus = true;
+            return false;
         }
     }
 
-    private void blockLearningAidIfNecessary(final String appName) {
+    private boolean blockByLearningAidIfNecessary(final String appName) {
         final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
                 - TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS);
-        if (timeLeft > 0
-                && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-                && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        //Log.d(getClass().toString(), "left: " + timeLeft + " blocked: " + TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + " passed: " + TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS));
+
+        if (timeLeft == TimeCredits.CREDIT_LEARNING.getBlockedMinutes() && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+            Log.d(getClass().toString(), "left: " + timeLeft + " blocked: " + TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + " passed: " + TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS));
+
             commitStatus = false;
-            final Intent blockIntent = new Intent(getApplicationContext(), MainActivity.class);
+            final Intent blockIntent = new Intent(getApplicationContext(), TimeCreditShopActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(blockIntent);
+            return true;
         } else {
             commitStatus = true;
+            return false;
         }
     }
 
