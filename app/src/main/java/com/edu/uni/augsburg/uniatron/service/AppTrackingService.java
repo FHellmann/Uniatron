@@ -19,6 +19,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
+import com.edu.uni.augsburg.uniatron.ui.home.shop.LearningAid;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.AppChecker;
 
@@ -37,10 +38,9 @@ public class AppTrackingService extends LifecycleService {
 
     private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final List<String> FILTERS = new ArrayList<>();
-    private static final int NOTIFICATION_TIME_OFFSET = 1;
-    private static final int ONE_MINUTE = 60;
-    private static final int FIVE_MINUTES = 300;
-    private static final int TEN_MINUTES = 600;
+    private static final int NOTIFICATION_ONE_MINUTE = 59;
+    private static final int NOTIFICATION_FIVE_MINUTES = 299;
+    private static final int NOTIFICATION_TEN_MINUTES = 599;
 
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
@@ -49,15 +49,15 @@ public class AppTrackingService extends LifecycleService {
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
 
-    private Long mLearningAidDiff;
+    private Long mLearningAidDiffMillis;
     private final Observer<Long> learningAidObserver = new Observer<Long>() {
         @Override
         public void onChanged(@Nullable final Long learningAidDiff) {
             if (learningAidDiff == null) {
-                mLearningAidDiff = 1L;
+                mLearningAidDiffMillis = 1L;
             } else {
                 Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
-                mLearningAidDiff = learningAidDiff;
+                mLearningAidDiffMillis = learningAidDiff;
             }
         }
     };
@@ -150,10 +150,10 @@ public class AppTrackingService extends LifecycleService {
     // is being called periodically and handles all logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
 
-        if (!blockByLearningAidIfNecessary(appName)){
-            blockAppIfNecessary(appName);
+        if (!blockByLearningAid(appName)){
+            blockByTimeCreditIfNecessary(appName);
+            showNotificationIfNecessary();
         }
-        showNotificationIfNecessary();
 
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
@@ -161,9 +161,9 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void showNotificationIfNecessary() {
-        if (remainingUsageTime + 1 == ONE_MINUTE
-                || remainingUsageTime == FIVE_MINUTES - NOTIFICATION_TIME_OFFSET
-                || remainingUsageTime == TEN_MINUTES - NOTIFICATION_TIME_OFFSET) {
+        if (remainingUsageTime == NOTIFICATION_ONE_MINUTE
+                || remainingUsageTime == NOTIFICATION_FIVE_MINUTES
+                || remainingUsageTime == NOTIFICATION_TEN_MINUTES) {
             final Context context = getApplicationContext();
             final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, remainingUsageTime + 1);
             final Notification notification = builder.build();
@@ -172,7 +172,7 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private boolean blockAppIfNecessary(final String appName) {
+    private void blockByTimeCreditIfNecessary(final String appName) {
         if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
 
@@ -180,28 +180,30 @@ public class AppTrackingService extends LifecycleService {
             final Intent blockIntent = new Intent(getApplicationContext(), MainActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(blockIntent);
-            return true;
         } else {
             commitStatus = true;
-            return false;
         }
     }
 
-    private boolean blockByLearningAidIfNecessary(final String appName) {
+    private boolean blockByLearningAid(final String appName) {
 
         mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
         mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
+        final long timeBlockedMinutes = TimeCredits.CREDIT_LEARNING.getBlockedMinutes();
+        final long timePassedMinutes = TimeUnit.MINUTES.convert(mLearningAidDiffMillis, TimeUnit.MILLISECONDS);
 
-        long blocked = TimeCredits.CREDIT_LEARNING.getBlockedMinutes();
-        long passed = TimeUnit.MINUTES.convert(mLearningAidDiff, TimeUnit.MILLISECONDS);
-        long timeleft = blocked - passed;
-        Log.d(getClass().toString(), " blocked: " + blocked + " passed: " + passed + " timeleft: " + timeleft);
+        //Log.d(getClass().toString(), " blocked: " + timeBlockedMinutes + " passed: " + timePassedMinutes);
 
-        if (passed < blocked && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
-            Log.d(getClass().toString(), " blocked: " + blocked + " diff: " + passed + " timeleft: " + timeleft);
+        if (mLearningAidDiffMillis > 0 && timePassedMinutes < timeBlockedMinutes
+                && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+
+            Log.d(getClass().toString(),"aid active. blocking.. "
+                    + " timeblocked: " + timeBlockedMinutes
+                    + " timepassed: " + timePassedMinutes);
 
             commitStatus = false;
+
             final Intent blockIntent = new Intent(getApplicationContext(), TimeCreditShopActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(blockIntent);
