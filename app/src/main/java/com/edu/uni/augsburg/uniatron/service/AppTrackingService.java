@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
@@ -50,14 +49,15 @@ public class AppTrackingService extends LifecycleService {
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
 
-    private Long timePassedLearningAid;
+    private Long mLearningAidDiff;
     private final Observer<Long> learningAidObserver = new Observer<Long>() {
         @Override
         public void onChanged(@Nullable final Long learningAidDiff) {
             if (learningAidDiff == null) {
-                timePassedLearningAid = 0L;
+                mLearningAidDiff = 1L;
             } else {
-                timePassedLearningAid = learningAidDiff;
+                Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
+                mLearningAidDiff = learningAidDiff;
             }
         }
     };
@@ -188,12 +188,18 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private boolean blockByLearningAidIfNecessary(final String appName) {
-        final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-                - TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS);
-        //Log.d(getClass().toString(), "left: " + timeLeft + " blocked: " + TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + " passed: " + TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS));
 
-        if (timeLeft == TimeCredits.CREDIT_LEARNING.getBlockedMinutes() && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
-            Log.d(getClass().toString(), "left: " + timeLeft + " blocked: " + TimeCredits.CREDIT_LEARNING.getBlockedMinutes() + " passed: " + TimeUnit.MINUTES.convert(timePassedLearningAid, TimeUnit.MILLISECONDS));
+        mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
+        mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
+
+
+        long blocked = TimeCredits.CREDIT_LEARNING.getBlockedMinutes();
+        long passed = TimeUnit.MINUTES.convert(mLearningAidDiff, TimeUnit.MILLISECONDS);
+        long timeleft = blocked - passed;
+        Log.d(getClass().toString(), " blocked: " + blocked + " passed: " + passed + " timeleft: " + timeleft);
+
+        if (passed < blocked && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+            Log.d(getClass().toString(), " blocked: " + blocked + " diff: " + passed + " timeleft: " + timeleft);
 
             commitStatus = false;
             final Intent blockIntent = new Intent(getApplicationContext(), TimeCreditShopActivity.class);
