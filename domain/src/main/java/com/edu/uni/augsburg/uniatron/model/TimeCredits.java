@@ -47,7 +47,7 @@ public enum TimeCredits implements TimeCredit {
     /**
      * The mTime credit for a learning aid.
      */
-    CREDIT_LEARNING(TimeCreditType.LEARNING_AID, 0, 5, 45);
+    CREDIT_LEARNING(TimeCreditType.LEARNING_AID, 0, 5, 1);
 
     private final TimeCreditType mType;
     private final int mStepCount;

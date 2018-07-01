@@ -36,7 +36,7 @@ public class SettingViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mHandler;
     private final OnSharedPreferenceChangeListener mSharedPrefsListener = new OnSharedPreferenceChangeListener() {
         @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String str) {
             Log.d(getClass().toString(), "shared prefs changed");
             mObservable.postValue(getAllInstalledApps(getApplication()));
         }

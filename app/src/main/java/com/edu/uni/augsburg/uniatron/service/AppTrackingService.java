@@ -19,6 +19,7 @@ import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.notification.builder.AidFinishNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
@@ -26,6 +27,7 @@ import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,19 +44,24 @@ public class AppTrackingService extends LifecycleService {
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
     private static final int NOTIFICATION_TEN_MINUTES = 599;
-
+    private Set<String> blackList;
+    private List<Set<String>> allBlackLists = new ArrayList<Set<String>>();
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
-
+    //Initialize Listener for changes of Blacklist
     private final OnSharedPreferenceChangeListener mSharedPrefsListener
             = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                    .removeObserver(usageTimeObserver);
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+            //mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
+            removeAllObserver();
+            blackList = mSharedPreferencesHandler.getAppsBlacklist();
+            removeAllObserver();
+            allBlackLists.add(blackList);
+            mRepository.getRemainingAppUsageTimeToday(blackList)
                     .observe(AppTrackingService.this, usageTimeObserver);
+
         }
     };
     private Boolean commitStatus = false;
@@ -66,7 +73,7 @@ public class AppTrackingService extends LifecycleService {
             if (learningAidDiff == null) {
                 mLearningAidDiffMillis = 1L;
             } else {
-                Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
+                //Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
                 mLearningAidDiffMillis = learningAidDiff;
             }
         }
@@ -85,6 +92,15 @@ public class AppTrackingService extends LifecycleService {
             }
         }
     };
+
+
+    private final void removeAllObserver(){
+        for (Set<String> elem: allBlackLists
+             ) {
+            mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
+        }
+    }
+
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -109,21 +125,26 @@ public class AppTrackingService extends LifecycleService {
         FILTERS.add(getDefaultLauncherPackageName());
         FILTERS.add("com.edu.uni.augsburg.uniatron");
 
+        //register Events ScreenOn and ScreenOff
         final IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.SCREEN_ON");
         filter.addAction("android.intent.action.SCREEN_OFF");
         registerReceiver(mScreenEventReceiver, filter);
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
+        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
         mRepository = MainApplication.getRepository(getBaseContext());
 
 
+        if (blackList == null) {
+            blackList = mSharedPreferencesHandler.getAppsBlacklist();
+        }
+        allBlackLists.add(blackList);
+        //initialize Observer for Blacklist and learningAid
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
                 .observe(this, usageTimeObserver);
-
-        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
-
         mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
+
 
         startAppChecker();
     }
@@ -180,6 +201,8 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
+
+
     private void blockByTimeCreditIfTimeUp(final String appName) {
         if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
@@ -207,8 +230,16 @@ public class AppTrackingService extends LifecycleService {
             Log.d(getClass().toString(), "aid active. blocking.. "
                     + " timeblocked: " + timeBlockedMinutes
                     + " timepassed: " + timePassedMinutes);
-
+            Log.d(getClass().toString(),"mLearningAidDiffMillis: " + mLearningAidDiffMillis);
             commitStatus = false;
+
+            if (mLearningAidDiffMillis == TimeCredits.CREDIT_LEARNING.getBlockedMinutes()*60 * 1000 -1) {
+                final Context context = getApplicationContext();
+                final AidFinishNotificationBuilder builder = new AidFinishNotificationBuilder(context);
+                final Notification notification = builder.build();
+                final int notificationId = builder.getId();
+                NotificationManagerCompat.from(context).notify(notificationId, notification);
+            }
 
             final Intent blockIntent = new Intent(getApplicationContext(), TimeCreditShopActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

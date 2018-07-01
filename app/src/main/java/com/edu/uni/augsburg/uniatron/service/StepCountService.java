@@ -41,6 +41,7 @@ public class StepCountService extends Service implements SensorEventListener {
         // grab step detector and register the listener
         final SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
+        commitSteps(100);
         // this could return null if the app has
         // no permissions for that sensor, or it doesn't exist
         final Sensor stepDetectorSensor =
