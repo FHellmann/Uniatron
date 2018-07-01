@@ -44,26 +44,35 @@ public class AppTrackingService extends LifecycleService {
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
     private static final int NOTIFICATION_TEN_MINUTES = 599;
-    private Set<String> blackList;
-    private List<Set<String>> allBlackLists = new ArrayList<Set<String>>();
+
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
-    //Initialize Listener for changes of Blacklist
+    private Set<String> mDBBlacklist;
+    private List<Set<String>> allBlackLists = new ArrayList<Set<String>>();
+
     private final OnSharedPreferenceChangeListener mSharedPrefsListener
             = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            //mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
-            removeAllObserver();
-            blackList = mSharedPreferencesHandler.getAppsBlacklist();
-            removeAllObserver();
-            allBlackLists.add(blackList);
-            mRepository.getRemainingAppUsageTimeToday(blackList)
-                    .observe(AppTrackingService.this, usageTimeObserver);
+            Log.d(getClass().toString(), "shared prefs changed");
+            Log.d(getClass().toString(), "before" + mDBBlacklist.toString());
 
+            // remove observers of old blacklist
+            // TODO this doesn't work
+            //update blacklist
+            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
+            allBlackLists.add(mDBBlacklist);
+            removeAllObserver();
+            Log.d(getClass().toString(), "after" + mDBBlacklist.toString());
+
+            // observe the new one
+            mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
+                    .observe(AppTrackingService.this, usageTimeObserver);
+            // TODO we will now have multiple observers reporting different values (for different blacklists)
         }
     };
+
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
     private Long mLearningAidDiffMillis;
@@ -73,7 +82,7 @@ public class AppTrackingService extends LifecycleService {
             if (learningAidDiff == null) {
                 mLearningAidDiffMillis = 1L;
             } else {
-                //Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
+                Log.d(getClass().toString(), "learningaiddiff onchanged: " + learningAidDiff);
                 mLearningAidDiffMillis = learningAidDiff;
             }
         }
@@ -97,7 +106,7 @@ public class AppTrackingService extends LifecycleService {
     private final void removeAllObserver(){
         for (Set<String> elem: allBlackLists
              ) {
-            mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
+            mRepository.getRemainingAppUsageTimeToday(elem).removeObserver(usageTimeObserver);
         }
     }
 
@@ -132,19 +141,17 @@ public class AppTrackingService extends LifecycleService {
         registerReceiver(mScreenEventReceiver, filter);
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
-        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
         mRepository = MainApplication.getRepository(getBaseContext());
 
+        mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
+        allBlackLists.add(mDBBlacklist);
 
-        if (blackList == null) {
-            blackList = mSharedPreferencesHandler.getAppsBlacklist();
-        }
-        allBlackLists.add(blackList);
-        //initialize Observer for Blacklist and learningAid
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+        mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                 .observe(this, usageTimeObserver);
-        mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
+        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
+
+        mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
         startAppChecker();
     }
@@ -166,7 +173,7 @@ public class AppTrackingService extends LifecycleService {
     public void onDestroy() {
         unregisterReceiver(mScreenEventReceiver);
 
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+        mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                 .removeObserver(usageTimeObserver);
         mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
 
@@ -184,7 +191,7 @@ public class AppTrackingService extends LifecycleService {
             showNotificationIfTimeAlmostUp();
         }
 
-        if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        if (commitStatus || !mDBBlacklist.contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
     }
@@ -201,10 +208,8 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-
-
     private void blockByTimeCreditIfTimeUp(final String appName) {
-        if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        if (remainingUsageTime <= 0 && mDBBlacklist.contains(appName)) {
             commitStatus = false;
 
             Log.d(getClass().toString(), "blocking app. time remaining = " + remainingUsageTime);
@@ -225,11 +230,12 @@ public class AppTrackingService extends LifecycleService {
         final long timePassedMinutes = TimeUnit.MINUTES.convert(mLearningAidDiffMillis, TimeUnit.MILLISECONDS);
 
         if (mLearningAidDiffMillis > 0 && timePassedMinutes < timeBlockedMinutes
-                && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+                && mDBBlacklist.contains(appName)) {
 
             Log.d(getClass().toString(), "aid active. blocking.. "
                     + " timeblocked: " + timeBlockedMinutes
                     + " timepassed: " + timePassedMinutes);
+
             Log.d(getClass().toString(),"mLearningAidDiffMillis: " + mLearningAidDiffMillis);
             commitStatus = false;
 
@@ -273,8 +279,6 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void stopAppChecker() {
-
-
         mAppChecker.stop();
     }
 }
