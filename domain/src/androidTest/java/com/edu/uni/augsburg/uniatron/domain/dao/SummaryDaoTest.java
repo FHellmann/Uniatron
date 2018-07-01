@@ -68,7 +68,7 @@ public class SummaryDaoTest {
         final Date date = new Date();
 
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, -7);
 
         final LiveData<List<SummaryEntity>> summaries = mDao.getSummariesByDate(calendar.getTime(), date);
 
@@ -82,7 +82,7 @@ public class SummaryDaoTest {
         final Date date = new Date();
 
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, -7);
 
         final LiveData<List<SummaryEntity>> summaries = mDao.getSummariesByDate(calendar.getTime(), date);
 

@@ -1,11 +1,9 @@
 package com.edu.uni.augsburg.uniatron.domain;
 
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.annimon.stream.IntStream;
-import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -29,41 +27,35 @@ public final class DatabaseUtil {
     }
 
     public static void createRandomData(@NonNull final AppDatabase appDatabase) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                final Random random = new Random(42);
+        final Random random = new Random(42);
 
-                Log.i("Database", "### Starting Database mockup data creation! ###");
+        Log.i("Database", "### Starting Database mockup data creation! ###");
 
-                long start = System.currentTimeMillis();
-                IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                        .mapToObj(index -> getAppUsage(random, index))
-                        .forEach(item -> appDatabase.appUsageDao().add(item));
-                Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " app usage data in " + (System.currentTimeMillis() - start) + "ms");
+        long start = System.currentTimeMillis();
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getAppUsage(random, index))
+                .forEach(item -> appDatabase.appUsageDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " app usage data in " + (System.currentTimeMillis() - start) + "ms");
 
-                start = System.currentTimeMillis();
-                IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                        .mapToObj(index -> getStepCount(random, index))
-                        .forEach(item -> appDatabase.stepCountDao().add(item));
-                Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " step count data in " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getStepCount(random, index))
+                .forEach(item -> appDatabase.stepCountDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " step count data in " + (System.currentTimeMillis() - start) + "ms");
 
-                start = System.currentTimeMillis();
-                IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                        .mapToObj(index -> getTimeCredit(random, index))
-                        .forEach(item -> appDatabase.timeCreditDao().add(item));
-                Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " time credit data in " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getTimeCredit(random, index))
+                .forEach(item -> appDatabase.timeCreditDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " time credit data in " + (System.currentTimeMillis() - start) + "ms");
 
-                start = System.currentTimeMillis();
-                IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                        .mapToObj(index -> getEmotion(random, index))
-                        .forEach(item -> appDatabase.emotionDao().add(item));
-                Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " emotion data in " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getEmotion(random, index))
+                .forEach(item -> appDatabase.emotionDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " emotion data in " + (System.currentTimeMillis() - start) + "ms");
 
-                Log.i("Database", "### Database mockup data finished! ###");
-                return null;
-            }
-        }.execute();
+        Log.i("Database", "### Database mockup data finished! ###");
     }
 
     private static AppUsageEntity getAppUsage(Random random, int index) {
