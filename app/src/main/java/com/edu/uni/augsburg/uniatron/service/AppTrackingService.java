@@ -26,6 +26,7 @@ import com.rvalerio.fgchecker.AppChecker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,17 +47,24 @@ public class AppTrackingService extends LifecycleService {
     private final AppChecker mAppChecker = new AppChecker();
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
+    private Set<String> mDBBlacklist;
 
     private final OnSharedPreferenceChangeListener mSharedPrefsListener
             = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
+            Log.d(getClass().toString(), "shared prefs changed");
+            Log.d(getClass().toString(), mDBBlacklist.toString());
+
+            // the blacklist changed, we want to observe the new one
+            mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                     .removeObserver(usageTimeObserver);
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+            mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                     .observe(AppTrackingService.this, usageTimeObserver);
         }
     };
+
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
     private Long mLearningAidDiffMillis;
@@ -117,8 +125,9 @@ public class AppTrackingService extends LifecycleService {
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
         mRepository = MainApplication.getRepository(getBaseContext());
 
+        mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
 
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+        mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                 .observe(this, usageTimeObserver);
 
         mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
@@ -145,7 +154,7 @@ public class AppTrackingService extends LifecycleService {
     public void onDestroy() {
         unregisterReceiver(mScreenEventReceiver);
 
-        mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+        mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                 .removeObserver(usageTimeObserver);
         mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
 
@@ -163,7 +172,7 @@ public class AppTrackingService extends LifecycleService {
             showNotificationIfTimeAlmostUp();
         }
 
-        if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        if (commitStatus || !mDBBlacklist.contains(appName)) {
             commitAppUsageTime(appName, timeMillis);
         }
     }
@@ -181,7 +190,7 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void blockByTimeCreditIfTimeUp(final String appName) {
-        if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+        if (remainingUsageTime <= 0 && mDBBlacklist.contains(appName)) {
             commitStatus = false;
 
             Log.d(getClass().toString(), "blocking app. time remaining = " + remainingUsageTime);
@@ -202,7 +211,7 @@ public class AppTrackingService extends LifecycleService {
         final long timePassedMinutes = TimeUnit.MINUTES.convert(mLearningAidDiffMillis, TimeUnit.MILLISECONDS);
 
         if (mLearningAidDiffMillis > 0 && timePassedMinutes < timeBlockedMinutes
-                && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
+                && mDBBlacklist.contains(appName)) {
 
             Log.d(getClass().toString(), "aid active. blocking.. "
                     + " timeblocked: " + timeBlockedMinutes
