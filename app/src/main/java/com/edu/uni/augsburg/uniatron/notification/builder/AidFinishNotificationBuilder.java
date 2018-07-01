@@ -13,7 +13,7 @@ import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 
 /**
- * Class for notify when times up
+ * Class for notify when times up.
  */
 public class AidFinishNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;

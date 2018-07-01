@@ -44,35 +44,11 @@ public class AppTrackingService extends LifecycleService {
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
     private static final int NOTIFICATION_TEN_MINUTES = 599;
-    private Set<String> blackList;
     private final AppChecker mAppChecker = new AppChecker();
     private final List<Set<String>> allBlackLists = new ArrayList<>();
     private Set<String> mDBBlacklist;
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
-
-    private final OnSharedPreferenceChangeListener mSharedPrefsListener
-            = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            Log.d(getClass().toString(), "shared prefs changed");
-            Log.d(getClass().toString(), "before" + mDBBlacklist.toString());
-
-            // remove observers of old blacklist
-            // TODO this doesn't work
-            //update blacklist
-            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
-            allBlackLists.add(mDBBlacklist);
-            removeAllObserver();
-            Log.d(getClass().toString(), "after" + mDBBlacklist.toString());
-
-            // observe the new one
-            mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
-                    .observe(AppTrackingService.this, usageTimeObserver);
-            // TODO we will now have multiple observers reporting different values (for different blacklists)
-        }
-    };
-
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
     private Long mLearningAidDiffMillis;
@@ -101,15 +77,30 @@ public class AppTrackingService extends LifecycleService {
             }
         }
     };
+    private final OnSharedPreferenceChangeListener mSharedPrefsListener
+            = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+            Log.d(getClass().toString(), "shared prefs changed");
+            Log.d(getClass().toString(), "before" + mDBBlacklist.toString());
 
+            // remove observers of old blacklist
+            //TODO this doesn't work
+            //update blacklist
+            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
+            allBlackLists.add(mDBBlacklist);
+            for (final Set<String> elem : allBlackLists) {
+                mRepository.getRemainingAppUsageTimeToday(elem).removeObserver(AppTrackingService.this.usageTimeObserver);
+            }
+            Log.d(getClass().toString(), "after" + mDBBlacklist.toString());
 
-    private final void removeAllObserver(){
-        for (Set<String> elem: allBlackLists
-             ) {
-            mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
+            // observe the new one
+            mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
+                    .observe(AppTrackingService.this, usageTimeObserver);
+            //TODO we will now have multiple observers reporting
+            // different values (for different blacklists)
         }
-    }
-
+    };
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
