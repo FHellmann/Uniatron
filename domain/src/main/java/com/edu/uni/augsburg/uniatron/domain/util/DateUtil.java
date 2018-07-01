@@ -56,6 +56,13 @@ public final class DateUtil {
         return calendar.getTime();
     }
 
+    /**
+     * Get the earliest date of the specified month.
+     *
+     * @param date The month to get the earliest date.
+     * @return The date.
+     */
+    @NonNull
     public static Date extractMinDateOfMonth(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -67,6 +74,13 @@ public final class DateUtil {
         return calendar.getTime();
     }
 
+    /**
+     * Get the earliest month of the specified year.
+     *
+     * @param date The year to get the earliest month.
+     * @return The date.
+     */
+    @NonNull
     public static Date extractMinMonthOfYear(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);

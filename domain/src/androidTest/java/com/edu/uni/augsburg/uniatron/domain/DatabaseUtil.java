@@ -23,7 +23,7 @@ public final class DatabaseUtil {
             "Neftlix", "YouTube", "Spotify", "Soundcloud", "Instagram", "Facebook", "Twitter",
             "Pinterest", "Skype", "Messenger", "WhatsApp", "Snapchat", "Tinder", "Kindle"
     };
-    private static final int MOCK_DATA_ITEM_COUNT = 5000;
+    private static final int MOCK_DATA_ITEM_COUNT = 100;
 
     private DatabaseUtil() {
     }

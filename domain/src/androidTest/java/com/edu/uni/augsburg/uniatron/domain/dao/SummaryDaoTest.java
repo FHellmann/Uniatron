@@ -54,7 +54,7 @@ public class SummaryDaoTest {
     public void getSummariesEmpty() throws InterruptedException {
         final Date date = new Date();
 
-        final LiveData<List<SummaryEntity>> summaries = mDao.getSummaries(date, date);
+        final LiveData<List<SummaryEntity>> summaries = mDao.getSummariesByDate(date, date);
 
         final List<SummaryEntity> liveDataValue = getLiveDataValue(summaries);
         assertThat(liveDataValue, is(notNullValue()));
@@ -70,7 +70,7 @@ public class SummaryDaoTest {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.add(Calendar.DATE, -1);
 
-        final LiveData<List<SummaryEntity>> summaries = mDao.getSummaries(calendar.getTime(), date);
+        final LiveData<List<SummaryEntity>> summaries = mDao.getSummariesByDate(calendar.getTime(), date);
 
         final List<SummaryEntity> liveDataValue = getLiveDataValue(summaries);
         assertThat(liveDataValue, is(notNullValue()));
@@ -84,7 +84,7 @@ public class SummaryDaoTest {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.add(Calendar.DATE, -1);
 
-        final LiveData<List<SummaryEntity>> summaries = mDao.getSummaries(calendar.getTime(), date);
+        final LiveData<List<SummaryEntity>> summaries = mDao.getSummariesByDate(calendar.getTime(), date);
 
         final List<SummaryEntity> liveDataValue = getLiveDataValue(summaries);
         assertThat(liveDataValue, is(notNullValue()));
