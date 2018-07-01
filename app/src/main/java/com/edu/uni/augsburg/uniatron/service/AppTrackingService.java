@@ -44,26 +44,13 @@ public class AppTrackingService extends LifecycleService {
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
     private static final int NOTIFICATION_TEN_MINUTES = 599;
-    private Set<String> blackList;
-    private List<Set<String>> allBlackLists = new ArrayList<Set<String>>();
     private final AppChecker mAppChecker = new AppChecker();
+    private final List<Set<String>> allBlackLists = new ArrayList<>();
+    private Set<String> blackList;
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
     //Initialize Listener for changes of Blacklist
-    private final OnSharedPreferenceChangeListener mSharedPrefsListener
-            = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            //mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
-            removeAllObserver();
-            blackList = mSharedPreferencesHandler.getAppsBlacklist();
-            removeAllObserver();
-            allBlackLists.add(blackList);
-            mRepository.getRemainingAppUsageTimeToday(blackList)
-                    .observe(AppTrackingService.this, usageTimeObserver);
 
-        }
-    };
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
     private Long mLearningAidDiffMillis;
@@ -79,8 +66,8 @@ public class AppTrackingService extends LifecycleService {
         }
     };
     // initialize with a value > 0
-    // in case we use the value before the observer reports it
     private int remainingUsageTime = 10;
+    // in case we use the value before the observer reports it
     private final Observer<Integer> usageTimeObserver = new Observer<Integer>() {
         @Override
         public void onChanged(@Nullable final Integer remainingUsageTimeDB) {
@@ -93,14 +80,20 @@ public class AppTrackingService extends LifecycleService {
         }
     };
 
+    private final OnSharedPreferenceChangeListener mSharedPrefsListener
+            = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+            for (Set<String> item : allBlackLists) {
+                mRepository.getRemainingAppUsageTimeToday(item).removeObserver(AppTrackingService.this.usageTimeObserver);
+            }
+            blackList = mSharedPreferencesHandler.getAppsBlacklist();
+            allBlackLists.add(blackList);
+            mRepository.getRemainingAppUsageTimeToday(blackList)
+                    .observe(AppTrackingService.this, usageTimeObserver);
 
-    private final void removeAllObserver(){
-        for (Set<String> elem: allBlackLists
-             ) {
-            mRepository.getRemainingAppUsageTimeToday(blackList).removeObserver(AppTrackingService.this.usageTimeObserver);
         }
-    }
-
+    };
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -202,7 +195,6 @@ public class AppTrackingService extends LifecycleService {
     }
 
 
-
     private void blockByTimeCreditIfTimeUp(final String appName) {
         if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
@@ -230,10 +222,10 @@ public class AppTrackingService extends LifecycleService {
             Log.d(getClass().toString(), "aid active. blocking.. "
                     + " timeblocked: " + timeBlockedMinutes
                     + " timepassed: " + timePassedMinutes);
-            Log.d(getClass().toString(),"mLearningAidDiffMillis: " + mLearningAidDiffMillis);
+            Log.d(getClass().toString(), "mLearningAidDiffMillis: " + mLearningAidDiffMillis);
             commitStatus = false;
 
-            if (mLearningAidDiffMillis == TimeCredits.CREDIT_LEARNING.getBlockedMinutes()*60 * 1000 -1) {
+            if (mLearningAidDiffMillis == TimeCredits.CREDIT_LEARNING.getBlockedMinutes() * 60 * 1000 - 1) {
                 final Context context = getApplicationContext();
                 final AidFinishNotificationBuilder builder = new AidFinishNotificationBuilder(context);
                 final Notification notification = builder.build();
