@@ -53,15 +53,22 @@ public class AppTrackingService extends LifecycleService {
             = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
             Log.d(getClass().toString(), "shared prefs changed");
-            Log.d(getClass().toString(), mDBBlacklist.toString());
+            Log.d(getClass().toString(), "before" + mDBBlacklist.toString());
 
-            // the blacklist changed, we want to observe the new one
+            // remove observers of old blacklist
+            // TODO this doesn't work
             mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
-                    .removeObserver(usageTimeObserver);
+                    .removeObservers(AppTrackingService.this);
+
+            //update blacklist
+            mDBBlacklist = mSharedPreferencesHandler.getAppsBlacklist();
+            Log.d(getClass().toString(), "after" + mDBBlacklist.toString());
+
+            // observe the new one
             mRepository.getRemainingAppUsageTimeToday(mDBBlacklist)
                     .observe(AppTrackingService.this, usageTimeObserver);
+            // TODO we will now have multiple observers reporting different values (for different blacklists)
         }
     };
 
