@@ -24,9 +24,6 @@ import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -105,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
             super.onBackPressed();
         } else {
             // Otherwise, select the home screen.
-            mFragmentViewChanger.selectHome();
+            setNavToHome();
         }
     }
 
@@ -119,6 +116,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                 && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
+    }
+
+    private void setNavToHome() {
+        final TabLayout.Tab tab = mTabLayout.getTabAt(NAV_POSITION_HOME);
+        if (tab != null) {
+            tab.select();
         }
     }
 
@@ -144,29 +148,28 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
     private static final class FragmentViewChanger {
         @NonNull
         private final FragmentManager mFragmentManager;
-        private final Map<Integer, Fragment> mFragmentMap;
+        private final HomeFragment mHomeFragment;
+        private final HistoryFragment mHistoryFragment;
 
         FragmentViewChanger(@NonNull final FragmentManager fragmentManager) {
             mFragmentManager = fragmentManager;
-            mFragmentMap = new LinkedHashMap<>();
-            mFragmentMap.put(NAV_POSITION_HOME, new HomeFragment());
-            mFragmentMap.put(NAV_POSITION_HISTORY, new HistoryFragment());
+            mHomeFragment = new HomeFragment();
+            mHistoryFragment = new HistoryFragment();
         }
 
         private void selectHome() {
-            setContentFragment(NAV_POSITION_HOME);
+            setContentFragment(mHomeFragment);
         }
 
         private void selectHistory() {
-            setContentFragment(NAV_POSITION_HISTORY);
+            setContentFragment(mHistoryFragment);
         }
 
-        private void setContentFragment(final int position) {
-            final FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            final Fragment fragment = mFragmentMap.get(position);
-            fragmentTransaction.replace(R.id.content_fragment, fragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+        private void setContentFragment(final Fragment fragment) {
+            final FragmentTransaction transaction = mFragmentManager.beginTransaction();
+            transaction.replace(R.id.content_fragment, fragment);
+            transaction.disallowAddToBackStack();
+            transaction.commit();
         }
     }
 }
