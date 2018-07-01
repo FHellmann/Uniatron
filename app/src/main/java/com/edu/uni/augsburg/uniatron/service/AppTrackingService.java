@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
@@ -19,7 +21,6 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.LearningAid;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.AppChecker;
 
@@ -46,9 +47,18 @@ public class AppTrackingService extends LifecycleService {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private DataRepository mRepository;
 
+    private final OnSharedPreferenceChangeListener mSharedPrefsListener
+            = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .removeObserver(usageTimeObserver);
+            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
+                    .observe(AppTrackingService.this, usageTimeObserver);
+        }
+    };
     private Boolean commitStatus = false;
     private Boolean lastCommitStatus = false;
-
     private Long mLearningAidDiffMillis;
     private final Observer<Long> learningAidObserver = new Observer<Long>() {
         @Override
@@ -66,7 +76,7 @@ public class AppTrackingService extends LifecycleService {
     private int remainingUsageTime = 10;
     private final Observer<Integer> usageTimeObserver = new Observer<Integer>() {
         @Override
-        public void onChanged(@Nullable Integer remainingUsageTimeDB) {
+        public void onChanged(@Nullable final Integer remainingUsageTimeDB) {
             if (remainingUsageTimeDB == null) {
                 remainingUsageTime = 10;
             } else {
@@ -75,7 +85,6 @@ public class AppTrackingService extends LifecycleService {
             }
         }
     };
-
     private final BroadcastReceiver mScreenEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -106,18 +115,14 @@ public class AppTrackingService extends LifecycleService {
         registerReceiver(mScreenEventReceiver, filter);
 
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(getBaseContext());
-
-        mSharedPreferencesHandler.registerOnPreferenceChangeListener((sharedPreferences, s) -> {
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                    .removeObserver(usageTimeObserver);
-            mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
-                    .observe(AppTrackingService.this, usageTimeObserver);
-        });
-
         mRepository = MainApplication.getRepository(getBaseContext());
+
 
         mRepository.getRemainingAppUsageTimeToday(mSharedPreferencesHandler.getAppsBlacklist())
                 .observe(this, usageTimeObserver);
+
+        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mSharedPrefsListener);
+
         mRepository.getLatestLearningAidDiff().observe(this, learningAidObserver);
 
         startAppChecker();
@@ -144,15 +149,18 @@ public class AppTrackingService extends LifecycleService {
                 .removeObserver(usageTimeObserver);
         mRepository.getLatestLearningAidDiff().removeObserver(learningAidObserver);
 
+        mSharedPreferencesHandler.unRegisterOnPreferenceChangeListener(mSharedPrefsListener);
+
         super.onDestroy();
     }
 
-    // is being called periodically and handles all logic
+    // called periodically and handles all app blocking logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
 
-        if (!blockByLearningAid(appName)){
-            blockByTimeCreditIfNecessary(appName);
-            showNotificationIfNecessary();
+        // learning aid blocking has higher priority
+        if (!blockByLearningAid(appName)) {
+            blockByTimeCreditIfTimeUp(appName);
+            showNotificationIfTimeAlmostUp();
         }
 
         if (commitStatus || !mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
@@ -160,7 +168,7 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private void showNotificationIfNecessary() {
+    private void showNotificationIfTimeAlmostUp() {
         if (remainingUsageTime == NOTIFICATION_ONE_MINUTE
                 || remainingUsageTime == NOTIFICATION_FIVE_MINUTES
                 || remainingUsageTime == NOTIFICATION_TEN_MINUTES) {
@@ -172,11 +180,11 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private void blockByTimeCreditIfNecessary(final String appName) {
+    private void blockByTimeCreditIfTimeUp(final String appName) {
         if (remainingUsageTime <= 0 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
             commitStatus = false;
 
-            Log.d(getClass().toString(), "bloacking app. time remaining = " + remainingUsageTime);
+            Log.d(getClass().toString(), "blocking app. time remaining = " + remainingUsageTime);
             final Intent blockIntent = new Intent(getApplicationContext(), MainActivity.class);
             blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(blockIntent);
@@ -193,12 +201,10 @@ public class AppTrackingService extends LifecycleService {
         final long timeBlockedMinutes = TimeCredits.CREDIT_LEARNING.getBlockedMinutes();
         final long timePassedMinutes = TimeUnit.MINUTES.convert(mLearningAidDiffMillis, TimeUnit.MILLISECONDS);
 
-        //Log.d(getClass().toString(), " blocked: " + timeBlockedMinutes + " passed: " + timePassedMinutes);
-
         if (mLearningAidDiffMillis > 0 && timePassedMinutes < timeBlockedMinutes
                 && mSharedPreferencesHandler.getAppsBlacklist().contains(appName)) {
 
-            Log.d(getClass().toString(),"aid active. blocking.. "
+            Log.d(getClass().toString(), "aid active. blocking.. "
                     + " timeblocked: " + timeBlockedMinutes
                     + " timepassed: " + timePassedMinutes);
 
@@ -236,6 +242,8 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void stopAppChecker() {
+
+
         mAppChecker.stop();
     }
 }
