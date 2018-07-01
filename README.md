@@ -8,6 +8,12 @@ At the beginning of a day, each user launches with a set amount of usage time th
 
 The automatic locking of apps will encourage the user to become more active and to counteract the general use of mobile phones.
 
+## Motivation
+- Quality > Quantity
+- Clean-Code
+- Clean-Design
+- Easy to use
+
 ## Features
 - Lock social/fun apps after a certain amount of time has been spent
 - Collect time for doing sportive activity (user can exchange steps for additional screen time)
@@ -33,6 +39,11 @@ We will further refine the prototype. Thus, additional functionalities might be 
 Considering the fact that the user can reach every content of the app with three clicks, we opted for a flat navigation hierarchy. With a navigation bar at the bottom with three options (timeline, home, settings) every screen can be reached with just one click. Accordingly, a navigation depth of no more than two clicks can be claimed on each of these pages.
 
 The design of our app complies with the design guidelines of [Google Material Design](https://material.io/guidelines/material-design/introduction.html).
+
+### Final App
+![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/FinalApp.JPG)
+
+### Prototype
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
 
 ## Coding
