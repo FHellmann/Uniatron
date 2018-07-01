@@ -33,7 +33,6 @@ public class MainActivityViewModel extends AndroidViewModel {
 
         final DataRepository repository = MainApplication.getRepository(application);
 
-
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
                 repository.getRemainingStepCountsToday(),

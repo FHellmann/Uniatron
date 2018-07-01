@@ -7,10 +7,12 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiFunction;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
+import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 import com.edu.uni.augsburg.uniatron.domain.util.AsyncTaskWrapper;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
@@ -371,13 +373,7 @@ public final class DataRepository {
      */
     public LiveData<List<Summary>> getSummaryByDate(@NonNull final Date dateFrom,
                                                     @NonNull final Date dateTo) {
-        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
-        final Date dateToMax = extractMaxTimeOfDate(dateTo);
-        return Transformations.map(
-                mDatabase.summaryDao().getSummariesByDate(dateFromMin, dateToMax),
-                data -> data == null ? Collections.emptyList()
-                        : Stream.of(data).collect(Collectors.toList())
-        );
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByDate);
     }
 
     /**
@@ -389,13 +385,7 @@ public final class DataRepository {
      */
     public LiveData<List<Summary>> getSummaryByMonth(@NonNull final Date dateFrom,
                                                      @NonNull final Date dateTo) {
-        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
-        final Date dateToMax = extractMaxTimeOfDate(dateTo);
-        return Transformations.map(
-                mDatabase.summaryDao().getSummariesByMonth(dateFromMin, dateToMax),
-                data -> data == null ? Collections.emptyList()
-                        : Stream.of(data).collect(Collectors.toList())
-        );
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByMonth);
     }
 
     /**
@@ -407,10 +397,17 @@ public final class DataRepository {
      */
     public LiveData<List<Summary>> getSummaryByYear(@NonNull final Date dateFrom,
                                                     @NonNull final Date dateTo) {
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByYear);
+    }
+
+    private LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
+                                               @NonNull final Date dateTo,
+                                               @NonNull final BiFunction<Date, Date,
+                                                       LiveData<List<SummaryEntity>>> function) {
         final Date dateFromMin = extractMinTimeOfDate(dateFrom);
         final Date dateToMax = extractMaxTimeOfDate(dateTo);
         return Transformations.map(
-                mDatabase.summaryDao().getSummariesByYear(dateFromMin, dateToMax),
+                function.apply(dateFromMin, dateToMax),
                 data -> data == null ? Collections.emptyList()
                         : Stream.of(data).collect(Collectors.toList())
         );

@@ -6,8 +6,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 public class DateUtilTest {
@@ -88,7 +90,8 @@ public class DateUtilTest {
 
         final String dateString = DateUtil.formatForMonth(calendar.getTime());
 
-        assertThat(dateString, is(equalTo("Juli 2018")));
+        assertThat(dateString, is(startsWith("Jul")));
+        assertThat(dateString, is(endsWith("2018")));
     }
 
     @Test
