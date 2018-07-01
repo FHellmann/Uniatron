@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.home.shop;
+package com.edu.uni.augsburg.uniatron.model;
 
 /**
  * The model for learning aid.
@@ -15,7 +15,7 @@ public class LearningAid {
      * @param active   The state of the learning aid.
      * @param leftTime The time left.
      */
-    LearningAid(final boolean active, final long leftTime) {
+    public LearningAid(final boolean active, final long leftTime) {
         this.active = active;
         this.leftTime = leftTime;
     }

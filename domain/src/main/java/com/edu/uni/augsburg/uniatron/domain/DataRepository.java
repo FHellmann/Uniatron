@@ -16,9 +16,11 @@ import com.edu.uni.augsburg.uniatron.domain.util.AsyncTaskWrapper;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.StepCount;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.Collections;
 import java.util.Date;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
@@ -79,11 +82,20 @@ public final class DataRepository {
      * @see TimeCreditDao#getLatestLearningAid()
      */
     @NonNull
-    public LiveData<Long> getLatestLearningAidDiff() {
+    public LiveData<LearningAid> getLatestLearningAid() {
         return Transformations.map(
                 mDatabase.timeCreditDao().getLatestLearningAid(),
-                data -> data == null ? 0 : System.currentTimeMillis() - data.getTime()
-        );
+                data -> {
+                    final long timePassed = data == null
+                            ? 0 : System.currentTimeMillis() - data.getTime();
+                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                            - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
+                    if (timeLeft > 0
+                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+                        return new LearningAid(timePassed > 0, timeLeft);
+                    }
+                    return new LearningAid(false, 0);
+                });
     }
 
     /**

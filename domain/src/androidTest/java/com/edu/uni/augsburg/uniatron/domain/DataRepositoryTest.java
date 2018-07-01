@@ -16,19 +16,18 @@ import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.StepCount;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -106,27 +105,28 @@ public class DataRepositoryTest {
     }
 
     @Test
-    public void getLatestLearningAidDiffEmpty() throws InterruptedException {
+    public void getLatestLearningAidInactive() throws InterruptedException {
         final MutableLiveData<Date> liveData = new MutableLiveData<>();
         liveData.setValue(null);
         when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
 
-        final LiveData<Long> latestLearningAidDiff = mRepository.getLatestLearningAidDiff();
+        final LiveData<LearningAid> latestLearningAidDiff = mRepository.getLatestLearningAid();
 
-        final Long liveDataValue = getLiveDataValue(latestLearningAidDiff);
-        assertThat(liveDataValue, is(equalTo(0L)));
+        final LearningAid liveDataValue = getLiveDataValue(latestLearningAidDiff);
+        assertThat(liveDataValue.isActive(), is(false));
     }
 
     @Test
-    public void getLatestLearningAidDiff() throws InterruptedException {
+    public void getLatestLearningAidActive() throws InterruptedException {
         final MutableLiveData<Date> liveData = new MutableLiveData<>();
         liveData.setValue(new Date());
         when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
 
-        final LiveData<Long> latestLearningAidDiff = mRepository.getLatestLearningAidDiff();
+        final LiveData<LearningAid> latestLearningAidDiff = mRepository.getLatestLearningAid();
 
-        final Long liveDataValue = getLiveDataValue(latestLearningAidDiff);
-        assertThat(liveDataValue > 0, is(true));
+        final LearningAid liveDataValue = getLiveDataValue(latestLearningAidDiff);
+        assertThat(liveDataValue.isActive(), is(true));
+        assertThat(liveDataValue.getLeftTime() > 0 , is(true));
     }
 
     @Test
