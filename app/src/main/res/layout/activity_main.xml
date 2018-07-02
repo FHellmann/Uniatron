@@ -62,7 +62,7 @@
                 android:drawablePadding="@dimen/activity_horizontal_margin"
                 android:drawableStart="@drawable/ic_directions_walk_white_24dp"
                 android:textAlignment="viewStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@android:color/white"
                 tools:text="387 Steps" />
 
@@ -78,7 +78,7 @@
                 android:drawableEnd="@drawable/ic_phonelink_lock_white_24dp"
                 android:drawablePadding="@dimen/activity_horizontal_margin"
                 android:textAlignment="viewEnd"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@android:color/white"
                 tools:text="2:31 Minutes" />
         </LinearLayout>

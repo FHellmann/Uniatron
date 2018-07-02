@@ -1,9 +1,11 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
@@ -16,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
@@ -65,11 +68,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 .get(MainActivityViewModel.class);
         model.getRemainingAppUsageTime().observe(this,
                 data -> mTextNavMinutes.setText(
-                        getString(R.string.nav_text_minutes, data, data % 60)));
+                        getString(R.string.nav_text_minutes, data / 60, data % 60)));
         model.getRemainingStepCountToday().observe(this,
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
         requestUsageStatsPermission();
+        requestBatteryOptimizationDisablePermission();
+        NotificationChannels.setupChannels(this);
         startServices();
     }
 
@@ -117,6 +122,21 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
+    }
+
+    private void requestBatteryOptimizationDisablePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
+            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+        }
+    }
+
+    private boolean checkBatteryOptimized() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            return !powerManager
+                    .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+        }
+        return true;
     }
 
     private void setNavToHome() {

@@ -42,12 +42,16 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // initialize logger
         Logger.addLogAdapter(new AndroidLogAdapter() {
             @Override
             public boolean isLoggable(final int priority, @Nullable final String tag) {
                 return BuildConfig.DEBUG;
             }
         });
+
+        // initialize app database
         mDataRepository = new DataRepository(AppDatabase.create(this));
         mSharedPreferencesHandler = new SharedPreferencesHandler(this);
         NotificationChannels.setupChannels(this);
