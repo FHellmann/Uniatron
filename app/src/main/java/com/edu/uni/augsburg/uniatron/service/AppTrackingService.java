@@ -15,13 +15,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.LearningAid;
-import com.edu.uni.augsburg.uniatron.notification.builder.AidFinishNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
@@ -46,8 +44,7 @@ public class AppTrackingService extends LifecycleService {
     private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
-    private static final int NOTIFICATION_TEN_MINUTES = 599;
-    private static final int LEARNING_AID_TIME_OVER = 0;
+    private static final int NOTIFICATION_TEN_MINUTES = 599;;
 
     private final AppChecker mAppChecker = new AppChecker();
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
@@ -131,14 +128,6 @@ public class AppTrackingService extends LifecycleService {
 
     // called periodically and handles all app blocking logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
-        if (mLearningAidHelper.isLearningAidActive() && mLearningAidHelper.getTimeLeft() == LEARNING_AID_TIME_OVER) {
-            final Context context = getApplicationContext();
-            final AidFinishNotificationBuilder builder = new AidFinishNotificationBuilder(context);
-            final Notification notification = builder.build();
-            final int notificationId = builder.getId();
-            NotificationManagerCompat.from(context).notify(notificationId, notification);
-        }
-        Log.d(getClass().toString(), "Time Aid left: " + mLearningAidHelper.getTimeLeft());
         mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
         if (isAppNotInBlacklist(appName)) {
             // Will catch all cases, when app name is not in the blacklist

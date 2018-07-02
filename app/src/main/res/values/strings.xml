@@ -31,7 +31,6 @@
     <string name="notify_package_added">New app installed</string>
     <string name="notify_package_added_summary">Press to add %1$s to the blacklist.</string>
     <string name="time_notification">Less than %1$d Minute%2$s left! Tap to get more time".</string>
-    <string name="aid_finish_notification">You have finished your learning aid!</string>
     <string name="time_credits_header">Choose your time credit!</string>
     <string name="learning_aid_active">The learning aid is active, you still have to wait %d minutes.</string>
     <string name="group_by_day">Group by day</string>
