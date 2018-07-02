@@ -127,16 +127,19 @@ public class AppTrackingService extends LifecycleService {
     private void delegateAppUsage(final String appName, final int timeMillis) {
         mLearningAidHelper.addLiveData(mRepository.getLatestLearningAidDiff());
 
-        //Logger.d("Remaining Time Usage=" + mUsageTimeHelper.getRemainingUsageTime() + ", Learning aid active=" + mLearningAidHelper.isLearningAidActive());
+        //Logger.d("Remaining Time Usage=" + mUsageTimeHelper.getRemainingUsageTime()
+        // + ", Learning aid active=" + mLearningAidHelper.isLearningAidActive());
 
         if (!getAppsBlacklist().contains(appName)) {
             //Logger.d("App '" + appName + "' is not on the blacklist -> SAVED");
             // Will catch all cases, when app name is not in the blacklist otherwise else...
             commitAppUsageTime(appName, timeMillis);
-        } else if (mLearningAidHelper.isLearningAidActive()) {
+            return;
+        }
+        if (mLearningAidHelper.isLearningAidActive()) {
             Logger.d("App '" + appName + "' is blocked by learning aid -> BLOCKED");
             // 1. Priority: Check whether the learning aid is active or not
-            blockByLearningAid(appName);
+            blockByLearningAid();
         } else if (mUsageTimeHelper.getRemainingUsageTime() <= 0) {
             Logger.d("App '" + appName + "' is blocked by time credit up -> BLOCKED");
             // 2. Priority: Check whether the time credit time is up or not
@@ -168,7 +171,7 @@ public class AppTrackingService extends LifecycleService {
         startActivity(blockIntent);
     }
 
-    private void blockByLearningAid(final String appName) {
+    private void blockByLearningAid() {
         if (mLearningAidHelper.getLearningAidDiffMillis()
                 == TimeCredits.CREDIT_LEARNING.getBlockedMinutes() * 60 * 1000 - 1) {
             //Logger.d("Learning aid time is up -> NOTIFICATION!");
@@ -230,14 +233,16 @@ public class AppTrackingService extends LifecycleService {
             return mRemainingUsageTime;
         }
 
-        private synchronized void addLiveData(@NonNull final LiveData<Integer> liveData) {
-            if (mReset) {
-                removeLiveData();
+        private void addLiveData(@NonNull final LiveData<Integer> liveData) {
+            synchronized (this) {
+                if (mReset) {
+                    removeLiveData();
+                }
+                mLiveData = liveData;
+                mUsageTimeMediator.addSource(mLiveData, mUsageTimeMediator::setValue);
+                mUsageTimeMediator.observeForever(this);
+                mReset = true;
             }
-            mLiveData = liveData;
-            mUsageTimeMediator.addSource(mLiveData, mUsageTimeMediator::setValue);
-            mUsageTimeMediator.observeForever(this);
-            mReset = true;
         }
 
         private void removeLiveData() {
@@ -274,14 +279,16 @@ public class AppTrackingService extends LifecycleService {
             return mLearningAidDiffMillis;
         }
 
-        private synchronized void addLiveData(@NonNull final LiveData<Long> liveData) {
-            if (mReset) {
-                removeLiveData();
+        private void addLiveData(@NonNull final LiveData<Long> liveData) {
+            synchronized (this) {
+                if (mReset) {
+                    removeLiveData();
+                }
+                mLiveData = liveData;
+                mLearningAidMediator.addSource(mLiveData, mLearningAidMediator::setValue);
+                mLearningAidMediator.observeForever(this);
+                mReset = true;
             }
-            mLiveData = liveData;
-            mLearningAidMediator.addSource(mLiveData, mLearningAidMediator::setValue);
-            mLearningAidMediator.observeForever(this);
-            mReset = true;
         }
 
         private void removeLiveData() {
