@@ -29,7 +29,7 @@ public class AidFinishNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
-        // TODO Define this string in the string.xml
+        //TODO Define this string in the string.xml
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))

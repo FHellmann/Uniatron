@@ -150,6 +150,7 @@ public class AppTrackingService extends LifecycleService {
             //Logger.d("Time is running out -> NOTIFICATION");
             // 3. Priority: Show a notification, when the time is running out
             showNotificationIfTimeAlmostUp();
+            commitAppUsageTime(appName, timeMillis);
         } else {
             //Logger.d("App '" + appName + "' usage -> SAVED");
             // x. Priority: Every other case...
