@@ -51,7 +51,7 @@ public class StepCountService extends Service implements SensorEventListener {
             final Sensor accelerometerSensor = sensorManager
                     .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             sensorManager.registerListener(this,
-                    accelerometerSensor, sensorManager.SENSOR_DELAY_FASTEST);
+                    accelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST);
         } else {
             sensorManager.registerListener(this, stepDetectorSensor,
                     SensorManager.SENSOR_DELAY_FASTEST);
