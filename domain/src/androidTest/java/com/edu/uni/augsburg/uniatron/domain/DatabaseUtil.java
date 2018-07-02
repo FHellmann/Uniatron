@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.domain;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.annimon.stream.IntStream;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
@@ -20,29 +21,41 @@ public final class DatabaseUtil {
             "Neftlix", "YouTube", "Spotify", "Soundcloud", "Instagram", "Facebook", "Twitter",
             "Pinterest", "Skype", "Messenger", "WhatsApp", "Snapchat", "Tinder", "Kindle"
     };
-    private static final int MOCK_DATA_ITEM_COUNT = 500;
+    private static final int MOCK_DATA_ITEM_COUNT = 100;
 
     private DatabaseUtil() {
     }
 
     public static void createRandomData(@NonNull final AppDatabase appDatabase) {
-        final Random random = new Random();
+        final Random random = new Random(42);
 
+        Log.i("Database", "### Starting Database mockup data creation! ###");
+
+        long start = System.currentTimeMillis();
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getAppUsage(random, index))
                 .forEach(item -> appDatabase.appUsageDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " app usage data in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getStepCount(random, index))
                 .forEach(item -> appDatabase.stepCountDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " step count data in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getTimeCredit(random, index))
                 .forEach(item -> appDatabase.timeCreditDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " time credit data in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getEmotion(random, index))
                 .forEach(item -> appDatabase.emotionDao().add(item));
+        Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " emotion data in " + (System.currentTimeMillis() - start) + "ms");
+
+        Log.i("Database", "### Database mockup data finished! ###");
     }
 
     private static AppUsageEntity getAppUsage(Random random, int index) {
@@ -81,7 +94,7 @@ public final class DatabaseUtil {
 
     private static Date getRandomDate(int index) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -(index % 50));
+        calendar.add(Calendar.DATE, -index);
 
         return calendar.getTime();
     }
