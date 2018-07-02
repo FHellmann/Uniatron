@@ -6,10 +6,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
  * @author Fabio Hellmann
  */
 public class HistoryViewModel extends AndroidViewModel {
+    private final List<LiveData<List<Summary>>> mRegisteredLiveDataList;
     private final MediatorLiveData<List<Summary>> mObservableDaySummary;
     private final DataRepository mRepository;
 
@@ -29,10 +32,17 @@ public class HistoryViewModel extends AndroidViewModel {
      */
     public HistoryViewModel(@NonNull final Application application) {
         super(application);
-
+        mRegisteredLiveDataList = new ArrayList<>();
         mRepository = MainApplication.getRepository(application);
-
         mObservableDaySummary = new MediatorLiveData<>();
+    }
+
+    /**
+     * Clear all the registered live datas.
+     */
+    public void clear() {
+        Stream.of(mRegisteredLiveDataList).forEach(mObservableDaySummary::removeSource);
+        mRegisteredLiveDataList.clear();
     }
 
     /**
@@ -41,9 +51,41 @@ public class HistoryViewModel extends AndroidViewModel {
      * @param dateFrom The date to start searching.
      * @param dateTo   The date to end searching.
      */
-    public void registerDateRange(@NonNull final Date dateFrom, @NonNull final Date dateTo) {
+    public void registerForDateRange(@NonNull final Date dateFrom, @NonNull final Date dateTo) {
+        final LiveData<List<Summary>> liveData = mRepository.getSummaryByDate(dateFrom, dateTo);
+        mRegisteredLiveDataList.add(liveData);
         mObservableDaySummary.addSource(
-                mRepository.getSummary(dateFrom, dateTo),
+                liveData,
+                mObservableDaySummary::setValue
+        );
+    }
+
+    /**
+     * Register to listen on changes of the summary for the specified time range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     */
+    public void registerForMonthRange(@NonNull final Date dateFrom, @NonNull final Date dateTo) {
+        final LiveData<List<Summary>> liveData = mRepository.getSummaryByMonth(dateFrom, dateTo);
+        mRegisteredLiveDataList.add(liveData);
+        mObservableDaySummary.addSource(
+                liveData,
+                mObservableDaySummary::setValue
+        );
+    }
+
+    /**
+     * Register to listen on changes of the summary for the specified time range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     */
+    public void registerForYearRange(@NonNull final Date dateFrom, @NonNull final Date dateTo) {
+        final LiveData<List<Summary>> liveData = mRepository.getSummaryByYear(dateFrom, dateTo);
+        mRegisteredLiveDataList.add(liveData);
+        mObservableDaySummary.addSource(
+                liveData,
                 mObservableDaySummary::setValue
         );
     }

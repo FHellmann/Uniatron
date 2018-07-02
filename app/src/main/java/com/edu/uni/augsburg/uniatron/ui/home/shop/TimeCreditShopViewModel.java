@@ -12,11 +12,11 @@ import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -29,7 +29,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
-    private final MediatorLiveData<Long> mLearningAid;
+    private final MediatorLiveData<LearningAid> mLearningAid;
     private OnShopChangedListener mListener;
 
     /**
@@ -54,7 +54,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mLearningAid = new MediatorLiveData<>();
         mLearningAid.addSource(
-                mRepository.getLatestLearningAidDiff(),
+                mRepository.getLatestLearningAid(),
                 mLearningAid::setValue
         );
     }
@@ -66,17 +66,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
      */
     @NonNull
     public LiveData<LearningAid> getLatestLearningAidTimePassed() {
-        return Transformations.map(
-                mLearningAid,
-                timePassed -> {
-                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
-                            - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
-                    if (timeLeft > 0
-                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
-                        return new LearningAid(timePassed > 0, timeLeft);
-                    }
-                    return new LearningAid(false, 0);
-                });
+        return mLearningAid;
     }
 
     /**

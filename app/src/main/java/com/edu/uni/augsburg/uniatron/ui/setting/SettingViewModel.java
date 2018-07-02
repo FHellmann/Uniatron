@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
+ * The {@link SettingViewModel} provides the data for the {@link SettingActivity}.
  *
  * @author Fabio Hellmann
  */
