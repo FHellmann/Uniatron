@@ -24,9 +24,9 @@ public class AidFinishNotificationBuilder implements AppNotificationBuilder {
         this.mContext = context;
     }
 
-
     @Override
     public Notification build() {
+        // TODO Define this string in the string.xml
         final String detailedText = "You have finished your learning aid!";
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -49,5 +49,4 @@ public class AidFinishNotificationBuilder implements AppNotificationBuilder {
     public int getId() {
         return 0;
     }
-
 }

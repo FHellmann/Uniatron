@@ -30,9 +30,9 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
         this.remainingTime = remainingTime;
     }
 
-
     @Override
     public Notification build() {
+        // TODO Define this string in the string.xml and call it with parameters
         final String detailedText = (int) Math.round(remainingTime / 60.0f) + " Minute"
                         + (Math.round(remainingTime / 60.0f) == 1 ? "" : "s")
                         + " left! Tap to get more time";
@@ -57,5 +57,4 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     public int getId() {
         return 0;
     }
-
 }

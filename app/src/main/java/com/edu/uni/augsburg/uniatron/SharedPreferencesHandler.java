@@ -113,7 +113,7 @@ public final class SharedPreferencesHandler {
      *
      * @param listener the listener to register
      */
-    public void unRegisterOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
+    public void unregisterOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 }
