@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 .get(MainActivityViewModel.class);
         model.getRemainingAppUsageTime().observe(this,
                 data -> mTextNavMinutes.setText(
-                        getString(R.string.nav_text_minutes, data, data % 60)));
+                        getString(R.string.nav_text_minutes, data / 60, data % 60)));
         model.getRemainingStepCountToday().observe(this,
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
