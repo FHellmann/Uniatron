@@ -15,11 +15,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.notification.builder.AidFinishNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
@@ -41,11 +42,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class AppTrackingService extends LifecycleService {
 
-    private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final List<String> FILTERS = new ArrayList<>();
+    private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
     private static final int NOTIFICATION_TEN_MINUTES = 599;
+    private static final int LEARNING_AID_TIME_OVER = 0;
 
     private final AppChecker mAppChecker = new AppChecker();
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
@@ -89,7 +91,7 @@ public class AppTrackingService extends LifecycleService {
         mRepository = MainApplication.getRepository(getBaseContext());
 
         mUsageTimeHelper.addLiveData(mRepository.getRemainingAppUsageTimeToday(getAppsBlacklist()));
-        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAidDiff());
+        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
 
         mSharedPreferencesHandler.registerOnPreferenceChangeListener(mPrefChangeListener);
 
@@ -123,36 +125,39 @@ public class AppTrackingService extends LifecycleService {
         return mSharedPreferencesHandler.getAppsBlacklist();
     }
 
+    private boolean isAppNotInBlacklist(@NonNull final String appName) {
+        return !getAppsBlacklist().contains(appName);
+    }
+
     // called periodically and handles all app blocking logic
     private void delegateAppUsage(final String appName, final int timeMillis) {
-        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAidDiff());
-
-        //Logger.d("Remaining Time Usage=" + mUsageTimeHelper.getRemainingUsageTime()
-        // + ", Learning aid active=" + mLearningAidHelper.isLearningAidActive());
-
-        if (!getAppsBlacklist().contains(appName)) {
-            //Logger.d("App '" + appName + "' is not on the blacklist -> SAVED");
-            // Will catch all cases, when app name is not in the blacklist otherwise else...
-            commitAppUsageTime(appName, timeMillis);
-            return;
+        if (mLearningAidHelper.isLearningAidActive() && mLearningAidHelper.getTimeLeft() == LEARNING_AID_TIME_OVER) {
+            final Context context = getApplicationContext();
+            final AidFinishNotificationBuilder builder = new AidFinishNotificationBuilder(context);
+            final Notification notification = builder.build();
+            final int notificationId = builder.getId();
+            NotificationManagerCompat.from(context).notify(notificationId, notification);
         }
-        if (mLearningAidHelper.isLearningAidActive()) {
+        Log.d(getClass().toString(), "Time Aid left: " + mLearningAidHelper.getTimeLeft());
+        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
+        if (isAppNotInBlacklist(appName)) {
+            // Will catch all cases, when app name is not in the blacklist
+            commitAppUsageTime(appName, timeMillis);
+        } else if (mLearningAidHelper.isLearningAidActive()) {
             Logger.d("App '" + appName + "' is blocked by learning aid -> BLOCKED");
             // 1. Priority: Check whether the learning aid is active or not
             blockByLearningAid();
         } else if (mUsageTimeHelper.getRemainingUsageTime() <= 0) {
-            Logger.d("App '" + appName + "' is blocked by time credit up -> BLOCKED");
+            //Logger.d("App '" + appName + "' is blocked by time credit up -> BLOCKED");
             // 2. Priority: Check whether the time credit time is up or not
             blockByTimeCreditIfTimeUp();
-        } else if (mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_ONE_MINUTE
-                || mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_FIVE_MINUTES
-                || mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_TEN_MINUTES) {
-            //Logger.d("Time is running out -> NOTIFICATION");
-            // 3. Priority: Show a notification, when the time is running out
-            showNotificationIfTimeAlmostUp();
-            commitAppUsageTime(appName, timeMillis);
         } else {
-            //Logger.d("App '" + appName + "' usage -> SAVED");
+            if (mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_ONE_MINUTE
+                    || mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_FIVE_MINUTES
+                    || mUsageTimeHelper.getRemainingUsageTime() == NOTIFICATION_TEN_MINUTES) {
+                Logger.d("Time is running out -> NOTIFICATION");
+                showNotificationIfTimeAlmostUp();
+            }
             // x. Priority: Every other case...
             commitAppUsageTime(appName, timeMillis);
         }
@@ -160,7 +165,10 @@ public class AppTrackingService extends LifecycleService {
 
     private void showNotificationIfTimeAlmostUp() {
         final Context context = getApplicationContext();
-        final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(context, mUsageTimeHelper.getRemainingUsageTime() + 1);
+        final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(
+                context,
+                mUsageTimeHelper.getRemainingUsageTime() + 1
+        );
         final Notification notification = builder.build();
         final int notificationId = builder.getId();
         NotificationManagerCompat.from(context).notify(notificationId, notification);
@@ -173,16 +181,6 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void blockByLearningAid() {
-        if (mLearningAidHelper.getLearningAidDiffMillis()
-                == TimeCredits.CREDIT_LEARNING.getBlockedMinutes() * 60 * 1000 - 1) {
-            //Logger.d("Learning aid time is up -> NOTIFICATION!");
-            final Context context = getApplicationContext();
-            final AidFinishNotificationBuilder builder = new AidFinishNotificationBuilder(context);
-            final Notification notification = builder.build();
-            final int notificationId = builder.getId();
-            NotificationManagerCompat.from(context).notify(notificationId, notification);
-        }
-
         final Intent blockIntent = new Intent(getApplicationContext(), TimeCreditShopActivity.class);
         blockIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(blockIntent);
@@ -253,34 +251,30 @@ public class AppTrackingService extends LifecycleService {
         }
     }
 
-    private static final class LearningAidHelper implements Observer<Long> {
-        private final MediatorLiveData<Long> mLearningAidMediator = new MediatorLiveData<>();
-        private Long mLearningAidDiffMillis = 0L;
-        private LiveData<Long> mLiveData;
+    private static final class LearningAidHelper implements Observer<LearningAid> {
+        private final MediatorLiveData<LearningAid> mLearningAidMediator = new MediatorLiveData<>();
+        private LearningAid mLearningAidTmp;
+        private LiveData<LearningAid> mLiveData;
         private boolean mReset;
 
         @Override
-        public void onChanged(@Nullable final Long learningAidDiff) {
-            if (learningAidDiff == null) {
-                mLearningAidDiffMillis = 0L;
+        public void onChanged(@Nullable final LearningAid learningAid) {
+            if (learningAid == null) {
+                mLearningAidTmp = new LearningAid(false, 0);
             } else {
-                mLearningAidDiffMillis = learningAidDiff;
+                mLearningAidTmp = learningAid;
             }
         }
 
         private boolean isLearningAidActive() {
-            final long timeBlockedMinutes = TimeCredits.CREDIT_LEARNING.getBlockedMinutes();
-            final long timePassedMinutes = TimeUnit.MINUTES
-                    .convert(mLearningAidDiffMillis, TimeUnit.MILLISECONDS);
-
-            return mLearningAidDiffMillis > 0 && timePassedMinutes < timeBlockedMinutes;
+            return mLearningAidTmp.isActive();
         }
 
-        private long getLearningAidDiffMillis() {
-            return mLearningAidDiffMillis;
+        private long getTimeLeft() {
+            return mLearningAidTmp.getLeftTime();
         }
 
-        private void addLiveData(@NonNull final LiveData<Long> liveData) {
+        private void addLiveData(@NonNull final LiveData<LearningAid> liveData) {
             synchronized (this) {
                 if (mReset) {
                     removeLiveData();

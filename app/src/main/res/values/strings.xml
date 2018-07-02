@@ -2,14 +2,16 @@
     <string name="app_name">UNIAtron</string>
     <string name="title_home">Home</string>
     <string name="title_history">History</string>
-    <string name="title_settings">Settings</string>
+    <string name="settings">Settings</string>
     <string name="app_others">Others</string>
     <string name="card_time_credit_steps">%d minutes\nfor %d steps</string>
     <string name="card_time_credit_learning">%d minutes\nfor %d minutes blocking</string>
     <string name="cancel">Cancel</string>
     <string name="time_credit_shop_title">Time Credit Shop</string>
     <string name="home_chart_no_data">Have you already used some apps today?</string>
-    <string name="pie_chart_center_text">%1$d:%2$02d minute(s)\nremaining</string>
+    <string name="pie_chart_center_text">TOP 5</string>
+    <string name="nav_text_minutes">%1$d:%2$02d minutes</string>
+    <string name="nav_text_steps">%1$d steps</string>
     <string name="trade">Trade</string>
     <string name="ok">OK</string>
     <string name="pref_category_general">General</string>
@@ -28,6 +30,11 @@
     <string name="learning_finished">Learning finished</string>
     <string name="notify_package_added">New app installed</string>
     <string name="notify_package_added_summary">Press to add %1$s to the blacklist.</string>
+    <string name="time_notification">Less than %1$d Minute%2$s left! Tap to get more time".</string>
+    <string name="aid_finish_notification">You have finished your learning aid!</string>
     <string name="time_credits_header">Choose your time credit!</string>
     <string name="learning_aid_active">The learning aid is active, you still have to wait %d minutes.</string>
+    <string name="group_by_day">Group by day</string>
+    <string name="group_by_month">Group by month</string>
+    <string name="group_by_year">Group by year</string>
 </resources>

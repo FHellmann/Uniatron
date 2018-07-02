@@ -29,11 +29,10 @@ public class AidFinishNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
-        //TODO Define this string in the string.xml
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText("You have finished your learning aid!")
+                .setContentText(mContext.getString(R.string.aid_finish_notification))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,

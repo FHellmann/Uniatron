@@ -7,18 +7,22 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiFunction;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
+import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 import com.edu.uni.augsburg.uniatron.domain.util.AsyncTaskWrapper;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.StepCount;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
+import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.Collections;
 import java.util.Date;
@@ -26,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
@@ -79,11 +84,20 @@ public final class DataRepository {
      * @see TimeCreditDao#getLatestLearningAid()
      */
     @NonNull
-    public LiveData<Long> getLatestLearningAidDiff() {
+    public LiveData<LearningAid> getLatestLearningAid() {
         return Transformations.map(
                 mDatabase.timeCreditDao().getLatestLearningAid(),
-                data -> data == null ? 0 : System.currentTimeMillis() - data.getTime()
-        );
+                data -> {
+                    final long timePassed = data == null
+                            ? 0 : System.currentTimeMillis() - data.getTime();
+                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                            - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
+                    if (timeLeft > 0
+                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+                        return new LearningAid(timePassed > 0, timeLeft);
+                    }
+                    return new LearningAid(false, 0);
+                });
     }
 
     /**
@@ -357,12 +371,43 @@ public final class DataRepository {
      * @param dateTo   The date to end searching.
      * @return The summaries.
      */
-    public LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
-                                              @NonNull final Date dateTo) {
+    public LiveData<List<Summary>> getSummaryByDate(@NonNull final Date dateFrom,
+                                                    @NonNull final Date dateTo) {
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByDate);
+    }
+
+    /**
+     * Get the summaries for a specified date range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     * @return The summaries.
+     */
+    public LiveData<List<Summary>> getSummaryByMonth(@NonNull final Date dateFrom,
+                                                     @NonNull final Date dateTo) {
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByMonth);
+    }
+
+    /**
+     * Get the summaries for a specified date range.
+     *
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
+     * @return The summaries.
+     */
+    public LiveData<List<Summary>> getSummaryByYear(@NonNull final Date dateFrom,
+                                                    @NonNull final Date dateTo) {
+        return getSummary(dateFrom, dateTo, mDatabase.summaryDao()::getSummariesByYear);
+    }
+
+    private LiveData<List<Summary>> getSummary(@NonNull final Date dateFrom,
+                                               @NonNull final Date dateTo,
+                                               @NonNull final BiFunction<Date, Date,
+                                                       LiveData<List<SummaryEntity>>> function) {
         final Date dateFromMin = extractMinTimeOfDate(dateFrom);
         final Date dateToMax = extractMaxTimeOfDate(dateTo);
         return Transformations.map(
-                mDatabase.summaryDao().getSummaries(dateFromMin, dateToMax),
+                function.apply(dateFromMin, dateToMax),
                 data -> data == null ? Collections.emptyList()
                         : Stream.of(data).collect(Collectors.toList())
         );

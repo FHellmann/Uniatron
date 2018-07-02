@@ -32,14 +32,11 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public Notification build() {
-        //TODO Define this string in the string.xml and call it with parameters
-        final String detailedText = "Less than" + (int) Math.round(remainingTime / 60.0f) + " Minute"
-                        + (Math.round(remainingTime / 60.0f) == 1 ? "" : "s")
-                        + " left! Tap to get more time";
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText(detailedText)
+                .setContentText(mContext.getString(R.string.time_notification,
+                        (int) Math.round(remainingTime / 60.0f), Math.round(remainingTime / 60.0f) == 1 ? "" : "s"))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
