@@ -45,9 +45,9 @@ Considering the fact that the user can reach every content of the app with three
 The design of our app complies with the design guidelines of [Google Material Design](https://material.io/guidelines/material-design/introduction.html).
 
 ### Final App
-<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/1_Play-Store.png' width="230" />
-<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/2_Play-Store.png' width="230" />
-<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/3_Play-Store.png' width="230" />
+Home | History | History
+:---:|:-------:|:------:
+<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/1_Play-Store.png' width="230" /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/2_Play-Store.png' width="230" /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/3_Play-Store.png' width="230" />
 
 ### Prototype
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
