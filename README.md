@@ -18,12 +18,17 @@ The automatic locking of apps will encourage the user to become more active and 
 - Clean-Design
 - Easy to use
 
-## Features
-- Lock social/fun apps after a certain amount of time has been spent
-- Collect time for doing sportive activity (user can exchange steps for additional screen time)
-- Track emotions after app usage and throughout the day (via questions/smileys)
-- Configure app settings (user can set the time at which the daily stepcount reset happens)
-- Aid learning (locking screen/apps for certain amount of time)
+## Feature descriptions
+### App time usage
+Collect time for doing sportive activity (user can exchange steps for additional screen time)
+### App locking
+Lock social/fun apps after a certain amount of time has been spent
+### Emotion tracking
+Track emotions after app usage and throughout the day (via questions/smileys)
+### Configurations
+Configure app settings (user can set the time at which the daily stepcount reset happens)
+### Learning Aid
+Aid learning (locking screen/apps for certain amount of time)
 
 ## Schedule
 ### Milestone 1: First prototype (Due date May 31, 2018)
@@ -34,10 +39,17 @@ We will create a first prototype with the basic functionality.
 - Tracking emotions
 - Configure the app
 
-### Milestone 2: Final app (Due date June 28, 2018)
+### Milestone 2: Final app - BETA (Due date July 5, 2018)
 We will further refine the prototype. Thus, additional functionalities might be implemented.
 
 - Learning aid
+
+### Milestone 3: Final app - RELEASE
+
+- Onboarding
+- Detail history day/month/year view
+- App Icon
+- (Wearables connection)
 
 ## Design
 Considering the fact that the user can reach every content of the app with three clicks, we opted for a flat navigation hierarchy. With a navigation bar at the bottom with three options (timeline, home, settings) every screen can be reached with just one click. Accordingly, a navigation depth of no more than two clicks can be claimed on each of these pages.
@@ -47,7 +59,7 @@ The design of our app complies with the design guidelines of [Google Material De
 ### Final App
 Home | History | History
 :---:|:-------:|:------:
-<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/1_Play-Store.png' width="240" /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/2_Play-Store.png' width="240" /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/3_Play-Store.png' width="240" />
+<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/1_Play-Store.png' /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/2_Play-Store.png' /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/3_Play-Store.png' />
 
 ### Prototype
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
