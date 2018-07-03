@@ -7,9 +7,12 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -23,7 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The {@link SettingViewModel} provides the data for the {@link SettingFragment}.
+ * The {@link SettingViewModel} provides the data for the {@link SettingActivity}.
  *
  * @author Fabio Hellmann
  */
@@ -31,6 +34,13 @@ public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;
+    private final OnSharedPreferenceChangeListener mSharedPrefsListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final  String key) {
+            Log.d(getClass().toString(), "shared prefs changed");
+            mObservable.postValue(getAllInstalledApps(getApplication()));
+        }
+    };
 
     /**
      * Ctr.
@@ -43,9 +53,8 @@ public class SettingViewModel extends AndroidViewModel {
         mHandler = MainApplication.getSharedPreferencesHandler(application);
 
         // the blacklist will be instantly updated upon saving the selection the user made
-        MainApplication.getSharedPreferencesHandler(application).registerOnPreferenceChangeListener(
-                (sharedPrefs, key) -> mObservable.postValue(getAllInstalledApps(getApplication()))
-        );
+        MainApplication.getSharedPreferencesHandler(application)
+                .registerOnPreferenceChangeListener(mSharedPrefsListener);
 
         mObservable.setValue(getAllInstalledApps(application));
 

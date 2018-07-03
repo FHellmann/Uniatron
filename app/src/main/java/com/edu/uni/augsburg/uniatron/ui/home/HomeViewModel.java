@@ -13,14 +13,12 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -34,8 +32,6 @@ public class HomeViewModel extends AndroidViewModel {
      */
     public static final int MAX_COUNT = 5;
     private final MediatorLiveData<Map<String, Double>> mAppUsages;
-    private final MediatorLiveData<Integer> mRemainingStepCount;
-    private final MediatorLiveData<Integer> mRemainingAppUsageTime;
 
     /**
      * Ctr.
@@ -47,27 +43,10 @@ public class HomeViewModel extends AndroidViewModel {
 
         final DataRepository repository = MainApplication.getRepository(application);
 
-        final SharedPreferencesHandler handler = MainApplication.
-                getSharedPreferencesHandler(application);
-
-        final Set<String> blacklist = handler.getAppsBlacklist();
-
         mAppUsages = new MediatorLiveData<>();
         mAppUsages.addSource(
                 repository.getAppUsagePercentToday(),
                 mAppUsages::setValue
-        );
-
-        mRemainingStepCount = new MediatorLiveData<>();
-        mRemainingStepCount.addSource(
-                repository.getRemainingStepCountsToday(),
-                mRemainingStepCount::setValue
-        );
-
-        mRemainingAppUsageTime = new MediatorLiveData<>();
-        mRemainingAppUsageTime.addSource(
-                repository.getRemainingAppUsageTimeToday(blacklist),
-                mRemainingAppUsageTime::setValue
         );
     }
 
@@ -80,28 +59,6 @@ public class HomeViewModel extends AndroidViewModel {
     @NonNull
     public LiveData<Map<String, Double>> getAppUsageOfTop5Apps(@NonNull final Context context) {
         return Transformations.map(mAppUsages, data -> extractValues(context, data, MAX_COUNT));
-    }
-
-    /**
-     * Get the remaining step count for today.
-     *
-     * @return The remaining step count.
-     */
-    @NonNull
-    public LiveData<Integer> getRemainingStepCountToday() {
-        return Transformations.map(mRemainingStepCount,
-                data -> data != null && data > 0 ? data : 0);
-    }
-
-    /**
-     * Get the remaining app usage time for today.
-     *
-     * @return The remaining app usage time.
-     */
-    @NonNull
-    public LiveData<Integer> getRemainingAppUsageTime() {
-        return Transformations.map(mRemainingAppUsageTime,
-                data -> data != null && data > 0 ? data : 0);
     }
 
     @NonNull

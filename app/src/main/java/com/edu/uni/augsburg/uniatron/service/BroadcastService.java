@@ -25,14 +25,12 @@ public class BroadcastService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         registerReceiver(mPackageAddedReceiver, PackageAddedHandler.getIntentFilter());
-
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         unregisterReceiver(mPackageAddedReceiver);
-
         super.onDestroy();
     }
 }

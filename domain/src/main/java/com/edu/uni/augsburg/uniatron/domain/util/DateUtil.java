@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * This is a helper class for date specific actions.
@@ -53,5 +54,75 @@ public final class DateUtil {
         calendar.set(Calendar.SECOND, SECOND_MAX);
         calendar.set(Calendar.MILLISECOND, MILLISECOND_MAX);
         return calendar.getTime();
+    }
+
+    /**
+     * Get the earliest date of the specified month.
+     *
+     * @param date The month to get the earliest date.
+     * @return The date.
+     */
+    @NonNull
+    public static Date extractMinDateOfMonth(@NonNull final Date date) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    /**
+     * Get the earliest month of the specified year.
+     *
+     * @param date The year to get the earliest month.
+     * @return The date.
+     */
+    @NonNull
+    public static Date extractMinMonthOfYear(@NonNull final Date date) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.MONTH, 0);
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    /**
+     * Format the date to a date specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForDate(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%te. %tb %tY", date, date, date);
+    }
+
+    /**
+     * Format the date to a month specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForMonth(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%tB %tY", date, date);
+    }
+
+    /**
+     * Format the date to a year specific string.
+     *
+     * @param date The date to format.
+     * @return the formatted date.
+     */
+    @NonNull
+    public static String formatForYear(@NonNull final Date date) {
+        return String.format(Locale.getDefault(), "%tY", date);
     }
 }
