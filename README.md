@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/FHellmann/Uniatron.svg?branch=master)](https://travis-ci.org/FHellmann/Uniatron)
 [![Coverage Status](https://coveralls.io/repos/github/FHellmann/Uniatron/badge.svg?branch=master)](https://coveralls.io/github/FHellmann/Uniatron?branch=master)
 
-![Banner](https://github.com/FHellmann/Uniatron/blob/master/doc/Play Store/0_Play-Store_Functiongraph.png)
+![Banner](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/0_Play-Store_Functiongraph.png)
 
 **Uniatron is the app to spend less time on the phone and more time with exercise!**
 
