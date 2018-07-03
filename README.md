@@ -2,11 +2,15 @@
 [![Build Status](https://travis-ci.org/FHellmann/Uniatron.svg?branch=master)](https://travis-ci.org/FHellmann/Uniatron)
 [![Coverage Status](https://coveralls.io/repos/github/FHellmann/Uniatron/badge.svg?branch=master)](https://coveralls.io/github/FHellmann/Uniatron?branch=master)
 
+![Banner](https://github.com/FHellmann/Uniatron/blob/master/doc/Play Store/0_Play-Store_Functiongraph.png)
+
 **Uniatron is the app to spend less time on the phone and more time with exercise!**
 
 At the beginning of a day, each user launches with a set amount of usage time that gradually degrades as apps are used. By achieving activity goals, they can be used to re-enable usage time. Depending on the extent of the activity, a longer or shorter usage time can be added to your daily limit.
 
 The automatic locking of apps will encourage the user to become more active and to counteract the general use of mobile phones.
+
+[![Get it on Google Play](https://play.google.com/intl/en_gb/badges/images/generic/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.edu.uni.augsburg.uniatron&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
 ## Motivation
 - Quality > Quantity
