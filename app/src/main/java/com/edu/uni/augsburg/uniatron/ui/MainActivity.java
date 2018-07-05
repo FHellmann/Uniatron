@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
     private void requestBatteryOptimizationDisablePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
-            Intent batteryIntent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            final Intent batteryIntent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
 
             batteryIntent.setData(Uri.parse("package:" + getPackageName()));
             startActivity(batteryIntent);
