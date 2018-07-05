@@ -6,9 +6,13 @@
 
 **Uniatron is the app to spend less time on the phone and more time with exercise!**
 
-At the beginning of a day, each user launches with a set amount of usage time that gradually degrades as apps are used. By achieving activity goals (steps during the day), they can be used to re-enable usage time. Depending on the extent of the activity, a longer or shorter usage time can be added to your daily limit.
+Smartphone usage today has become excessive and is becoming a serious concern for overall health. This app tries to counteract
 
-The automatic locking of apps will encourage the user to become more active and to counteract the general use of mobile phones.
+At the beginning of each day the user launches with no time contingent. This will benefit both people who use their phone too much past midnight, as well as everyone who doesn't want to leave their bed and spends too much time on their phone directly after waking up. 
+
+By achieving activity goals (steps during the day), the user can re-enable usage time. Depending on the extent of the activity, a longer or shorter usage time can be added to your daily limit.
+
+The automatic locking of apps will encourage the user to become more active. Additionally, it will counteract excessive usage of mobile devices.
 
 [<img alt='Get it on Google Play' src='https://play.google.com/intl/en_gb/badges/images/generic/en_badge_web_generic.png' width="180" />](https://play.google.com/store/apps/details?id=com.edu.uni.augsburg.uniatron&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
