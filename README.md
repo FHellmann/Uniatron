@@ -24,7 +24,7 @@ Collect time for all used apps during the day (whether in blacklist or not).
 The Top 5 apps and their percentages in usage time are displayed in the pie cart on the main page.
 ### Step Counter
 You are rewarded for doing sportive activity (user can exchange steps for additional screen time).
-All steps are being counted during the day via a build-in sensor.
+All steps are being counted during the day via a built-in sensor.
 The amount of recent steps is displayed on the lower left part of the main page.
 After exchange to usage time the amount is decreased by the specified number. 
 (For overview on all steps see History View)
