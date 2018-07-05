@@ -29,22 +29,22 @@ The amount of recent steps is displayed on the lower left part of the main page.
 After exchange to usage time the amount is decreased by the specified number. 
 (For overview on all steps see History View)
 ### App locking
-Lock social/fun apps from blacklist after a certain amount of time has been spent on the phone.
-After App Lock is active when opening specific blocked app Uniatron 
+Lock social/fun apps from Blacklist after a certain amount of time has been spent on the phone.
+After App Lock is active when opening blacklisted apps Uniatron will block the access to these apps. 
 ### Learning Aid
 Helps you keep concentrated by locking screen/apps for a certain amount of time.
 You won't be destracted by your phone anymore.
 E.g. screen is locked for 55 minutes before you get access to apps again.
-### Emotion tracking
-Track emotions after app usage and throughout the day (via emojis on a range from sad to happy).
-You can track your mood afterward in the History View
 ### History View
 By clicking on history (on main page) you get a list of recent days with info on average emotion, total of app usage time and total amount of steps during this day.
 By selecting "Group by month" or "Group by year" the list consists of entrys with summarys for month or year
+### Emotion tracking
+Track emotions after app usage and throughout the day (via emojis on a range from sad to happy).
+You can track your mood afterwards in the History View.
 ### Configurations
 Configure app settings:
-Select a Fitness Level: How easy/hard do you want it to be to exchange steps for usage time
-In the blacklist all apps that you want to get blocked by Uniatron should be selected.
+Select a Fitness Level: How easy/hard do you want it to be to exchange steps for usage time.
+In the Blacklist all apps that you want to get blocked by Uniatron should be selected.
 
 
 
