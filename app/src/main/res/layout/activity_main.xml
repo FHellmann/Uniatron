@@ -60,11 +60,11 @@
                 android:layout_marginTop="@dimen/card_vertical_margin"
                 android:layout_weight="1"
                 android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_directions_walk_white_24dp"
-                android:textAlignment="viewStart"
+                android:drawableStart="@drawable/ic_copyright_black_24dp"
+                android:gravity="center_vertical|start"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@android:color/white"
-                tools:text="387 Steps" />
+                tools:text="387" />
 
             <TextView
                 android:id="@+id/textNavMinutes"
@@ -77,29 +77,19 @@
                 android:layout_weight="1"
                 android:drawableEnd="@drawable/ic_phonelink_lock_white_24dp"
                 android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:textAlignment="viewEnd"
+                android:gravity="center_vertical|end"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@android:color/white"
                 tools:text="2:31 Minutes" />
         </LinearLayout>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabTextColor="@android:color/white">
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:icon="@drawable/ic_home_white_24dp"
-                android:text="@string/title_home" />
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:icon="@drawable/ic_history_white_24dp"
-                android:text="@string/title_history" />
-        </android.support.design.widget.TabLayout>
+            android:background="@color/primaryColor"
+            app:itemIconTint="@color/secondaryLightColor"
+            app:itemTextColor="@android:color/white"
+            app:menu="@menu/navigation" />
     </android.support.design.widget.AppBarLayout>
 </LinearLayout>

@@ -1,9 +1,10 @@
-package com.edu.uni.augsburg.uniatron.domain;
+package com.edu.uni.augsburg.uniatron.domain.util;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.annimon.stream.IntStream;
+import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -69,7 +70,7 @@ public final class DatabaseUtil {
     private static StepCountEntity getStepCount(Random random, int index) {
         final StepCountEntity stepCountEntity = new StepCountEntity();
         stepCountEntity.setTimestamp(getRandomDate(index));
-        stepCountEntity.setStepCount(random.nextInt(1000));
+        stepCountEntity.setStepCount(random.nextInt(10000));
         return stepCountEntity;
     }
 
@@ -94,7 +95,7 @@ public final class DatabaseUtil {
 
     private static Date getRandomDate(int index) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -index);
+        calendar.add(Calendar.DATE, -index%5);
 
         return calendar.getTime();
     }

@@ -24,6 +24,7 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.lid.lib.LabelTextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,6 +70,13 @@ public class TimeCreditShopActivity extends AppCompatActivity {
         mModel = ViewModelProviders.of(this)
                 .get(TimeCreditShopViewModel.class);
         mModel.setShopChangeListener(empty -> mMenuTrade.setVisible(!empty));
+
+        mRadioGroupEmotion.setOnCheckedChangeListener((radioGroup, position) -> {
+            final int checkedRadioButtonId = mRadioGroupEmotion.getCheckedRadioButtonId();
+            final View checkedRadioButton = mRadioGroupEmotion.findViewById(checkedRadioButtonId);
+            final int checkedIndex = mRadioGroupEmotion.indexOfChild(checkedRadioButton);
+            mModel.setEmotion(Emotions.values()[checkedIndex]);
+        });
 
         setupRecyclerView();
 
@@ -126,6 +134,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.homeAsUp:
+                mModel.clear();
                 finish();
                 return true;
             case R.id.trade:
@@ -137,13 +146,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     }
 
     private void trade() {
-        // Get selected emotion
-        final int checkedRadioButtonId = mRadioGroupEmotion.getCheckedRadioButtonId();
-        final View checkedRadioButton = mRadioGroupEmotion.findViewById(checkedRadioButtonId);
-        final int checkedIndex = mRadioGroupEmotion.indexOfChild(checkedRadioButton);
-
-        // Buy the time credit
-        mModel.buy(Emotions.values()[checkedIndex]);
+        mModel.buy();
         finish();
     }
 
@@ -186,18 +189,28 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             }
             holder.mValue = timeCredits;
 
+            holder.mTextViewTradeOffer.setText(String.valueOf(timeCredits.getTime()) + " Min");
+            holder.mTextViewTradeOffer.setCompoundDrawables(null, null, null, null);
+            holder.mTextViewTradeOffer.setLabelHeight(30);
+
             if (timeCredits == TimeCredits.CREDIT_LEARNING) {
+                /*
                 holder.mTextViewTradeOffer.setText(getString(
                         R.string.card_time_credit_learning,
                         timeCredits.getTime(),
                         timeCredits.getBlockedMinutes())
                 );
+                */
+                holder.mTextViewTradeOffer.setLabelText(String.valueOf(timeCredits.getBlockedMinutes()) + " Min");
             } else {
+                /*
                 holder.mTextViewTradeOffer.setText(getString(
                         R.string.card_time_credit_steps,
                         timeCredits.getTime(),
                         (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()))
                 );
+                */
+                holder.mTextViewTradeOffer.setLabelText(String.valueOf((int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount())) + " \u00A9");
             }
         }
 
@@ -225,7 +238,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
          */
         public final class ViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.textViewTradeOffer)
-            TextView mTextViewTradeOffer;
+            LabelTextView mTextViewTradeOffer;
             private TimeCredits mValue;
 
             ViewHolder(final View itemView) {

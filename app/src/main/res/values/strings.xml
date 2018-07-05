@@ -11,7 +11,7 @@
     <string name="home_chart_no_data">Have you already used some apps today?</string>
     <string name="pie_chart_center_text">TOP 5</string>
     <string name="nav_text_minutes">%1$d:%2$02d minutes</string>
-    <string name="nav_text_steps">%1$d steps</string>
+    <string name="nav_text_money">%1$d</string>
     <string name="trade">Trade</string>
     <string name="ok">OK</string>
     <string name="pref_category_general">General</string>

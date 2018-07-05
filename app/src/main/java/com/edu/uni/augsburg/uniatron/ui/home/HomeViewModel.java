@@ -30,7 +30,7 @@ public class HomeViewModel extends AndroidViewModel {
     /**
      * The maximum count of apps shown as top n apps.
      */
-    public static final int MAX_COUNT = 5;
+    public static final int MAX_COUNT = 4;
     private final MediatorLiveData<Map<String, Double>> mAppUsages;
 
     /**

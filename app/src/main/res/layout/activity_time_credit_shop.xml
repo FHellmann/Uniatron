@@ -71,7 +71,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:checkedButton="@+id/radioButton3"
                 android:orientation="horizontal">
 
                 <RadioButton

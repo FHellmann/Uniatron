@@ -51,10 +51,11 @@ dependencies {
     implementation 'com.annimon:stream:1.2.0'
     implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
     implementation 'com.rvalerio:fgchecker:1.1.0'
+    implementation 'com.github.linger1216:labelview:v1.1.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
-apply from: rootProject.file('gradle/static-analysis.gradle')
+//apply from: rootProject.file('gradle/static-analysis.gradle')

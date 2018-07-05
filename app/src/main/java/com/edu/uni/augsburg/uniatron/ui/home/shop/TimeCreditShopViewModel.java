@@ -28,6 +28,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
+    private final List<Emotions> mEmotionCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
     private final MediatorLiveData<LearningAid> mLearningAid;
     private OnShopChangedListener mListener;
@@ -45,6 +46,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
         mRepository = MainApplication.getRepository(application);
 
         mShoppingCart = new ArrayList<>();
+        mEmotionCart = new ArrayList<>();
 
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
@@ -89,7 +91,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
         mShoppingCart.clear(); // We only want one entry
         mShoppingCart.add(timeCredits);
         if (mListener != null) {
-            mListener.onChange(mShoppingCart.isEmpty());
+            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
         }
     }
 
@@ -101,7 +103,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     public void removeFromShoppingCart(@NonNull final TimeCredits timeCredits) {
         mShoppingCart.remove(timeCredits);
         if (mListener != null) {
-            mListener.onChange(mShoppingCart.isEmpty());
+            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
         }
     }
 
@@ -116,17 +118,36 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     }
 
     /**
-     * Stores the saved time credits of the shopping cart in the database.
+     * Set the emotion of the user.
      *
-     * @param emotion The emotion.
+     * @param emotion the user emotion.
      */
-    public void buy(@NonNull final Emotions emotion) {
-        if (!mShoppingCart.isEmpty()) {
+    public void setEmotion(@NonNull final Emotions emotion) {
+        mEmotionCart.add(emotion);
+        if (mListener != null) {
+            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
+        }
+    }
+
+    /**
+     * Clear the shopping cart.
+     */
+    public void clear() {
+        mShoppingCart.clear();
+        mEmotionCart.clear();
+    }
+
+    /**
+     * Stores the saved time credits of the shopping cart in the database.
+     */
+    public void buy() {
+        if (!mShoppingCart.isEmpty() && !mEmotionCart.isEmpty()) {
             Stream.of(mShoppingCart).forEach(credit -> {
                 final double stepsFactor = mPrefHandler.getStepsFactor();
                 mRepository.addTimeCredit(credit, stepsFactor);
             });
-            mRepository.addEmotion(emotion);
+            mRepository.addEmotion(mEmotionCart.get(0));
+            clear();
         }
     }
 

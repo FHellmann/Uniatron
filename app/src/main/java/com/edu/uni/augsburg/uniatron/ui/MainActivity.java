@@ -9,12 +9,13 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
-import android.support.design.widget.TabLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
@@ -36,17 +37,14 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnTabSelectedListener {
-
-    private static final int NAV_POSITION_HOME = 0;
-    private static final int NAV_POSITION_HISTORY = 1;
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.bar)
     BottomAppBar mBottomAppBar;
-    @BindView(R.id.tabs)
-    TabLayout mTabLayout;
+    @BindView(R.id.bottom_navigation)
+    BottomNavigationView mBottomNavigation;
     @BindView(R.id.textNavSteps)
-    TextView mTextNavSteps;
+    TextView mTextNavMoney;
     @BindView(R.id.textNavMinutes)
     TextView mTextNavMinutes;
 
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
         mFragmentViewChanger = new FragmentViewChanger(getSupportFragmentManager());
         mFragmentViewChanger.selectHome();
-        mTabLayout.addOnTabSelectedListener(this);
+        mBottomNavigation.setOnNavigationItemSelectedListener(this);
 
         final MainActivityViewModel model = ViewModelProviders.of(this)
                 .get(MainActivityViewModel.class);
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 data -> mTextNavMinutes.setText(
                         getString(R.string.nav_text_minutes, data / 60, data % 60)));
         model.getRemainingStepCountToday().observe(this,
-                data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
+                data -> mTextNavMoney.setText(getString(R.string.nav_text_money, data)));
 
         requestUsageStatsPermission();
         requestBatteryOptimizationDisablePermission();
@@ -100,14 +98,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
     @Override
     public void onBackPressed() {
-        if (mTabLayout.getSelectedTabPosition() == NAV_POSITION_HOME) {
+        if (mBottomNavigation.getSelectedItemId() == R.id.navigation_home) {
             // If the user is currently looking at the home screen,
             // allow the system to handle the Back button. This
             // calls finish() on this activity and pops the back stack.
             super.onBackPressed();
         } else {
             // Otherwise, select the home screen.
-            setNavToHome();
+            mBottomNavigation.setSelectedItemId(R.id.navigation_home);
         }
     }
 
@@ -139,30 +137,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         return true;
     }
 
-    private void setNavToHome() {
-        final TabLayout.Tab tab = mTabLayout.getTabAt(NAV_POSITION_HOME);
-        if (tab != null) {
-            tab.select();
-        }
-    }
-
     @Override
-    public void onTabSelected(final TabLayout.Tab tab) {
-        if (NAV_POSITION_HOME == tab.getPosition()) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (R.id.navigation_home == menuItem.getItemId()) {
             mFragmentViewChanger.selectHome();
-        } else if (NAV_POSITION_HISTORY == tab.getPosition()) {
+            return true;
+        } else if (R.id.navigation_history == menuItem.getItemId()) {
             mFragmentViewChanger.selectHistory();
+            return true;
         }
-    }
-
-    @Override
-    public void onTabUnselected(final TabLayout.Tab tab) {
-        // not relevant
-    }
-
-    @Override
-    public void onTabReselected(final TabLayout.Tab tab) {
-        // not relevant
+        return false;
     }
 
     private static final class FragmentViewChanger {
