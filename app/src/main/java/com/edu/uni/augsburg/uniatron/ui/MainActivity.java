@@ -3,6 +3,7 @@ package com.edu.uni.augsburg.uniatron.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -126,7 +127,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
     private void requestBatteryOptimizationDisablePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
-            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+            Intent batteryIntent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+
+            batteryIntent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(batteryIntent);
         }
     }
 
