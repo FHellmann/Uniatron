@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.button.MaterialButton;
@@ -28,6 +27,7 @@ import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
+import com.edu.uni.augsburg.uniatron.ui.card.AppStatisticsViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
@@ -79,10 +79,14 @@ public class MainActivity extends AppCompatActivity implements android.support.v
         mRecyclerView.setAdapter(adapter);
 
         final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
-        modelSummary.getSummary().observe(this, adapter::addOrUpdateCard);
+        modelSummary.getSummaryCard().observe(this, adapter::addOrUpdateCard);
+
+        final AppStatisticsViewModel modelAppTop5 = ViewModelProviders.of(this).get(AppStatisticsViewModel.class);
+        modelAppTop5.getAppStatisticsCard().observe(this, adapter::addOrUpdateCard);
 
         mModelNavigation = ViewModelProviders.of(this).get(BasicViewModel.class);
         mModelNavigation.registerCardViewModel(modelSummary);
+        mModelNavigation.registerCardViewModel(modelAppTop5);
         mModelNavigation.getCurrentDate().observe(this, date -> {
             adapter.clear();
             switch (mModelNavigation.getGroupByStrategy()) {

@@ -64,7 +64,7 @@ public class SummaryCard implements CardView {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
         final View view = LayoutInflater.from(context)
-                .inflate(R.layout.card_dashboard_summary, viewGroup, false);
+                .inflate(R.layout.card_summary, viewGroup, false);
         return new ViewHolder(view);
     }
 

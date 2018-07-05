@@ -1,7 +1,6 @@
 package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
@@ -17,25 +16,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class SummaryViewModel extends AndroidViewModel implements CardViewModel {
+public class SummaryViewModel extends DateCacheViewModel implements CardViewModel {
     private final MediatorLiveData<SummaryCard> mObservableDaySummary;
-    private final List<LiveData<List<Summary>>> mSourceCache;
     private final DataRepository mRepository;
 
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
         mRepository = MainApplication.getRepository(application);
         mObservableDaySummary = new MediatorLiveData<>();
-        mSourceCache = new ArrayList<>();
     }
 
     public void setup(@NonNull final Date date, final int calendarType) {
-        if (!mSourceCache.isEmpty()) {
-            mObservableDaySummary.removeSource(mSourceCache.get(0));
-            mSourceCache.clear();
-        }
+        super.setup(date, calendarType);
         final LiveData<List<Summary>> source = getSummarySourceBy(date, calendarType);
-        mSourceCache.add(source);
+        register(mObservableDaySummary, source);
         mObservableDaySummary.addSource(
                 source,
                 value -> {
@@ -67,7 +61,7 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
         }
     }
 
-    public LiveData<SummaryCard> getSummary() {
+    public LiveData<SummaryCard> getSummaryCard() {
         return mObservableDaySummary;
     }
 }
