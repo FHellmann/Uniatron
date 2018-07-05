@@ -1,12 +1,11 @@
-package com.edu.uni.augsburg.uniatron.ui.day;
+package com.edu.uni.augsburg.uniatron.ui;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-public interface ModelCard {
-    void update(ModelCard modelCard);
+public interface CardView {
+    void update(CardView cardView);
 
     void onBindView(Context context, RecyclerView.ViewHolder viewHolder);
 

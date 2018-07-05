@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.day;
+package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -9,29 +9,35 @@ import android.support.annotation.NonNull;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.edu.uni.augsburg.uniatron.ui.day.card.SummaryCard;
+import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class DayViewModel extends AndroidViewModel {
+public class SummaryViewModel extends AndroidViewModel implements CardViewModel {
     private final MediatorLiveData<SummaryCard> mObservableDaySummary;
+    private final List<LiveData<List<Summary>>> mSourceCache;
     private final DataRepository mRepository;
 
-    public DayViewModel(@NonNull final Application application) {
+    public SummaryViewModel(@NonNull final Application application) {
         super(application);
-
         mRepository = MainApplication.getRepository(application);
-
         mObservableDaySummary = new MediatorLiveData<>();
+        mSourceCache = new ArrayList<>();
     }
 
     public void setup(@NonNull final Date date, final int calendarType) {
+        if (!mSourceCache.isEmpty()) {
+            mObservableDaySummary.removeSource(mSourceCache.get(0));
+            mSourceCache.clear();
+        }
+        final LiveData<List<Summary>> source = getSummarySourceBy(date, calendarType);
+        mSourceCache.add(source);
         mObservableDaySummary.addSource(
-                getSummarySourceBy(date, calendarType),
+                source,
                 value -> {
                     if (value != null && !value.isEmpty()) {
                         // There always be only one summary

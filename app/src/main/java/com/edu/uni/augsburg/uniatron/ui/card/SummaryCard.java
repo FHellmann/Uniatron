@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.day.card;
+package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -13,14 +13,14 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.edu.uni.augsburg.uniatron.ui.day.ModelCard;
+import com.edu.uni.augsburg.uniatron.ui.CardView;
 
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SummaryCard implements ModelCard {
+public class SummaryCard implements CardView {
     private static final int TYPE = 1;
     @NonNull
     private Summary mSummary;
@@ -30,8 +30,8 @@ public class SummaryCard implements ModelCard {
     }
 
     @Override
-    public void update(ModelCard modelCard) {
-        mSummary = ((SummaryCard) modelCard).mSummary;
+    public void update(CardView cardView) {
+        mSummary = ((SummaryCard) cardView).mSummary;
     }
 
     @Override

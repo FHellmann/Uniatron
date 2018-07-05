@@ -225,38 +225,12 @@ public final class DataRepository {
      * @return The amount of days.
      */
     @NonNull
-    public LiveData<Integer> getTotalDaysSinceStart() {
-        return getTotalData(mDatabase.appUsageDao()::getTotalDays);
-    }
-
-    /**
-     * Get the total amount of months since the app was installed.
-     *
-     * @return The amount of months.
-     */
-    @NonNull
-    public LiveData<Integer> getTotalMonthsSinceStart() {
-        return getTotalData(mDatabase.appUsageDao()::getTotalMonths);
-    }
-
-    /**
-     * Get the total amount of years since the app was installed.
-     *
-     * @return The amount of years.
-     */
-    @NonNull
-    public LiveData<Integer> getTotalYearsSinceStart() {
-        return getTotalData(mDatabase.appUsageDao()::getTotalYears);
-    }
-
-    @NonNull
-    private LiveData<Integer> getTotalData(
-            @NonNull final BiFunction<Date, Date, LiveData<Integer>> function) {
+    public LiveData<Date> getMinDate() {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.set(1990, 0, 1);
         final Date dateFrom = getMinTimeOfDate(calendar.getTime());
         final Date dateTo = getMaxTimeOfDate(new Date());
-        return function.apply(dateFrom, dateTo);
+        return mDatabase.appUsageDao().getMinDate(dateFrom, dateTo);
     }
 
     /**

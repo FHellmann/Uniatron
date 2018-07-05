@@ -1,14 +1,14 @@
-package com.edu.uni.augsburg.uniatron.ui.day.card;
+package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.edu.uni.augsburg.uniatron.ui.day.ModelCard;
+import com.edu.uni.augsburg.uniatron.ui.CardView;
 
-public class AppStatisticsCard implements ModelCard {
+public class AppStatisticsCard implements CardView {
     @Override
-    public void update(ModelCard modelCard) {
+    public void update(CardView cardView) {
 
     }
 

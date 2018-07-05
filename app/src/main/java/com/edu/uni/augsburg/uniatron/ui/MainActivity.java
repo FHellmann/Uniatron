@@ -9,30 +9,34 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.button.MaterialButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
-import com.edu.uni.augsburg.uniatron.ui.day.DayFragment;
+import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,8 +49,8 @@ import butterknife.OnClick;
  */
 public class MainActivity extends AppCompatActivity implements android.support.v7.widget.Toolbar.OnMenuItemClickListener {
 
-    @BindView(R.id.fragmentPager)
-    ViewPager mFragmentPager;
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
     @BindView(R.id.bar)
     BottomAppBar mBottomAppBar;
     @BindView(R.id.prevDateButton)
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements android.support.v
     @BindView(R.id.nextDateButton)
     MaterialButton mNextDateButton;
 
-    private MainActivityViewModel mModel;
+    private BasicViewModel mModelNavigation;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -67,59 +71,36 @@ public class MainActivity extends AppCompatActivity implements android.support.v
         mBottomAppBar.replaceMenu(R.menu.nav_bottom_bar_menu);
         mBottomAppBar.setOnMenuItemClickListener(this);
 
-        final DayFragmentLoader adapter = new DayFragmentLoader(getSupportFragmentManager());
-        mFragmentPager.setAdapter(adapter);
-        mFragmentPager.setOffscreenPageLimit(1);
-        mFragmentPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            private int oldPosition;
+        final LinearLayoutManager layout = new LinearLayoutManager(this);
+        layout.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(layout);
 
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-                // Ignore
-            }
+        final CardListAdapter adapter = new CardListAdapter(this);
+        mRecyclerView.setAdapter(adapter);
 
-            @Override
-            public void onPageSelected(int position) {
-                if (position > oldPosition) {
-                    // scrolled right
-                    mModel.nextData();
-                } else {
-                    // scrolled left
-                    mModel.prevData();
-                }
-                oldPosition = position;
-            }
+        final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
+        modelSummary.getSummary().observe(this, adapter::addOrUpdateCard);
 
-            @Override
-            public void onPageScrollStateChanged(int i) {
-                // Ignore
-            }
-        });
-
-        mModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-        mModel.getDataCountToLoad().observe(this, count -> {
-            // Reset the old data by the currently loaded data
-            adapter.setCount(count);
-            mFragmentPager.setCurrentItem(count);
-            mModel.setDate(new Date());
-        });
-        mModel.getCurrentDate().observe(this, date -> {
-            switch (mModel.getCurrentLoadingStrategy()) {
-                case Calendar.MONTH:
+        mModelNavigation = ViewModelProviders.of(this).get(BasicViewModel.class);
+        mModelNavigation.registerCardViewModel(modelSummary);
+        mModelNavigation.getCurrentDate().observe(this, date -> {
+            adapter.clear();
+            switch (mModelNavigation.getGroupByStrategy()) {
+                case MONTH:
                     mDateDisplayButton.setText(DateUtil.formatForMonth(date.getTime()));
-                    adapter.setDate(date, Calendar.MONTH);
                     break;
-                case Calendar.YEAR:
+                case YEAR:
                     mDateDisplayButton.setText(DateUtil.formatForYear(date.getTime()));
-                    adapter.setDate(date, Calendar.YEAR);
                     break;
-                case Calendar.DATE:
+                case DATE:
                 default:
                     mDateDisplayButton.setText(DateUtil.formatForDate(date.getTime()));
-                    adapter.setDate(date, Calendar.DATE);
                     break;
             }
-            mNextDateButton.setEnabled(!mModel.isToday());
+            final int calendarType = mModelNavigation.getGroupByStrategy().getCalendarType();
+            modelSummary.setup(date.getTime(), calendarType);
+            mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
+            mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
         });
 
         NotificationChannels.setupChannels(this);
@@ -129,8 +110,7 @@ public class MainActivity extends AppCompatActivity implements android.support.v
 
     @OnClick(R.id.prevDateButton)
     public void onPrevClicked() {
-        mFragmentPager.setCurrentItem(mFragmentPager.getCurrentItem() - 1);
-        mModel.prevData();
+        mModelNavigation.prevData();
     }
 
     @OnClick(R.id.dateDisplayButton)
@@ -140,22 +120,17 @@ public class MainActivity extends AppCompatActivity implements android.support.v
                 (datePicker, year, month, date) -> {
                     final Calendar calendar = GregorianCalendar.getInstance();
                     calendar.set(year, month, date);
-                    if (DateUtil.getMinTimeOfDate(new Date()).before(calendar.getTime())) {
-                        mModel.setDate(new Date());
-                    } else {
-                        mModel.setDate(calendar.getTime());
-                    }
+                    mModelNavigation.setDate(calendar.getTime());
                 },
-                mModel.getCurrentDateValue(Calendar.YEAR),
-                mModel.getCurrentDateValue(Calendar.MONTH),
-                mModel.getCurrentDateValue(Calendar.DATE)
+                mModelNavigation.getCurrentDateValue(Calendar.YEAR),
+                mModelNavigation.getCurrentDateValue(Calendar.MONTH),
+                mModelNavigation.getCurrentDateValue(Calendar.DATE)
         ).show();
     }
 
     @OnClick(R.id.nextDateButton)
     public void onNextClicked() {
-        mFragmentPager.setCurrentItem(mFragmentPager.getCurrentItem() + 1);
-        mModel.nextData();
+        mModelNavigation.nextData();
     }
 
     /**
@@ -200,51 +175,84 @@ public class MainActivity extends AppCompatActivity implements android.support.v
                 return true;
             case R.id.group_by_day:
                 menuItem.setChecked(true);
-                mModel.setLoadDayCount();
+                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.DATE);
                 return true;
             case R.id.group_by_month:
                 menuItem.setChecked(true);
-                mModel.setLoadMonthCount();
+                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.MONTH);
                 return true;
             case R.id.group_by_year:
                 menuItem.setChecked(true);
-                mModel.setLoadYearCount();
+                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.YEAR);
                 return true;
             default:
                 return false;
         }
     }
 
-    private static final class DayFragmentLoader extends FragmentStatePagerAdapter {
+    private static final class CardListAdapter
+            extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private int mCount;
-        private Calendar mDate;
-        private int mCalendarType;
+        private final List<CardView> mCardViewList = new ArrayList<>();
+        @NonNull
+        private final Context mContext;
 
-        DayFragmentLoader(@NonNull final FragmentManager fm) {
-            super(fm);
-            mCount = 1;
-            mDate = GregorianCalendar.getInstance();
+        CardListAdapter(@NonNull final Context context) {
+            mContext = context;
         }
 
-        void setCount(final int count) {
-            mCount = count;
+        void addOrUpdateCard(@NonNull final CardView cardView) {
+            // Remove the card if it does already exists
+            final Optional<CardView> cardOptional = Stream.of(mCardViewList)
+                    .filter(card -> card.getType() == cardView.getType())
+                    .findFirst();
+            if (cardOptional.isPresent()) {
+                cardOptional.get().update(cardView);
+                notifyItemChanged(mCardViewList.indexOf(cardOptional.get()));
+                notifyDataSetChanged();
+            } else {
+                mCardViewList.add(cardView);
+                Collections.sort(
+                        mCardViewList,
+                        (cardView1, t1) -> Integer.compare(cardView1.getType(), t1.getType())
+                );
+                notifyItemInserted(mCardViewList.indexOf(cardView));
+                notifyDataSetChanged();
+            }
+        }
+
+        void clear() {
+            final int size = mCardViewList.size();
+            mCardViewList.clear();
+            notifyItemRangeRemoved(0, size);
             notifyDataSetChanged();
         }
 
-        void setDate(@NonNull final Calendar date, final int calendarType) {
-            mDate = date;
-            mCalendarType = calendarType;
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup viewGroup,
+                                                          final int type) {
+            return Stream.of(mCardViewList)
+                    .filter(card -> card.getType() == type)
+                    .findFirst()
+                    .map(card -> card.onCreateViewHolder(mContext, viewGroup))
+                    .orElseThrow(() -> new IllegalStateException("The card needs to " +
+                            "create a view holder!"));
         }
 
         @Override
-        public Fragment getItem(final int position) {
-            return DayFragment.createInstance(mDate, mCalendarType);
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+            mCardViewList.get(position).onBindView(mContext, viewHolder);
         }
 
         @Override
-        public int getCount() {
-            return mCount;
+        public int getItemViewType(int position) {
+            return mCardViewList.get(position).getType();
+        }
+
+        @Override
+        public int getItemCount() {
+            return mCardViewList.size();
         }
     }
 }

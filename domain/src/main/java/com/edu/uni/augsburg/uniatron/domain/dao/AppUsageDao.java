@@ -86,29 +86,7 @@ public interface AppUsageDao {
      * @param dateTo The date to end counting.
      * @return The total days.
      */
-    @Query("SELECT COUNT(*) FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "GROUP BY strftime('%Y-%m-%d', date(timestamp/1000, 'unixepoch'))")
-    LiveData<Integer> getTotalDays(Date dateFrom, Date dateTo);
-
-    /**
-     * Get the total months for the specified date range.
-     *
-     * @param dateFrom The date to start counting.
-     * @param dateTo The date to end counting.
-     * @return The total months.
-     */
-    @Query("SELECT COUNT(*) FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "GROUP BY strftime('%Y-%m', date(timestamp/1000, 'unixepoch'))")
-    LiveData<Integer> getTotalMonths(Date dateFrom, Date dateTo);
-
-    /**
-     * Get the total years for the specified date range.
-     *
-     * @param dateFrom The date to start counting.
-     * @param dateTo The date to end counting.
-     * @return The total years.
-     */
-    @Query("SELECT COUNT(*) FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "GROUP BY strftime('%Y', date(timestamp/1000, 'unixepoch'))")
-    LiveData<Integer> getTotalYears(Date dateFrom, Date dateTo);
+    @Query("SELECT timestamp FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
+            + "ORDER BY timestamp ASC LIMIT 1")
+    LiveData<Date> getMinDate(Date dateFrom, Date dateTo);
 }
