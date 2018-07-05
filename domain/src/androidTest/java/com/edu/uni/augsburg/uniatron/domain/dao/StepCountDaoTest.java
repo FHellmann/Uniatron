@@ -15,8 +15,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.is;
@@ -63,7 +63,7 @@ public class StepCountDaoTest {
         mDao.add(create(count, date));
 
         final LiveData<Integer> data = mDao
-                .loadStepCounts(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadStepCounts(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -82,7 +82,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadRemainingStepCount(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -102,7 +102,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadRemainingStepCount(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -116,7 +116,7 @@ public class StepCountDaoTest {
         mDao.add(create(count, date));
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadRemainingStepCount(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));

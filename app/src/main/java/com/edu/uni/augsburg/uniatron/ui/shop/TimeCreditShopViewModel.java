@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.home.shop;
+package com.edu.uni.augsburg.uniatron.ui.shop;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

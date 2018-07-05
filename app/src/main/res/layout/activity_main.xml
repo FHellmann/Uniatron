@@ -7,13 +7,56 @@
     android:orientation="vertical"
     tools:context=".ui.MainActivity">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
+        app:elevation="2dp"
+        app:liftOnScroll="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.design.button.MaterialButton
+                android:id="@+id/prevDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:backgroundTint="@android:color/transparent"
+                app:icon="@drawable/ic_chevron_left_gray_24dp" />
+
+            <android.support.design.button.MaterialButton
+                android:id="@+id/dateDisplayButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                app:backgroundTint="@android:color/transparent" />
+
+            <android.support.design.button.MaterialButton
+                android:id="@+id/nextDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:backgroundTint="@android:color/transparent"
+                app:icon="@drawable/ic_chevron_right_gray_24dp" />
+
+        </LinearLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <FrameLayout
-            android:id="@+id/content_fragment"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/fragmentPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -39,57 +82,4 @@
             android:src="@drawable/ic_local_play_black_24dp"
             app:layout_anchor="@id/bar" />
     </android.support.design.widget.CoordinatorLayout>
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/textNavSteps"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/card_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_vertical_margin"
-                android:layout_marginStart="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/card_vertical_margin"
-                android:layout_weight="1"
-                android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_copyright_black_24dp"
-                android:gravity="center_vertical|start"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@android:color/white"
-                tools:text="387" />
-
-            <TextView
-                android:id="@+id/textNavMinutes"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/card_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_vertical_margin"
-                android:layout_marginStart="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/card_vertical_margin"
-                android:layout_weight="1"
-                android:drawableEnd="@drawable/ic_phonelink_lock_white_24dp"
-                android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:gravity="center_vertical|end"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@android:color/white"
-                tools:text="2:31 Minutes" />
-        </LinearLayout>
-
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/primaryColor"
-            app:itemIconTint="@color/secondaryLightColor"
-            app:itemTextColor="@android:color/white"
-            app:menu="@menu/navigation" />
-    </android.support.design.widget.AppBarLayout>
 </LinearLayout>

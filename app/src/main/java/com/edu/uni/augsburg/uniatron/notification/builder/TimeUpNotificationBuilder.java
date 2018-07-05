@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
+import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 
 /**
  * Notification is shown when the time is running out soon.

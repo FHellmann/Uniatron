@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.home.shop.TimeCreditShopActivity"
+            android:name=".ui.shop.TimeCreditShopActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.MainActivity"

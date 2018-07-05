@@ -95,7 +95,7 @@ public final class DatabaseUtil {
 
     private static Date getRandomDate(int index) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -index%5);
+        calendar.add(Calendar.DATE, -index%10);
 
         return calendar.getTime();
     }

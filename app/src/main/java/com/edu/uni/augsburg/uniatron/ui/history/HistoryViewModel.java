@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The {@link HistoryViewModel} provides the data for the {@link HistoryFragment}.
+ * The {@link HistoryViewModel} provides the data for the HistoryFragment.
  *
  * @author Fabio Hellmann
  */

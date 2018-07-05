@@ -22,7 +22,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
+import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.orhanobut.logger.Logger;
 import com.rvalerio.fgchecker.AppChecker;
 

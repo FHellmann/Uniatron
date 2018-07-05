@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.home;
+package com.edu.uni.augsburg.uniatron.ui.dashboard;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The {@link HomeViewModel} provides the data for the {@link HomeFragment}.
+ * The {@link HomeViewModel} provides the data for the HomeFragment.
  *
  * @author Fabio Hellmann
  */

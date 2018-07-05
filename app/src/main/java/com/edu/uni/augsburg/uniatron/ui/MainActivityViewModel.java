@@ -8,10 +8,12 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 
-import java.util.Set;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * The {@link MainActivityViewModel} provides the data for
@@ -20,8 +22,12 @@ import java.util.Set;
  * @author Fabio Hellmann
  */
 public class MainActivityViewModel extends AndroidViewModel {
-    private final MediatorLiveData<Integer> mRemainingStepCount;
-    private final MediatorLiveData<Integer> mRemainingAppUsageTime;
+    private final MediatorLiveData<Calendar> mDateLoaded;
+    private final MediatorLiveData<Integer> mDataToLoad;
+    private final DataRepository mRepository;
+    private LiveData<Integer> mSourceToLoad;
+    private Calendar mData;
+    private int mCalendarData;
 
     /**
      * Ctr.
@@ -31,22 +37,18 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull final Application application) {
         super(application);
 
-        final DataRepository repository = MainApplication.getRepository(application);
+        mRepository = MainApplication.getRepository(application);
 
-        mRemainingStepCount = new MediatorLiveData<>();
-        mRemainingStepCount.addSource(
-                repository.getRemainingStepCountsToday(),
-                mRemainingStepCount::setValue
-        );
+        mData = GregorianCalendar.getInstance();
+        mCalendarData = Calendar.DATE;
+        mDateLoaded = new MediatorLiveData<>();
+        mDateLoaded.setValue(mData);
 
-        final SharedPreferencesHandler handler = MainApplication.
-                getSharedPreferencesHandler(application);
-        final Set<String> blacklist = handler.getAppsBlacklist();
-
-        mRemainingAppUsageTime = new MediatorLiveData<>();
-        mRemainingAppUsageTime.addSource(
-                repository.getRemainingAppUsageTimeToday(blacklist),
-                mRemainingAppUsageTime::setValue
+        mDataToLoad = new MediatorLiveData<>();
+        mSourceToLoad = mRepository.getTotalDaysSinceStart();
+        mDataToLoad.addSource(
+                mSourceToLoad,
+                mDataToLoad::setValue
         );
     }
 
@@ -56,19 +58,76 @@ public class MainActivityViewModel extends AndroidViewModel {
      * @return The remaining step count.
      */
     @NonNull
-    public LiveData<Integer> getRemainingStepCountToday() {
-        return Transformations.map(mRemainingStepCount,
+    public LiveData<Integer> getDataCountToLoad() {
+        return Transformations.map(mDataToLoad,
                 data -> data != null && data > 0 ? data : 0);
     }
 
-    /**
-     * Get the remaining app usage time for today.
-     *
-     * @return The remaining app usage time.
-     */
-    @NonNull
-    public LiveData<Integer> getRemainingAppUsageTime() {
-        return Transformations.map(mRemainingAppUsageTime,
-                data -> data != null && data > 0 ? data : 0);
+    public void setLoadDayCount() {
+        if(mSourceToLoad != null) {
+            mDataToLoad.removeSource(mSourceToLoad);
+        }
+        mCalendarData = Calendar.DATE;
+        mSourceToLoad = mRepository.getTotalDaysSinceStart();
+        mDataToLoad.addSource(mSourceToLoad, mDataToLoad::setValue);
+    }
+
+    public void setLoadMonthCount() {
+        if(mSourceToLoad != null) {
+            mDataToLoad.removeSource(mSourceToLoad);
+        }
+        mCalendarData = Calendar.MONTH;
+        mSourceToLoad = mRepository.getTotalMonthsSinceStart();
+        mDataToLoad.addSource(mSourceToLoad, mDataToLoad::setValue);
+    }
+
+    public void setLoadYearCount() {
+        if(mSourceToLoad != null) {
+            mDataToLoad.removeSource(mSourceToLoad);
+        }
+        mCalendarData = Calendar.YEAR;
+        mSourceToLoad = mRepository.getTotalYearsSinceStart();
+        mDataToLoad.addSource(mSourceToLoad, mDataToLoad::setValue);
+    }
+
+    public int getCurrentLoadingStrategy() {
+        return mCalendarData;
+    }
+
+    public void nextData() {
+        mData.add(mCalendarData, 1);
+        mDateLoaded.postValue(mData);
+    }
+
+    public void prevData() {
+        mData.add(mCalendarData, -1);
+        mDateLoaded.postValue(mData);
+    }
+
+    public void setDate(@NonNull final Date date) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        mData = calendar;
+        mDateLoaded.postValue(mData);
+    }
+
+    public int getCurrentDateValue(final int calendarField) {
+        return mData.get(calendarField);
+    }
+
+    public boolean isToday() {
+        return DateUtil.getMinTimeOfDate(new Date()).before(mData.getTime());
+    }
+
+    public boolean isLastDate() {
+        return false;
+    }
+
+    public LiveData<Calendar> getCurrentDate() {
+        return mDateLoaded;
+    }
+
+    public enum GroupBy {
+        DATE, MONTH, YEAR
     }
 }

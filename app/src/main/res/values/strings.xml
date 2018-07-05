@@ -36,4 +36,5 @@
     <string name="group_by_day">Group by day</string>
     <string name="group_by_month">Group by month</string>
     <string name="group_by_year">Group by year</string>
+    <string name="card_summary_title">Summary</string>
 </resources>

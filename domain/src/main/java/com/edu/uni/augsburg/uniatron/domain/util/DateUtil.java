@@ -29,7 +29,7 @@ public final class DateUtil {
      * @return The date.
      */
     @NonNull
-    public static Date extractMinTimeOfDate(@NonNull final Date date) {
+    public static Date getMinTimeOfDate(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -46,7 +46,7 @@ public final class DateUtil {
      * @return The date.
      */
     @NonNull
-    public static Date extractMaxTimeOfDate(@NonNull final Date date) {
+    public static Date getMaxTimeOfDate(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, HOUR_OF_DAY_MAX);
@@ -63,9 +63,46 @@ public final class DateUtil {
      * @return The date.
      */
     @NonNull
-    public static Date extractMinDateOfMonth(@NonNull final Date date) {
+    public static Date getMinDateOfMonth(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    /**
+     * Get the earliest date of the specified month.
+     *
+     * @param date The month to get the earliest date.
+     * @return The date.
+     */
+    @NonNull
+    public static Date getMaxDateOfMonth(@NonNull final Date date) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, HOUR_OF_DAY_MAX);
+        calendar.set(Calendar.MINUTE, MINUTE_MAX);
+        calendar.set(Calendar.SECOND, SECOND_MAX);
+        calendar.set(Calendar.MILLISECOND, MILLISECOND_MAX);
+        return calendar.getTime();
+    }
+
+    /**
+     * Get the earliest month of the specified year.
+     *
+     * @param date The year to get the earliest month.
+     * @return The date.
+     */
+    @NonNull
+    public static Date getMinMonthOfYear(@NonNull final Date date) {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.MONTH, 0);
         calendar.set(Calendar.DATE, 1);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -81,15 +118,15 @@ public final class DateUtil {
      * @return The date.
      */
     @NonNull
-    public static Date extractMinMonthOfYear(@NonNull final Date date) {
+    public static Date getMaxMonthOfYear(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.MONTH, 0);
-        calendar.set(Calendar.DATE, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, HOUR_OF_DAY_MAX);
+        calendar.set(Calendar.MINUTE, MINUTE_MAX);
+        calendar.set(Calendar.SECOND, SECOND_MAX);
+        calendar.set(Calendar.MILLISECOND, MILLISECOND_MAX);
         return calendar.getTime();
     }
 
