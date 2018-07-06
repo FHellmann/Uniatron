@@ -8,6 +8,7 @@ import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
@@ -17,11 +18,15 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
+import com.orhanobut.logger.Logger;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -64,20 +69,42 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
                         final AppUsageCard card = new AppUsageCard();
 
                         final int usageTimeSum = Stream.of(data).mapToInt(Map.Entry::getValue).sum();
+                        final ExecutorService service = Executors.newCachedThreadPool();
 
                         final List<AppUsageCard.AppUsageItem> appUsageItems = Stream.of(data)
                                 .map(entry -> {
-                                    final String applicationPackage = entry.getKey();
-                                    final int usageTime = entry.getValue();
-                                    final double usageTimePercent = usageTime * 100.0 / usageTimeSum;
+                                    final AppUsageCard.AppUsageItem item = new AppUsageCard.AppUsageItem();
 
-                                    return new AppUsageCard.AppUsageItem(
-                                            applicationPackage,
-                                            usageTime,
-                                            usageTimePercent
-                                    );
+                                    service.execute(() -> {
+                                        final String appLabel = getApplicationLabel(
+                                                context.getPackageManager(),
+                                                context.getString(R.string.unknwon),
+                                                entry.getKey()
+                                        );
+                                        item.setAppLabel(appLabel);
+                                    });
+                                    service.execute(() -> {
+                                        final Drawable appIcon = getApplicationIcon(
+                                                context.getPackageManager(),
+                                                context.getResources().getDrawable(android.R.drawable.sym_def_app_icon),
+                                                entry.getKey()
+                                        );
+                                        item.setAppIcon(appIcon);
+                                    });
+
+                                    item.setApplicationUsage(entry.getValue());
+                                    item.setApplicationUsagePercent(entry.getValue() * 100.0 / usageTimeSum);
+
+                                    return item;
                                 })
                                 .collect(Collectors.toList());
+
+                        service.shutdownNow();
+                        try {
+                            service.awaitTermination(3, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            Logger.e(e, "");
+                        }
 
                         card.addAll(appUsageItems);
                         return card;
@@ -106,6 +133,29 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
                         DateUtil.getMinTimeOfDate(date),
                         DateUtil.getMaxTimeOfDate(date)
                 );
+        }
+    }
+
+    @NonNull
+    private String getApplicationLabel(@NonNull final PackageManager packageManager,
+                                       @NonNull final String placeHolderText,
+                                       @NonNull final String packageName) {
+        try {
+            final ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);
+            return packageManager.getApplicationLabel(info).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            return placeHolderText;
+        }
+    }
+
+    @NonNull
+    private Drawable getApplicationIcon(@NonNull final PackageManager packageManager,
+                                        @NonNull final Drawable placeHolderIcon,
+                                        @NonNull final String packageName) {
+        try {
+            return packageManager.getApplicationIcon(packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            return placeHolderIcon;
         }
     }
 }
