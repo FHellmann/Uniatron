@@ -41,7 +41,7 @@
     <string name="app_usage_time">Usage time: %1$d:%2$02d min</string>
     <string name="show_all">Show all</string>
     <string name="show_only_top_five">Show only top 5</string>
-    <string name="app_usage_total">%1$d:%2$02d minutes</string>
+    <string name="time_in_minutes">%1$d:%2$02d minutes</string>
     <string name="card_summary_steps">You walked %1$d steps and felt %2$s during this day.</string>
     <string name="unknwon">Unknown</string>
     <string name="total">Total</string>
@@ -59,6 +59,6 @@
     <string name="coin_bag">Coin Bag</string>
     <string name="coin_bag_text">You have %d coins available.</string>
     <string name="time_account">Time Account</string>
-    <string name="time_account_desc">The remaining time: %1$d:%2$02d minutes</string>
+    <string name="time_account_desc">%1$d:%2$02d min</string>
     <string name="appbar_scrolling_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 </resources>

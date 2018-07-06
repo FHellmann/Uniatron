@@ -18,6 +18,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -84,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mBottomAppBar.replaceMenu(R.menu.nav_bottom_bar_menu);
         mBottomAppBar.setOnMenuItemClickListener(this);
 
-        final LinearLayoutManager layout = new LinearLayoutManager(this);
-        layout.setOrientation(LinearLayoutManager.VERTICAL);
+        final StaggeredGridLayoutManager layout =
+                new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layout);
 
         mAdapter = new CardListAdapter(this);

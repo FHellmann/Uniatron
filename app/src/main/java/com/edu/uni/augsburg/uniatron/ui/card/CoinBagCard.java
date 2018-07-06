@@ -56,7 +56,7 @@ public class CoinBagCard implements CardViewHolder {
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.mTextCoins.setText(context.getString(R.string.coin_bag_text, mCoins));
+        holder.mTextCoins.setText(String.valueOf(mCoins));
     }
 
     @Override

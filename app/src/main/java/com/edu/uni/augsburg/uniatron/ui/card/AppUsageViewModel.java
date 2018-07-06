@@ -81,7 +81,6 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
                                     service.execute(() -> {
                                         final String appLabel = getApplicationLabel(
                                                 context.getPackageManager(),
-                                                context.getString(R.string.unknwon),
                                                 entry.getKey()
                                         );
                                         item.setAppLabel(appLabel);
@@ -118,13 +117,12 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
 
     @NonNull
     private String getApplicationLabel(@NonNull final PackageManager packageManager,
-                                       @NonNull final String placeHolderText,
                                        @NonNull final String packageName) {
         try {
             final ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);
             return packageManager.getApplicationLabel(info).toString();
         } catch (PackageManager.NameNotFoundException e) {
-            return placeHolderText;
+            return packageName;
         }
     }
 

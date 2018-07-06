@@ -26,12 +26,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
             android:id="@+id/textAppUsage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     </LinearLayout>
 

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.button.MaterialButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,6 @@ import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,6 +56,10 @@ public class AppUsageCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
+        final StaggeredGridLayoutManager.LayoutParams layoutParams =
+                (StaggeredGridLayoutManager.LayoutParams) viewHolder.itemView.getLayoutParams();
+        layoutParams.setFullSpan(true);
+
         final ViewHolder holder = (ViewHolder) viewHolder;
 
         final LinearLayoutManager layout = new LinearLayoutManager(context);
@@ -64,7 +68,7 @@ public class AppUsageCard implements CardViewHolder {
         holder.mRecyclerView.setLayoutFrozen(true);
         holder.mRecyclerView.setAdapter(new AppUsageAdapter(context, mAppUsageList));
         final int totalAppUsage = getTotalAppUsage();
-        holder.mTextAppUsageTotal.setText(context.getString(R.string.app_usage_total, totalAppUsage / 60, totalAppUsage % 60));
+        holder.mTextAppUsageTotal.setText(context.getString(R.string.time_in_minutes, totalAppUsage / 60, totalAppUsage % 60));
         holder.mButtonShowAll.setText(R.string.show_all);
     }
 

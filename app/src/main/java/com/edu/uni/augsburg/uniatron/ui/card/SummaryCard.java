@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,10 @@ public class SummaryCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
+        final StaggeredGridLayoutManager.LayoutParams layoutParams =
+                (StaggeredGridLayoutManager.LayoutParams) viewHolder.itemView.getLayoutParams();
+        layoutParams.setFullSpan(true);
+
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());
