@@ -97,9 +97,9 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void setDate(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
-        if (mGroupByStrategy.mNextAvailable.apply(calendar)) {
+        if (!mGroupByStrategy.mNextAvailable.apply(calendar)) {
             calendar.setTime(new Date());
-        } else if (mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
+        } else if (!mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
             calendar.setTime(mMinCalendar.getTime());
         }
         mCalendar = calendar;

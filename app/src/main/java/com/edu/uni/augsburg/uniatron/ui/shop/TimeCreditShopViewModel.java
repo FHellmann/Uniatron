@@ -96,18 +96,6 @@ class TimeCreditShopViewModel extends AndroidViewModel {
     }
 
     /**
-     * Remove the time credit to the shopping cart.
-     *
-     * @param timeCredits The time credit to remove.
-     */
-    public void removeFromShoppingCart(@NonNull final TimeCredits timeCredits) {
-        mShoppingCart.remove(timeCredits);
-        if (mListener != null) {
-            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
-        }
-    }
-
-    /**
      * Check whether the time credit is already in the shopping cart or not.
      *
      * @param timeCredits The time credit to check.
