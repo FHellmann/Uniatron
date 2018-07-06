@@ -23,6 +23,7 @@ import com.edu.uni.augsburg.uniatron.ui.CardView;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -112,6 +113,10 @@ public class AppStatisticsCard implements CardView {
                     ));
         }
 
+        private double getPercentageValue(final int usageTime) {
+            return usageTime * 100.0 / Stream.of(mAppData).mapToInt(Map.Entry::getValue).sum();
+        }
+
         public void setShowSomeItems(final boolean visible) {
             mShowSmallVisibleAmount = visible;
         }
@@ -136,6 +141,11 @@ public class AppStatisticsCard implements CardView {
             viewHolderListItem.mTextAppName.setText(applicationLabel);
             viewHolderListItem.mImageAppIcon.setImageDrawable(applicationIcon);
             viewHolderListItem.mTextAppUsage.setText(mContext.getString(R.string.app_usage_time, usageTime));
+            viewHolderListItem.mTextAppUsagePercent.setText(String.format(
+                    Locale.getDefault(),
+                    "%d %%",
+                    Math.round(getPercentageValue(elementAt.getValue()))
+            ));
         }
 
         @Override
