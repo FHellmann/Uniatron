@@ -41,7 +41,13 @@
     <string name="app_usage_time">Usage time: %1$d:%2$02d min</string>
     <string name="show_all">Show all</string>
     <string name="show_only_top_five">Show only top 5</string>
-    <string name="card_summary_app_usage">%1$d:%2$02d minutes app usage</string>
-    <string name="card_summary_steps">%1$d steps</string>
+    <string name="app_usage_total">%1$d:%2$02d minutes</string>
+    <string name="card_summary_steps">You walked %1$d steps and felt %2$s during this day.</string>
     <string name="unknwon">Unknown</string>
+    <string name="total">Total</string>
+    <string name="emotion_angry">angry</string>
+    <string name="emotion_sad">sad</string>
+    <string name="emotion_neutral">neutral</string>
+    <string name="emotion_happy">happy</string>
+    <string name="emotion_fantastic">fantastic</string>
 </resources>

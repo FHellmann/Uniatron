@@ -48,6 +48,8 @@ public class AppStatisticsCard implements CardView {
     public void onBindView(Context context, RecyclerView.ViewHolder viewHolder) {
         final ViewHolder holder = (ViewHolder) viewHolder;
         holder.mRecyclerView.setAdapter(new StatisticsAdapter(context, mAppUsageData));
+        final int totalAppUsage = getTotalAppUsage();
+        holder.mTextAppUsageTotal.setText(context.getString(R.string.app_usage_total, totalAppUsage / 60, totalAppUsage % 60));
     }
 
     @Override
@@ -61,11 +63,17 @@ public class AppStatisticsCard implements CardView {
                 .inflate(R.layout.card_app_statistics, viewGroup, false));
     }
 
+    private int getTotalAppUsage() {
+        return Stream.of(mAppUsageData).mapToInt(Map.Entry::getValue).sum();
+    }
+
     static final class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.recyclerViewAppUsageData)
         RecyclerView mRecyclerView;
         @BindView(R.id.buttonShowAll)
         MaterialButton mButtonShowAll;
+        @BindView(R.id.textAppUsageTotal)
+        TextView mTextAppUsageTotal;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

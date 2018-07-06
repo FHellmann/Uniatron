@@ -15,8 +15,6 @@ import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.CardView;
 
-import java.util.Locale;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,7 +22,7 @@ public class SummaryCard implements CardView {
     private static final int TYPE = 1;
     private Summary mSummary;
 
-    public SummaryCard(@NonNull final Summary summary) {
+    SummaryCard(@NonNull final Summary summary) {
         mSummary = summary;
     }
 
@@ -37,12 +35,28 @@ public class SummaryCard implements CardView {
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
-        itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps, mSummary.getSteps()));
-        itemViewHolder.mTextViewUsageTime.setText(context.getString(R.string.card_summary_app_usage, mSummary.getAppUsageTime() / 60, mSummary.getAppUsageTime() % 60));
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());
         final Drawable drawable = getEmoticonDrawable(context, emotion);
+
         itemViewHolder.mImageViewEmoticon.setImageDrawable(drawable);
+        itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps, mSummary.getSteps(), getEmotionText(context, emotion)));
+    }
+
+    private String getEmotionText(@NonNull final Context context, @NonNull final Emotions emotion) {
+        switch (emotion) {
+            case ANGRY:
+                return context.getString(R.string.emotion_angry);
+            case SADNESS:
+                return context.getString(R.string.emotion_sad);
+            case HAPPINESS:
+                return context.getString(R.string.emotion_happy);
+            case FANTASTIC:
+                return context.getString(R.string.emotion_fantastic);
+            case NEUTRAL:
+            default:
+                return context.getString(R.string.emotion_neutral);
+        }
     }
 
     @Override
@@ -82,8 +96,6 @@ public class SummaryCard implements CardView {
     public static final class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.textViewSteps)
         TextView mTextViewSteps;
-        @BindView(R.id.textViewUsageTime)
-        TextView mTextViewUsageTime;
         @BindView(R.id.imageViewEmoticon)
         ImageView mImageViewEmoticon;
 
