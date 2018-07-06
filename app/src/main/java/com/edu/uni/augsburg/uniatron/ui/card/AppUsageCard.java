@@ -30,23 +30,39 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class AppStatisticsCard implements CardView {
+/**
+ * The card which displays the app usage data.
+ *
+ * @author Fabio Hellmann
+ */
+public class AppUsageCard implements CardView {
 
     private static final int TYPE = 2;
     private Map<String, Integer> mAppUsageData = new HashMap<>();
 
+    /**
+     * Add all the entries to display.
+     *
+     * @param data The data to display.
+     */
     public void addAll(@NonNull final Map<String, Integer> data) {
         mAppUsageData.putAll(data);
     }
 
     @Override
-    public void update(CardView cardView) {
-        mAppUsageData = ((AppStatisticsCard) cardView).mAppUsageData;
+    public void update(@NonNull final CardView cardView) {
+        mAppUsageData = ((AppUsageCard) cardView).mAppUsageData;
     }
 
     @Override
-    public void onBindView(Context context, RecyclerView.ViewHolder viewHolder) {
+    public void onBindView(@NonNull final Context context,
+                           @NonNull final RecyclerView.ViewHolder viewHolder) {
         final ViewHolder holder = (ViewHolder) viewHolder;
+
+        final LinearLayoutManager layout = new LinearLayoutManager(context);
+        layout.setOrientation(LinearLayoutManager.VERTICAL);
+        holder.mRecyclerView.setLayoutManager(layout);
+        holder.mRecyclerView.setLayoutFrozen(true);
         holder.mRecyclerView.setAdapter(new StatisticsAdapter(context, mAppUsageData));
         final int totalAppUsage = getTotalAppUsage();
         holder.mTextAppUsageTotal.setText(context.getString(R.string.app_usage_total, totalAppUsage / 60, totalAppUsage % 60));
@@ -58,7 +74,8 @@ public class AppStatisticsCard implements CardView {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(Context context, ViewGroup viewGroup) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
+                                                      @NonNull final ViewGroup viewGroup) {
         return new ViewHolder(LayoutInflater.from(context)
                 .inflate(R.layout.card_app_statistics, viewGroup, false));
     }
@@ -75,16 +92,14 @@ public class AppStatisticsCard implements CardView {
         @BindView(R.id.textAppUsageTotal)
         TextView mTextAppUsageTotal;
 
-        ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
-            final LinearLayoutManager layout = new LinearLayoutManager(itemView.getContext());
-            layout.setOrientation(LinearLayoutManager.VERTICAL);
-            mRecyclerView.setLayoutManager(layout);
-            mRecyclerView.setLayoutFrozen(true);
         }
 
+        /**
+         * Called when the show all button is clicked.
+         */
         @OnClick(R.id.buttonShowAll)
         public void onShowAllClicked() {
             final StatisticsAdapter adapter = (StatisticsAdapter) mRecyclerView.getAdapter();
@@ -98,7 +113,7 @@ public class AppStatisticsCard implements CardView {
         }
     }
 
-    static final class StatisticsAdapter extends RecyclerView.Adapter<AppStatisticsCard.ViewHolderListItem> {
+    static final class StatisticsAdapter extends RecyclerView.Adapter<AppUsageCard.ViewHolderListItem> {
         private static final int SMALL_VISIBLE_AMOUNT = 5;
         private final Context mContext;
         private final Map<String, Integer> mAppData;
@@ -106,17 +121,19 @@ public class AppStatisticsCard implements CardView {
 
         StatisticsAdapter(@NonNull final Context context,
                           @NonNull final Map<String, Integer> appData) {
+            super();
             mContext = context;
             mAppData = sortByValueDesc(appData);
         }
 
-        private static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDesc(Map<K, V> map) {
+        private static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDesc(
+                @NonNull final Map<K, V> map) {
             return Stream.of(map.entrySet())
                     .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
-                            (e1, e2) -> e1,
+                            (entry1, entry2) -> entry1,
                             LinkedHashMap::new
                     ));
         }
@@ -131,13 +148,15 @@ public class AppStatisticsCard implements CardView {
 
         @NonNull
         @Override
-        public ViewHolderListItem onCreateViewHolder(@NonNull ViewGroup viewGroup, int position) {
+        public ViewHolderListItem onCreateViewHolder(@NonNull final ViewGroup viewGroup,
+                                                     final int position) {
             return new ViewHolderListItem(LayoutInflater.from(mContext)
                     .inflate(R.layout.card_app_statistics_item, viewGroup, false));
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolderListItem viewHolderListItem, int position) {
+        public void onBindViewHolder(@NonNull final ViewHolderListItem viewHolderListItem,
+                                     final int position) {
             final Map.Entry<String, Integer> elementAt = getElementAt(position);
 
             final String applicationLabel = getApplicationLabel(mContext, elementAt.getKey())
@@ -200,7 +219,7 @@ public class AppStatisticsCard implements CardView {
         @BindView(R.id.textAppUsagePercent)
         TextView mTextAppUsagePercent;
 
-        ViewHolderListItem(@NonNull View itemView) {
+        ViewHolderListItem(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

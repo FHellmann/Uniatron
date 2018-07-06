@@ -18,6 +18,11 @@ import com.edu.uni.augsburg.uniatron.ui.CardView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * The card which displays the summary data.
+ *
+ * @author Fabio Hellmann
+ */
 public class SummaryCard implements CardView {
     private static final int TYPE = 1;
     private Summary mSummary;
@@ -27,7 +32,7 @@ public class SummaryCard implements CardView {
     }
 
     @Override
-    public void update(CardView cardView) {
+    public void update(@NonNull final CardView cardView) {
         mSummary = ((SummaryCard) cardView).mSummary;
     }
 
@@ -43,7 +48,8 @@ public class SummaryCard implements CardView {
         itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps, mSummary.getSteps(), getEmotionText(context, emotion)));
     }
 
-    private String getEmotionText(@NonNull final Context context, @NonNull final Emotions emotion) {
+    private String getEmotionText(@NonNull final Context context,
+                                  @NonNull final Emotions emotion) {
         switch (emotion) {
             case ANGRY:
                 return context.getString(R.string.emotion_angry);
@@ -93,13 +99,13 @@ public class SummaryCard implements CardView {
         }
     }
 
-    public static final class ViewHolder extends RecyclerView.ViewHolder {
+    static final class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.textViewSteps)
         TextView mTextViewSteps;
         @BindView(R.id.imageViewEmoticon)
         ImageView mImageViewEmoticon;
 
-        ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

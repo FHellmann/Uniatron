@@ -78,7 +78,7 @@ public enum NotificationChannels {
      * @param context The context.
      */
     public static void setupChannels(@NonNull final Context context) {
-        // setup all notification channels
+        // unregister all notification channels
         Stream.of(NotificationChannels.values()).forEach(channel -> channel.setup(context));
     }
 }

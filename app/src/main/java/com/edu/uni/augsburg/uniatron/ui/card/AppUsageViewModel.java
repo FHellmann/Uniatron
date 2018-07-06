@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Transformations;
@@ -15,21 +16,35 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-public class AppStatisticsViewModel extends DateCacheViewModel implements CardViewModel {
+/**
+ * The model is the connection between the {@link DataRepository}
+ * and the {@link AppUsageCard}.
+ *
+ * @author Fabio Hellmann
+ */
+public class AppUsageViewModel extends AndroidViewModel implements CardViewModel {
+    private final DateCache<Map<String, Integer>> mDateCache;
     private final MediatorLiveData<Map<String, Integer>> mAppUsages;
     private final DataRepository mRepository;
 
-    public AppStatisticsViewModel(@NonNull final Application application) {
+    /**
+     * Ctr.
+     *
+     * @param application The application.
+     */
+    public AppUsageViewModel(@NonNull final Application application) {
         super(application);
+        mDateCache = new DateCache<>();
         mRepository = MainApplication.getRepository(application);
         mAppUsages = new MediatorLiveData<>();
     }
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        super.setup(date, calendarType);
+        mDateCache.unregister();
+
         final LiveData<Map<String, Integer>> data = getAppUsageData(date, calendarType);
-        register(mAppUsages, data);
+        mDateCache.register(mAppUsages, data);
         mAppUsages.addSource(
                 data,
                 mAppUsages::setValue
@@ -37,11 +52,11 @@ public class AppStatisticsViewModel extends DateCacheViewModel implements CardVi
     }
 
     @NonNull
-    public LiveData<AppStatisticsCard> getAppStatisticsCard() {
+    public LiveData<AppUsageCard> getAppStatisticsCard() {
         return Transformations.map(mAppUsages,
                 data -> {
                     if (data != null && !data.isEmpty()) {
-                        final AppStatisticsCard card = new AppStatisticsCard();
+                        final AppUsageCard card = new AppUsageCard();
                         card.addAll(data);
                         return card;
                     }

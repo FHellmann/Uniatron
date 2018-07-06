@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
@@ -15,20 +16,34 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class SummaryViewModel extends DateCacheViewModel implements CardViewModel {
+/**
+ * The model is the connection between the {@link DataRepository}
+ * and the {@link SummaryCard}.
+ *
+ * @author Fabio Hellmann
+ */
+public class SummaryViewModel extends AndroidViewModel implements CardViewModel {
+    private final DateCache<List<Summary>> mDateCache;
     private final MediatorLiveData<SummaryCard> mObservableDaySummary;
     private final DataRepository mRepository;
 
+    /**
+     * Ctr.
+     *
+     * @param application The application.
+     */
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
         mRepository = MainApplication.getRepository(application);
+        mDateCache = new DateCache<>();
         mObservableDaySummary = new MediatorLiveData<>();
     }
 
+    @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        super.setup(date, calendarType);
+        mDateCache.unregister();
         final LiveData<List<Summary>> source = getSummarySourceBy(date, calendarType);
-        register(mObservableDaySummary, source);
+        mDateCache.register(mObservableDaySummary, source);
         mObservableDaySummary.addSource(
                 source,
                 value -> {
@@ -60,6 +75,11 @@ public class SummaryViewModel extends DateCacheViewModel implements CardViewMode
         }
     }
 
+    /**
+     * Get the summary card.
+     *
+     * @return The summary card.
+     */
     public LiveData<SummaryCard> getSummaryCard() {
         return mObservableDaySummary;
     }

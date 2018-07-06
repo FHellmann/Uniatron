@@ -67,6 +67,25 @@ public class TimeCreditShopActivity extends AppCompatActivity {
 
         mPrefHandler = new SharedPreferencesHandler(this);
 
+        final GridLayoutManager layout = new GridLayoutManager(this, 2);
+        layout.setOrientation(GridLayoutManager.VERTICAL);
+
+        final TimeCreditListAdapter adapter = new TimeCreditListAdapter();
+        mRecyclerViewCreditList.setAdapter(adapter);
+
+        mRecyclerViewCreditList.setHasFixedSize(true);
+        mRecyclerViewCreditList.setLayoutFrozen(true);
+        mRecyclerViewCreditList.setLayoutManager(layout);
+        mRecyclerViewCreditList.setItemAnimator(new SlideInUpAnimator());
+        mRecyclerViewCreditList.getItemAnimator().setAddDuration(ANIMATION_DURATION);
+        mRecyclerViewCreditList.getItemAnimator().setChangeDuration(ANIMATION_DURATION);
+        mRecyclerViewCreditList.getItemAnimator().setMoveDuration(ANIMATION_DURATION);
+        mRecyclerViewCreditList.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
+
+        setupModel(adapter);
+    }
+
+    private void setupModel(@NonNull final TimeCreditListAdapter adapter) {
         mModel = ViewModelProviders.of(this)
                 .get(TimeCreditShopViewModel.class);
         mModel.setShopChangeListener(empty -> mMenuTrade.setVisible(!empty));
@@ -77,11 +96,6 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             final int checkedIndex = mRadioGroupEmotion.indexOfChild(checkedRadioButton);
             mModel.setEmotion(Emotions.values()[checkedIndex]);
         });
-
-        setupRecyclerView();
-
-        final TimeCreditListAdapter adapter = new TimeCreditListAdapter();
-
         mModel.getLatestLearningAidTimePassed().observe(this, learningAid -> {
             if (learningAid.isActive()) {
                 mScrollView.setVisibility(View.GONE);
@@ -99,7 +113,6 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             adapter.setStepCount(stepCount);
             adapter.notifyDataSetChanged();
         });
-        mRecyclerViewCreditList.setAdapter(adapter);
     }
 
     private void setupActionBar() {
@@ -107,20 +120,6 @@ public class TimeCreditShopActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getString(R.string.time_credit_shop_title));
-    }
-
-    private void setupRecyclerView() {
-        final GridLayoutManager layout = new GridLayoutManager(this, 2);
-        layout.setOrientation(GridLayoutManager.VERTICAL);
-
-        mRecyclerViewCreditList.setHasFixedSize(true);
-        mRecyclerViewCreditList.setLayoutFrozen(true);
-        mRecyclerViewCreditList.setLayoutManager(layout);
-        mRecyclerViewCreditList.setItemAnimator(new SlideInUpAnimator());
-        mRecyclerViewCreditList.getItemAnimator().setAddDuration(ANIMATION_DURATION);
-        mRecyclerViewCreditList.getItemAnimator().setChangeDuration(ANIMATION_DURATION);
-        mRecyclerViewCreditList.getItemAnimator().setMoveDuration(ANIMATION_DURATION);
-        mRecyclerViewCreditList.getItemAnimator().setRemoveDuration(ANIMATION_DURATION);
     }
 
     @Override
@@ -189,28 +188,18 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             }
             holder.mValue = timeCredits;
 
-            holder.mTextViewTradeOffer.setText(String.valueOf(timeCredits.getTime()) + " Min");
+            holder.mTextViewTradeOffer.setText(
+                    getString(R.string.minutes_short, timeCredits.getTime()));
             holder.mTextViewTradeOffer.setCompoundDrawables(null, null, null, null);
             holder.mTextViewTradeOffer.setLabelHeight(30);
 
             if (timeCredits == TimeCredits.CREDIT_LEARNING) {
-                /*
-                holder.mTextViewTradeOffer.setText(getString(
-                        R.string.card_time_credit_learning,
-                        timeCredits.getTime(),
-                        timeCredits.getBlockedMinutes())
-                );
-                */
-                holder.mTextViewTradeOffer.setLabelText(String.valueOf(timeCredits.getBlockedMinutes()) + " Min");
+                holder.mTextViewTradeOffer.setLabelText(
+                        getString(R.string.minutes_short, timeCredits.getBlockedMinutes()));
             } else {
-                /*
-                holder.mTextViewTradeOffer.setText(getString(
-                        R.string.card_time_credit_steps,
-                        timeCredits.getTime(),
-                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount()))
-                );
-                */
-                holder.mTextViewTradeOffer.setLabelText(String.valueOf((int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount())) + " \u00A9");
+                holder.mTextViewTradeOffer.setLabelText(
+                        (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount())
+                        + " \u00A9");
             }
         }
 

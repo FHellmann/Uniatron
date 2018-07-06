@@ -10,15 +10,21 @@ import android.view.ViewGroup;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.CardView;
 
+/**
+ * An empty card.
+ *
+ * @author Fabio Hellmann
+ */
 public class EmptyCard implements CardView {
     @Override
-    public void update(CardView cardView) {
-        // Ignore
+    public void update(@NonNull final CardView cardView) {
+        // Empty
     }
 
     @Override
-    public void onBindView(final Context context, final RecyclerView.ViewHolder viewHolder) {
-
+    public void onBindView(@NonNull final Context context,
+                           @NonNull final RecyclerView.ViewHolder viewHolder) {
+        // Empty
     }
 
     @Override
@@ -27,14 +33,14 @@ public class EmptyCard implements CardView {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(final Context context,
-                                                      final ViewGroup viewGroup) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
+                                                      @NonNull final ViewGroup viewGroup) {
         return new ViewHolder(LayoutInflater.from(context)
                 .inflate(R.layout.card_empty, viewGroup, false));
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
-        ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
         }
     }

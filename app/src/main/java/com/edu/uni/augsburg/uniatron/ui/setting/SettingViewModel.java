@@ -47,7 +47,7 @@ class SettingViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    public SettingViewModel(@NonNull final Application application) {
+     SettingViewModel(@NonNull final Application application) {
         super(application);
 
         mHandler = MainApplication.getSharedPreferencesHandler(application);

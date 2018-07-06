@@ -19,12 +19,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
- * The {@link BasicViewModel} provides the data for
+ * The {@link MainActivityViewModel} provides the data for
  * the {@link MainActivity}.
  *
  * @author Fabio Hellmann
  */
-public class BasicViewModel extends AndroidViewModel {
+public class MainActivityViewModel extends AndroidViewModel {
     private final List<CardViewModel> mCardViewModelList;
     private final MediatorLiveData<Calendar> mDateLoaded;
     private Calendar mMinCalendar;
@@ -36,7 +36,7 @@ public class BasicViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    public BasicViewModel(@NonNull final Application application) {
+    public MainActivityViewModel(@NonNull final Application application) {
         super(application);
 
         MainApplication.getRepository(application).getMinDate().observeForever(date -> {
@@ -54,10 +54,18 @@ public class BasicViewModel extends AndroidViewModel {
         mDateLoaded.setValue(mCalendar);
     }
 
+    /**
+     * Registers a {@link CardViewModel} to be notified on changes.
+     *
+     * @param cardViewModel The model.
+     */
     public void registerCardViewModel(@NonNull final CardViewModel cardViewModel) {
         mCardViewModelList.add(cardViewModel);
     }
 
+    /**
+     * Notifies all registered {@link CardViewModel}s.
+     */
     private void notifyDataSetChanged() {
         Stream.of(mCardViewModelList)
                 .forEach(cardViewModel ->
@@ -65,25 +73,27 @@ public class BasicViewModel extends AndroidViewModel {
         mDateLoaded.postValue(mCalendar);
     }
 
+    /**
+     * Moves the date focus to the next date.
+     */
     public void nextData() {
         mCalendar.add(mGroupByStrategy.mCalendarType, 1);
-        notifyDataSetChanged();
+        setDate(mCalendar.getTime());
     }
 
+    /**
+     * Moves the date focus to the previous date.
+     */
     public void prevData() {
         mCalendar.add(mGroupByStrategy.mCalendarType, -1);
-        notifyDataSetChanged();
+        setDate(mCalendar.getTime());
     }
 
-    public void setGroupByStrategy(@NonNull final GroupBy groupBy) {
-        mGroupByStrategy = groupBy;
-        notifyDataSetChanged();
-    }
-
-    public GroupBy getGroupByStrategy() {
-        return mGroupByStrategy;
-    }
-
+    /**
+     * Set the date.
+     *
+     * @param date The date to set.
+     */
     public void setDate(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -96,28 +106,80 @@ public class BasicViewModel extends AndroidViewModel {
         notifyDataSetChanged();
     }
 
+    /**
+     * Set the group by strategy.
+     *
+     * @param groupBy The strategy.
+     */
+    public void setGroupByStrategy(@NonNull final GroupBy groupBy) {
+        mGroupByStrategy = groupBy;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Get the group by strategy.
+     *
+     * @return The strategy.
+     */
+    public GroupBy getGroupByStrategy() {
+        return mGroupByStrategy;
+    }
+
+    /**
+     * Get the calendar field values of the currently selected date.
+     *
+     * @param calendarField The calendar field.
+     * @return The calendar field value.
+     */
     public int getCurrentDateValue(final int calendarField) {
         return mCalendar.get(calendarField);
     }
 
+    /**
+     * Check whether the next date is available or not.
+     *
+     * @return {@code true} if the next date is available, {@code false} otherwise.
+     */
     public boolean isNextAvailable() {
         return mGroupByStrategy.mNextAvailable.apply(mCalendar);
     }
 
+    /**
+     * Check whether the previous date is available or not.
+     *
+     * @return {@code true} if the previous date is available, {@code false} otherwise.
+     */
     public boolean isPrevAvailable() {
         return mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, mCalendar);
     }
 
+    /**
+     * Get the current date.
+     *
+     * @return The current date.
+     */
+    @NonNull
     public LiveData<Calendar> getCurrentDate() {
         return mDateLoaded;
     }
 
+    /**
+     * The group by strategy for the dates.
+     *
+     * @author Fabio Hellmann
+     */
     public enum GroupBy {
+        /**
+         * Group by date.
+         */
         DATE(
                 Calendar.DATE,
                 calendar -> !DateUtil.getMinTimeOfDate(new Date()).before(calendar.getTime()),
                 (calS, calE) -> calE.getTime().after(DateUtil.getMaxTimeOfDate(calS.getTime()))
         ),
+        /**
+         * Group by month.
+         */
         MONTH(
                 Calendar.MONTH,
                 calendar -> calendar.get(Calendar.YEAR) <= GregorianCalendar.getInstance().get(Calendar.YEAR)
@@ -125,6 +187,9 @@ public class BasicViewModel extends AndroidViewModel {
                 (calS, calE) -> calE.get(Calendar.YEAR) >= calS.get(Calendar.YEAR)
                         && calE.get(Calendar.MONTH) > calS.get(Calendar.MONTH)
         ),
+        /**
+         * Group by year.
+         */
         YEAR(
                 Calendar.YEAR,
                 calendar -> calendar.get(Calendar.YEAR) < GregorianCalendar.getInstance().get(Calendar.YEAR),
@@ -143,6 +208,11 @@ public class BasicViewModel extends AndroidViewModel {
             mPrevAvailable = prevAvailable;
         }
 
+        /**
+         * Get the calendar type.
+         *
+         * @return The calendar type (date/month/year).
+         */
         public int getCalendarType() {
             return mCalendarType;
         }

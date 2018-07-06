@@ -57,7 +57,7 @@ public class MainApplication extends Application {
         final AppDatabase database = Room.inMemoryDatabaseBuilder(this, AppDatabase.class).build();
         new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected Void doInBackground(final Void... voids) {
                 DatabaseUtil.createRandomData(database);
                 return null;
             }

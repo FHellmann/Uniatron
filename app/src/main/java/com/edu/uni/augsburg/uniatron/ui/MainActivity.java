@@ -17,6 +17,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
@@ -28,15 +29,17 @@ import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
-import com.edu.uni.augsburg.uniatron.ui.card.AppStatisticsViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.EmptyCard;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
+import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -49,7 +52,7 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements android.support.v7.widget.Toolbar.OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements android.support.v
     @BindView(R.id.nextDateButton)
     MaterialButton mNextDateButton;
 
-    private BasicViewModel mModelNavigation;
+    private MainActivityViewModel mModelNavigation;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -79,50 +82,47 @@ public class MainActivity extends AppCompatActivity implements android.support.v
 
         final CardListAdapter adapter = new CardListAdapter(this);
         mRecyclerView.setAdapter(adapter);
-        adapter.addOrUpdateCard(new EmptyCard());
 
-        final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
-        modelSummary.getSummaryCard().observe(this, adapter::addOrUpdateCard);
-
-        final AppStatisticsViewModel modelAppStatistics = ViewModelProviders.of(this)
-                .get(AppStatisticsViewModel.class);
-        modelAppStatistics.getAppStatisticsCard().observe(this, adapter::addOrUpdateCard);
-
-        mModelNavigation = ViewModelProviders.of(this).get(BasicViewModel.class);
-        mModelNavigation.registerCardViewModel(modelSummary);
-        mModelNavigation.registerCardViewModel(modelAppStatistics);
-        mModelNavigation.getCurrentDate().observe(this, date -> {
-            adapter.clear();
-            adapter.addOrUpdateCard(new EmptyCard());
-            switch (mModelNavigation.getGroupByStrategy()) {
-                case MONTH:
-                    mDateDisplayButton.setText(DateUtil.formatForMonth(date.getTime()));
-                    break;
-                case YEAR:
-                    mDateDisplayButton.setText(DateUtil.formatForYear(date.getTime()));
-                    break;
-                case DATE:
-                default:
-                    mDateDisplayButton.setText(DateUtil.formatForDate(date.getTime()));
-                    break;
-            }
-            final int calendarType = mModelNavigation.getGroupByStrategy().getCalendarType();
-            modelSummary.setup(date.getTime(), calendarType);
-            mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
-            mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
-            mRecyclerView.smoothScrollToPosition(0);
-        });
+        setupCardModels(adapter);
 
         NotificationChannels.setupChannels(this);
         requestAppPermissions();
         startServices();
     }
 
+    private void setupCardModels(@NonNull final CardListAdapter adapter) {
+        final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
+        modelSummary.getSummaryCard().observe(this, adapter::addOrUpdateCard);
+
+        final AppUsageViewModel modelAppStatistics = ViewModelProviders.of(this)
+                .get(AppUsageViewModel.class);
+        modelAppStatistics.getAppStatisticsCard().observe(this, adapter::addOrUpdateCard);
+
+        mModelNavigation = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mModelNavigation.registerCardViewModel(modelSummary);
+        mModelNavigation.registerCardViewModel(modelAppStatistics);
+        mModelNavigation.getCurrentDate().observe(this, date -> {
+            adapter.clear();
+            mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
+            final int calendarType = mModelNavigation.getGroupByStrategy().getCalendarType();
+            modelSummary.setup(date.getTime(), calendarType);
+            mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
+            mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
+            mRecyclerView.smoothScrollToPosition(0);
+        });
+    }
+
+    /**
+     * Called when the button to step to the previous date is clicked.
+     */
     @OnClick(R.id.prevDateButton)
     public void onPrevClicked() {
         mModelNavigation.prevData();
     }
 
+    /**
+     * Called when the button which displays the date is clicked.
+     */
     @OnClick(R.id.dateDisplayButton)
     public void onDateDisplayClicked() {
         new DatePickerDialog(
@@ -138,6 +138,9 @@ public class MainActivity extends AppCompatActivity implements android.support.v
         ).show();
     }
 
+    /**
+     * Called when the button to step to the next date is clicked.
+     */
     @OnClick(R.id.nextDateButton)
     public void onNextClicked() {
         mModelNavigation.nextData();
@@ -175,25 +178,41 @@ public class MainActivity extends AppCompatActivity implements android.support.v
     private boolean checkBatteryOptimized() {
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         final String packageName = getApplicationContext().getPackageName();
-        return !powerManager.isIgnoringBatteryOptimizations(packageName);
+        return powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName);
+    }
+
+    private String getDateFormatByGroupStrategy(@NonNull final Date date) {
+        switch (mModelNavigation.getGroupByStrategy()) {
+            case MONTH:
+                return DateUtil.formatForMonth(date);
+            case YEAR:
+                return DateUtil.formatForYear(date);
+            case DATE:
+            default:
+                return DateUtil.formatForDate(date);
+        }
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
+    public boolean onMenuItemClick(@NonNull final MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.setting:
+                final Intent nextIntent = new Intent(this, SettingActivity.class);
+                TaskStackBuilder.create(this)
+                        .addNextIntentWithParentStack(nextIntent)
+                        .startActivities();
                 return true;
             case R.id.group_by_day:
                 menuItem.setChecked(true);
-                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.DATE);
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.DATE);
                 return true;
             case R.id.group_by_month:
                 menuItem.setChecked(true);
-                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.MONTH);
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.MONTH);
                 return true;
             case R.id.group_by_year:
                 menuItem.setChecked(true);
-                mModelNavigation.setGroupByStrategy(BasicViewModel.GroupBy.YEAR);
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.YEAR);
                 return true;
             default:
                 return false;
@@ -208,12 +227,15 @@ public class MainActivity extends AppCompatActivity implements android.support.v
         private final Context mContext;
 
         CardListAdapter(@NonNull final Context context) {
+            super();
             mContext = context;
         }
 
         void addOrUpdateCard(@Nullable final CardView cardView) {
             if (cardView == null) {
                 return;
+            } else if (mCardViewList.isEmpty()) {
+                mCardViewList.add(new EmptyCard());
             }
             // Remove the card if it does already exists
             final Optional<CardView> cardOptional = Stream.of(mCardViewList)
@@ -227,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements android.support.v
                 mCardViewList.add(cardView);
                 Collections.sort(
                         mCardViewList,
-                        (cardView1, t1) -> Integer.compare(cardView1.getType(), t1.getType())
+                        (card1, card2) -> Integer.compare(card1.getType(), card2.getType())
                 );
                 notifyItemInserted(mCardViewList.indexOf(cardView));
                 notifyDataSetChanged();
@@ -249,17 +271,18 @@ public class MainActivity extends AppCompatActivity implements android.support.v
                     .filter(card -> card.getType() == type)
                     .findFirst()
                     .map(card -> card.onCreateViewHolder(mContext, viewGroup))
-                    .orElseThrow(() -> new IllegalStateException("The card needs to " +
-                            "create a view holder!"));
+                    .orElseThrow(() -> new IllegalStateException("The card needs to "
+                            + "create a view holder!"));
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                     final int position) {
             mCardViewList.get(position).onBindView(mContext, viewHolder);
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public int getItemViewType(final int position) {
             return mCardViewList.get(position).getType();
         }
 

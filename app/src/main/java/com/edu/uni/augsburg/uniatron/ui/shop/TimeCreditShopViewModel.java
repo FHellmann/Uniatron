@@ -38,7 +38,7 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    public TimeCreditShopViewModel(@NonNull final Application application) {
+    TimeCreditShopViewModel(@NonNull final Application application) {
         super(application);
 
         mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
