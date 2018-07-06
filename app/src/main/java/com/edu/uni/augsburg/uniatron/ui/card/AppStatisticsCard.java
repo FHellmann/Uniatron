@@ -125,7 +125,7 @@ public class AppStatisticsCard implements CardView {
             return usageTime * 100.0 / Stream.of(mAppData).mapToInt(Map.Entry::getValue).sum();
         }
 
-        public void setShowSomeItems(final boolean visible) {
+        void setShowSomeItems(final boolean visible) {
             mShowSmallVisibleAmount = visible;
         }
 

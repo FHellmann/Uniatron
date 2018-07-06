@@ -44,7 +44,7 @@ public class AppTrackingService extends LifecycleService {
     private static final int DELAY_IN_MILLISECONDS = 1000;
     private static final int NOTIFICATION_ONE_MINUTE = 59;
     private static final int NOTIFICATION_FIVE_MINUTES = 299;
-    private static final int NOTIFICATION_TEN_MINUTES = 599;;
+    private static final int NOTIFICATION_TEN_MINUTES = 599;
 
     private final AppChecker mAppChecker = new AppChecker();
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
@@ -127,11 +127,11 @@ public class AppTrackingService extends LifecycleService {
     }
 
     // called periodically and handles all app blocking logic
-    private void delegateAppUsage(final String appName, final int timeMillis) {
+    private void delegateAppUsage(final String appName) {
         mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
         if (isAppNotInBlacklist(appName)) {
             // Will catch all cases, when app name is not in the blacklist
-            commitAppUsageTime(appName, timeMillis);
+            commitAppUsageTime(appName, AppTrackingService.DELAY_IN_MILLISECONDS);
         } else if (mLearningAidHelper.isLearningAidActive()) {
             Logger.d("App '" + appName + "' is blocked by learning aid -> BLOCKED");
             // 1. Priority: Check whether the learning aid is active or not
@@ -148,7 +148,7 @@ public class AppTrackingService extends LifecycleService {
                 showNotificationIfTimeAlmostUp();
             }
             // x. Priority: Every other case...
-            commitAppUsageTime(appName, timeMillis);
+            commitAppUsageTime(appName, AppTrackingService.DELAY_IN_MILLISECONDS);
         }
     }
 
@@ -191,7 +191,7 @@ public class AppTrackingService extends LifecycleService {
     }
 
     private void startAppChecker() {
-        mAppChecker.whenAny(process -> delegateAppUsage(process, DELAY_IN_MILLISECONDS))
+        mAppChecker.whenAny(this::delegateAppUsage)
                 .timeout(DELAY_IN_MILLISECONDS)
                 .start(getBaseContext());
     }
@@ -257,10 +257,6 @@ public class AppTrackingService extends LifecycleService {
 
         private boolean isLearningAidActive() {
             return mLearningAidTmp.isActive();
-        }
-
-        private long getTimeLeft() {
-            return mLearningAidTmp.getLeftTime();
         }
 
         private void addLiveData(@NonNull final LiveData<LearningAid> liveData) {

@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-public class SettingViewModel extends AndroidViewModel {
+class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;

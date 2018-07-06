@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Fabio Hellmann
  */
-public class TimeCreditShopViewModel extends AndroidViewModel {
+class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;

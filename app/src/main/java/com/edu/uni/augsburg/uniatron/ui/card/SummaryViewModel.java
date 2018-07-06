@@ -11,7 +11,6 @@ import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

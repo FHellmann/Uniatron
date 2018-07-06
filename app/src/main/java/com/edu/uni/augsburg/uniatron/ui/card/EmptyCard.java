@@ -34,7 +34,7 @@ public class EmptyCard implements CardView {
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }
