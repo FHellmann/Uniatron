@@ -67,10 +67,10 @@ public class MainActivityViewModel extends AndroidViewModel {
      * Notifies all registered {@link CardViewModel}s.
      */
     private void notifyDataSetChanged() {
+        mDateLoaded.setValue(mCalendar);
         Stream.of(mCardViewModelList)
                 .forEach(cardViewModel ->
                         cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType));
-        mDateLoaded.postValue(mCalendar);
     }
 
     /**
@@ -78,7 +78,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public void nextData() {
         mCalendar.add(mGroupByStrategy.mCalendarType, 1);
-        setDate(mCalendar.getTime());
+        notifyDataSetChanged();
     }
 
     /**
@@ -86,7 +86,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public void prevData() {
         mCalendar.add(mGroupByStrategy.mCalendarType, -1);
-        setDate(mCalendar.getTime());
+        notifyDataSetChanged();
     }
 
     /**
@@ -98,9 +98,9 @@ public class MainActivityViewModel extends AndroidViewModel {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
         if (mGroupByStrategy.mNextAvailable.apply(calendar)) {
-            calendar.setTime(mMinCalendar.getTime());
-        } else if (mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
             calendar.setTime(new Date());
+        } else if (mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
+            calendar.setTime(mMinCalendar.getTime());
         }
         mCalendar = calendar;
         notifyDataSetChanged();

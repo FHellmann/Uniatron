@@ -9,13 +9,13 @@ import android.view.ViewGroup;
  *
  * @author Fabio Hellmann
  */
-public interface CardView {
+public interface CardViewHolder {
     /**
      * Updates the card data.
      *
-     * @param cardView The card to update with.
+     * @param cardViewHolder The card to update with.
      */
-    void update(CardView cardView);
+    void update(CardViewHolder cardViewHolder);
 
     /**
      * Binds the view to the data.

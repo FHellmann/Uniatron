@@ -19,21 +19,15 @@ public class DateCache<T> {
     private final Map<MediatorLiveData<?>, LiveData<T>> mCache = new HashMap<>();
 
     /**
-     * Unregister all registered live data.
-     */
-    void unregister() {
-        Stream.of(mCache.entrySet()).forEach(entry -> entry.getKey().removeSource(entry.getValue()));
-        mCache.clear();
-    }
-
-    /**
      * Register a new live data.
      *
      * @param liveData The live data to listen on.
      * @param source   The source live data.
      */
-    void register(@NonNull final MediatorLiveData<?> liveData,
-                  @NonNull final LiveData<T> source) {
+    void clearAndRegister(@NonNull final MediatorLiveData<?> liveData,
+                          @NonNull final LiveData<T> source) {
+        Stream.of(mCache.entrySet()).forEach(entry -> entry.getKey().removeSource(entry.getValue()));
+        mCache.clear();
         mCache.put(liveData, source);
     }
 }

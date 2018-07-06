@@ -50,4 +50,10 @@
     <string name="emotion_neutral">neutral</string>
     <string name="emotion_happy">happy</string>
     <string name="emotion_fantastic">fantastic</string>
+    <string name="about">About</string>
+    <string name="feedback">Feedback</string>
+    <string name="about_description">UNIAtron was created for Mobile Application Development, a course at the University Augsburg in 2018.</string>
+    <string name="feedback_question">Do you like our app?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

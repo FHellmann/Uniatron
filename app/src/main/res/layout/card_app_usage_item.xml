@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="72dp">
 
-    <ImageView
+    <com.elyeproj.loaderviewlibrary.LoaderImageView
         android:id="@+id/imageAppIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -13,14 +13,13 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:contentDescription="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/sym_def_app_icon" />
+        app:use_gradient="true" />
 
-    <TextView
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
         android:id="@+id/textAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,9 +28,10 @@
         app:layout_constraintBottom_toBottomOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent"
+        app:use_gradient="true"
         tools:text="YouTube" />
 
-    <TextView
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
         android:id="@+id/textAppUsage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,6 +39,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:use_gradient="true"
         tools:text="Nutzungsdauer: 17 Minuten" />
 
     <android.support.constraint.Guideline
@@ -69,7 +70,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="52dp" />
 
-    <TextView
+    <com.elyeproj.loaderviewlibrary.LoaderTextView
         android:id="@+id/textAppUsagePercent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,6 +81,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:use_gradient="true"
         tools:text="5%" />
 
 </android.support.constraint.ConstraintLayout>

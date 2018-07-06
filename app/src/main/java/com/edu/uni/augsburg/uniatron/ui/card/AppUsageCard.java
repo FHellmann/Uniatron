@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.button.MaterialButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,17 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.CardView;
+import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
+import com.elyeproj.loaderviewlibrary.LoaderImageView;
+import com.elyeproj.loaderviewlibrary.LoaderTextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,23 +36,26 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class AppUsageCard implements CardView {
+public class AppUsageCard implements CardViewHolder {
 
     private static final int TYPE = 2;
-    private Map<String, Integer> mAppUsageData = new HashMap<>();
+    private final List<AppUsageItem> mAppUsageList = new ArrayList<>();
 
     /**
      * Add all the entries to display.
      *
      * @param data The data to display.
      */
-    public void addAll(@NonNull final Map<String, Integer> data) {
-        mAppUsageData.putAll(data);
+    public void addAll(@NonNull final List<AppUsageItem> data) {
+        mAppUsageList.addAll(data);
+        Collections.sort(mAppUsageList, (usage1, usage2) ->
+                Integer.compare(usage2.getApplicationUsage(), usage1.getApplicationUsage()));
     }
 
     @Override
-    public void update(@NonNull final CardView cardView) {
-        mAppUsageData = ((AppUsageCard) cardView).mAppUsageData;
+    public void update(@NonNull final CardViewHolder cardViewHolder) {
+        mAppUsageList.clear();
+        addAll(((AppUsageCard) cardViewHolder).mAppUsageList);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class AppUsageCard implements CardView {
         layout.setOrientation(LinearLayoutManager.VERTICAL);
         holder.mRecyclerView.setLayoutManager(layout);
         holder.mRecyclerView.setLayoutFrozen(true);
-        holder.mRecyclerView.setAdapter(new StatisticsAdapter(context, mAppUsageData));
+        holder.mRecyclerView.setAdapter(new StatisticsAdapter(context, mAppUsageList));
         final int totalAppUsage = getTotalAppUsage();
         holder.mTextAppUsageTotal.setText(context.getString(R.string.app_usage_total, totalAppUsage / 60, totalAppUsage % 60));
     }
@@ -77,11 +81,11 @@ public class AppUsageCard implements CardView {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
         return new ViewHolder(LayoutInflater.from(context)
-                .inflate(R.layout.card_app_statistics, viewGroup, false));
+                .inflate(R.layout.card_app_usage, viewGroup, false));
     }
 
     private int getTotalAppUsage() {
-        return Stream.of(mAppUsageData).mapToInt(Map.Entry::getValue).sum();
+        return Stream.of(mAppUsageList).mapToInt(AppUsageItem::getApplicationUsage).sum();
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
@@ -116,30 +120,14 @@ public class AppUsageCard implements CardView {
     static final class StatisticsAdapter extends RecyclerView.Adapter<AppUsageCard.ViewHolderListItem> {
         private static final int SMALL_VISIBLE_AMOUNT = 5;
         private final Context mContext;
-        private final Map<String, Integer> mAppData;
+        private final List<AppUsageItem> mAppData;
         private boolean mShowSmallVisibleAmount = true;
 
         StatisticsAdapter(@NonNull final Context context,
-                          @NonNull final Map<String, Integer> appData) {
+                          @NonNull final List<AppUsageItem> appData) {
             super();
             mContext = context;
-            mAppData = sortByValueDesc(appData);
-        }
-
-        private static <K, V extends Comparable<? super V>> Map<K, V> sortByValueDesc(
-                @NonNull final Map<K, V> map) {
-            return Stream.of(map.entrySet())
-                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (entry1, entry2) -> entry1,
-                            LinkedHashMap::new
-                    ));
-        }
-
-        private double getPercentageValue(final int usageTime) {
-            return usageTime * 100.0 / Stream.of(mAppData).mapToInt(Map.Entry::getValue).sum();
+            mAppData = appData;
         }
 
         void setShowSomeItems(final boolean visible) {
@@ -151,77 +139,146 @@ public class AppUsageCard implements CardView {
         public ViewHolderListItem onCreateViewHolder(@NonNull final ViewGroup viewGroup,
                                                      final int position) {
             return new ViewHolderListItem(LayoutInflater.from(mContext)
-                    .inflate(R.layout.card_app_statistics_item, viewGroup, false));
+                    .inflate(R.layout.card_app_usage_item, viewGroup, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull final ViewHolderListItem viewHolderListItem,
                                      final int position) {
-            final Map.Entry<String, Integer> elementAt = getElementAt(position);
+            final AppUsageItem item = mAppData.get(position);
 
-            final String applicationLabel = getApplicationLabel(mContext, elementAt.getKey())
-                    .orElse(mContext.getString(R.string.unknwon));
-            final Drawable applicationIcon = getApplicationIcon(mContext, elementAt.getKey())
-                    .orElse(mContext.getResources().getDrawable(android.R.drawable.sym_def_app_icon));
-            final int usageTime = elementAt.getValue();
+            final String applicationPackage = item.getApplicationPackage();
+            final int usageTime = item.getApplicationUsage();
+            final double usageTimePercent = item.getApplicationUsagePercent();
 
-            viewHolderListItem.mTextAppName.setText(applicationLabel);
-            viewHolderListItem.mImageAppIcon.setImageDrawable(applicationIcon);
-            viewHolderListItem.mTextAppUsage.setText(mContext.getString(R.string.app_usage_time, usageTime / 60, usageTime % 60));
-            viewHolderListItem.mTextAppUsagePercent.setText(String.format(
-                    Locale.getDefault(),
-                    "%d %%",
-                    Math.round(getPercentageValue(elementAt.getValue()))
-            ));
+            new AppInfoLoader(
+                    mContext.getPackageManager(),
+                    mContext.getString(R.string.unknwon),
+                    mContext.getResources().getDrawable(android.R.drawable.sym_def_app_icon),
+                    (appLabel, appIcon) -> {
+                        viewHolderListItem.mTextAppName.setText(appLabel);
+                        viewHolderListItem.mImageAppIcon.setImageDrawable(appIcon);
+                        viewHolderListItem.mTextAppUsage.setText(mContext.getString(
+                                R.string.app_usage_time,
+                                usageTime / 60,
+                                usageTime % 60
+                        ));
+                        viewHolderListItem.mTextAppUsagePercent.setText(String.format(
+                                Locale.getDefault(),
+                                "%d %%",
+                                Math.round(usageTimePercent)
+                        ));
+                    }
+            ).execute(applicationPackage);
         }
 
         @Override
         public int getItemCount() {
             return mAppData.size() > SMALL_VISIBLE_AMOUNT && mShowSmallVisibleAmount ? SMALL_VISIBLE_AMOUNT : mAppData.size();
         }
-
-        private Map.Entry<String, Integer> getElementAt(final int position) {
-            return Stream.of(mAppData).skip(position).findFirst().orElseThrow();
-        }
-
-        @NonNull
-        private Optional<String> getApplicationLabel(@NonNull final Context context,
-                                                     @NonNull final String packageName) {
-            final PackageManager packageManager = context.getPackageManager();
-            final List<ApplicationInfo> installedApplications = packageManager
-                    .getInstalledApplications(PackageManager.GET_META_DATA);
-            return Stream.of(installedApplications)
-                    .filter(app -> app.packageName.equals(packageName))
-                    .findFirst()
-                    .map(appInfo -> packageManager.getApplicationLabel(appInfo).toString());
-        }
-
-        @NonNull
-        private Optional<Drawable> getApplicationIcon(@NonNull final Context context,
-                                                      @NonNull final String packageName) {
-            final PackageManager packageManager = context.getPackageManager();
-            final List<ApplicationInfo> installedApplications = packageManager
-                    .getInstalledApplications(PackageManager.GET_META_DATA);
-            return Stream.of(installedApplications)
-                    .filter(app -> app.packageName.equals(packageName))
-                    .findFirst()
-                    .map(packageManager::getApplicationIcon);
-        }
     }
 
     static final class ViewHolderListItem extends RecyclerView.ViewHolder {
         @BindView(R.id.imageAppIcon)
-        ImageView mImageAppIcon;
+        LoaderImageView mImageAppIcon;
         @BindView(R.id.textAppName)
-        TextView mTextAppName;
+        LoaderTextView mTextAppName;
         @BindView(R.id.textAppUsage)
-        TextView mTextAppUsage;
+        LoaderTextView mTextAppUsage;
         @BindView(R.id.textAppUsagePercent)
-        TextView mTextAppUsagePercent;
+        LoaderTextView mTextAppUsagePercent;
 
         ViewHolderListItem(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    static final class AppUsageItem {
+        private final String mApplicationPackage;
+        private final int mApplicationUsage;
+        private final double mApplicationUsagePercent;
+
+        AppUsageItem(@NonNull final String applicationPackage,
+                     final int applicationUsage,
+                     final double applicationUsagePercent) {
+            mApplicationPackage = applicationPackage;
+            this.mApplicationUsage = applicationUsage;
+            this.mApplicationUsagePercent = applicationUsagePercent;
+        }
+
+        public String getApplicationPackage() {
+            return mApplicationPackage;
+        }
+
+        int getApplicationUsage() {
+            return mApplicationUsage;
+        }
+
+        double getApplicationUsagePercent() {
+            return mApplicationUsagePercent;
+        }
+    }
+
+    static final class AppInfoLoader extends AsyncTask<String, Void, Map<String, Drawable>> {
+        private final PackageManager mPackageManager;
+        @NonNull
+        private final String mPlaceHolderText;
+        private final Drawable mPlaceholder;
+        private final OnFinished mOnFinished;
+
+        AppInfoLoader(@NonNull final PackageManager packageManager,
+                      @NonNull final String placeHolderText,
+                      @NonNull final Drawable placeHolderImage,
+                      @NonNull final OnFinished onFinished) {
+            mPackageManager = packageManager;
+            mPlaceHolderText = placeHolderText;
+            mPlaceholder = placeHolderImage;
+            mOnFinished = onFinished;
+        }
+
+        @Override
+        protected Map<String, Drawable> doInBackground(@NonNull final String... packageName) {
+            final HashMap<String, Drawable> map = new HashMap<>();
+
+            final String appPackageName = packageName[0];
+            final String applicationLabel = getApplicationLabel(appPackageName);
+            final Drawable applicationIcon = getApplicationIcon(appPackageName);
+            map.put(applicationLabel, applicationIcon);
+
+            return map;
+        }
+
+        @Override
+        protected void onPostExecute(Map<String, Drawable> result) {
+            Stream.of(result).findFirst()
+                    .ifPresent(entry -> mOnFinished.finished(entry.getKey(), entry.getValue()));
+        }
+
+        @NonNull
+        private String getApplicationLabel(@NonNull final String packageName) {
+            final List<ApplicationInfo> installedApplications = mPackageManager
+                    .getInstalledApplications(PackageManager.GET_META_DATA);
+            return Stream.of(installedApplications)
+                    .filter(app -> app.packageName.equals(packageName))
+                    .findFirst()
+                    .map(appInfo -> mPackageManager.getApplicationLabel(appInfo).toString())
+                    .orElse(mPlaceHolderText);
+        }
+
+        @NonNull
+        private Drawable getApplicationIcon(@NonNull final String packageName) {
+            final List<ApplicationInfo> installedApplications = mPackageManager
+                    .getInstalledApplications(PackageManager.GET_META_DATA);
+            return Stream.of(installedApplications)
+                    .filter(app -> app.packageName.equals(packageName))
+                    .findFirst()
+                    .map(mPackageManager::getApplicationIcon)
+                    .orElse(mPlaceholder);
+        }
+
+        interface OnFinished {
+            void finished(@NonNull final String appLabel, @NonNull final Drawable appIcon);
         }
     }
 }

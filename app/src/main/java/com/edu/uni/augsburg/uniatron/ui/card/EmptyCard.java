@@ -8,16 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.CardView;
+import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
 /**
  * An empty card.
  *
  * @author Fabio Hellmann
  */
-public class EmptyCard implements CardView {
+public class EmptyCard implements CardViewHolder {
     @Override
-    public void update(@NonNull final CardView cardView) {
+    public void update(@NonNull final CardViewHolder cardViewHolder) {
         // Empty
     }
 

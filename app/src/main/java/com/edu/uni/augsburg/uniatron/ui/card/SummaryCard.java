@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.edu.uni.augsburg.uniatron.ui.CardView;
+import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,8 +23,8 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class SummaryCard implements CardView {
-    private static final int TYPE = 1;
+public class SummaryCard implements CardViewHolder {
+    private static final int TYPE = Integer.MAX_VALUE - 1;
     private Summary mSummary;
 
     SummaryCard(@NonNull final Summary summary) {
@@ -32,8 +32,8 @@ public class SummaryCard implements CardView {
     }
 
     @Override
-    public void update(@NonNull final CardView cardView) {
-        mSummary = ((SummaryCard) cardView).mSummary;
+    public void update(@NonNull final CardViewHolder cardViewHolder) {
+        mSummary = ((SummaryCard) cardViewHolder).mSummary;
     }
 
     @Override

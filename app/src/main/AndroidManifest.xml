@@ -52,6 +52,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.about.AboutActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
 
         <receiver
             android:name="com.edu.uni.augsburg.uniatron.service.handler.BootCompletedHandler"

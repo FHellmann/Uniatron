@@ -41,9 +41,8 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        mDateCache.unregister();
         final LiveData<List<Summary>> source = getSummarySourceBy(date, calendarType);
-        mDateCache.register(mObservableDaySummary, source);
+        mDateCache.clearAndRegister(mObservableDaySummary, source);
         mObservableDaySummary.addSource(
                 source,
                 value -> {

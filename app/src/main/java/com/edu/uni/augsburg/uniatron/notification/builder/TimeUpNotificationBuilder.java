@@ -34,7 +34,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     public Notification build() {
         final int remainingTimeRounded = Math.round(remainingTime / 60.0f);
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
                 .setContentText(mContext.getString(R.string.time_notification,
                         remainingTimeRounded, remainingTimeRounded == 1 ? "" : "s"))
