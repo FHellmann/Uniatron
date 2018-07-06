@@ -22,7 +22,6 @@ import butterknife.ButterKnife;
 
 public class SummaryCard implements CardView {
     private static final int TYPE = 1;
-    @NonNull
     private Summary mSummary;
 
     public SummaryCard(@NonNull final Summary summary) {
@@ -63,9 +62,8 @@ public class SummaryCard implements CardView {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
-        final View view = LayoutInflater.from(context)
-                .inflate(R.layout.card_summary, viewGroup, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(context)
+                .inflate(R.layout.card_summary, viewGroup, false));
     }
 
     private Drawable getEmoticonDrawable(@NonNull final Context context,
@@ -91,8 +89,6 @@ public class SummaryCard implements CardView {
     }
 
     public static final class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.textViewDate)
-        TextView mTextViewDate;
         @BindView(R.id.textViewSteps)
         TextView mTextViewSteps;
         @BindView(R.id.textViewUsageTime)

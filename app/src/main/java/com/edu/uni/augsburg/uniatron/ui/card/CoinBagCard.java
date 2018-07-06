@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 
 import com.edu.uni.augsburg.uniatron.ui.CardView;
 
-public class UsersBagCard implements CardView {
+public class CoinBagCard implements CardView {
     @Override
     public void update(CardView cardView) {
 

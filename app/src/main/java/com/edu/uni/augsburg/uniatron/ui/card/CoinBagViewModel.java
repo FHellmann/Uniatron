@@ -4,8 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 
-public class UsersBagViewModel extends AndroidViewModel {
-    public UsersBagViewModel(@NonNull Application application) {
+public class CoinBagViewModel extends AndroidViewModel {
+    public CoinBagViewModel(@NonNull Application application) {
         super(application);
     }
 }

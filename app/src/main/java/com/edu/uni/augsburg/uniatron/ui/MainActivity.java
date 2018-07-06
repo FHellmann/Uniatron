@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.button.MaterialButton;
@@ -28,6 +29,7 @@ import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.card.AppStatisticsViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.EmptyCard;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
@@ -77,18 +79,21 @@ public class MainActivity extends AppCompatActivity implements android.support.v
 
         final CardListAdapter adapter = new CardListAdapter(this);
         mRecyclerView.setAdapter(adapter);
+        adapter.addOrUpdateCard(new EmptyCard());
 
         final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
         modelSummary.getSummaryCard().observe(this, adapter::addOrUpdateCard);
 
-        final AppStatisticsViewModel modelAppTop5 = ViewModelProviders.of(this).get(AppStatisticsViewModel.class);
-        modelAppTop5.getAppStatisticsCard().observe(this, adapter::addOrUpdateCard);
+        final AppStatisticsViewModel modelAppStatistics = ViewModelProviders.of(this)
+                .get(AppStatisticsViewModel.class);
+        modelAppStatistics.getAppStatisticsCard().observe(this, adapter::addOrUpdateCard);
 
         mModelNavigation = ViewModelProviders.of(this).get(BasicViewModel.class);
         mModelNavigation.registerCardViewModel(modelSummary);
-        mModelNavigation.registerCardViewModel(modelAppTop5);
+        mModelNavigation.registerCardViewModel(modelAppStatistics);
         mModelNavigation.getCurrentDate().observe(this, date -> {
             adapter.clear();
+            adapter.addOrUpdateCard(new EmptyCard());
             switch (mModelNavigation.getGroupByStrategy()) {
                 case MONTH:
                     mDateDisplayButton.setText(DateUtil.formatForMonth(date.getTime()));
@@ -105,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements android.support.v
             modelSummary.setup(date.getTime(), calendarType);
             mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
             mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
+            mRecyclerView.smoothScrollToPosition(0);
         });
 
         NotificationChannels.setupChannels(this);
@@ -205,7 +211,10 @@ public class MainActivity extends AppCompatActivity implements android.support.v
             mContext = context;
         }
 
-        void addOrUpdateCard(@NonNull final CardView cardView) {
+        void addOrUpdateCard(@Nullable final CardView cardView) {
+            if (cardView == null) {
+                return;
+            }
             // Remove the card if it does already exists
             final Optional<CardView> cardOptional = Stream.of(mCardViewList)
                     .filter(card -> card.getType() == cardView.getType())

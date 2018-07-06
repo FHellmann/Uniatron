@@ -240,19 +240,21 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Map<String, Integer>> getAppUsageTimeToday() {
-        return getAppUsageTimeByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getAppUsageTimeByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the app usage time from date.
      *
-     * @param date The app usage time from date.
+     * @param dateFrom The app usage time from date.
      * @return The app usage time.
      */
     @NonNull
-    public LiveData<Map<String, Integer>> getAppUsageTimeByDate(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+    public LiveData<Map<String, Integer>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                                @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
                 appUsageList -> {
@@ -271,19 +273,21 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Map<String, Double>> getAppUsagePercentToday() {
-        return getAppUsagePercentByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getAppUsagePercentByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the app usage time in percent from date.
      *
-     * @param date The app usage time in percent from date.
+     * @param dateFrom The app usage time in percent from date.
      * @return The app usage time in percent.
      */
     @NonNull
-    public LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+    public LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date dateFrom,
+                                                                  @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsagePercent(dateFrom, dateTo),
                 appUsageList -> {

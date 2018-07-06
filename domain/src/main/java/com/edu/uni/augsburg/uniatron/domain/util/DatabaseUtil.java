@@ -19,8 +19,10 @@ import java.util.Random;
 
 public final class DatabaseUtil {
     private static final String[] FAVORIT_APPS = {
-            "Neftlix", "YouTube", "Spotify", "Soundcloud", "Instagram", "Facebook", "Twitter",
-            "Pinterest", "Skype", "Messenger", "WhatsApp", "Snapchat", "Tinder", "Kindle"
+            "com.netflix.mediaclient", "com.google.android.youtube", "com.spotify.music",
+            "com.soundcloud.android", "com.instagram.android", "com.facebook.katana",
+            "com.twitter.android", "com.pinterest", "com.skype.raider", "com.facebook.orca",
+            "com.whatsapp", "com.snapchat.android", "com.tinder", "com.amazon.kindle"
     };
     private static final int MOCK_DATA_ITEM_COUNT = 100;
 
@@ -95,7 +97,7 @@ public final class DatabaseUtil {
 
     private static Date getRandomDate(int index) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -index%10);
+        calendar.add(Calendar.DATE, -index%15);
 
         return calendar.getTime();
     }
