@@ -199,7 +199,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             } else {
                 holder.mTextViewTradeOffer.setLabelText(
                         (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount())
-                        + " \u00A9");
+                                + " \u00A9");
             }
         }
 
@@ -237,11 +237,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
 
             @OnClick(R.id.textViewTradeOffer)
             public void onClick() {
-                if (mModel.isInShoppingCart(mValue)) {
-                    mModel.removeFromShoppingCart(mValue);
-                } else {
-                    mModel.addToShoppingCart(mValue);
-                }
+                mModel.addToShoppingCart(mValue);
                 notifyDataSetChanged();
             }
         }

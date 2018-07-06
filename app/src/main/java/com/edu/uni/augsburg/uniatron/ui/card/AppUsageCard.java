@@ -64,6 +64,7 @@ public class AppUsageCard implements CardViewHolder {
         holder.mRecyclerView.setAdapter(new AppUsageAdapter(context, mAppUsageList));
         final int totalAppUsage = getTotalAppUsage();
         holder.mTextAppUsageTotal.setText(context.getString(R.string.app_usage_total, totalAppUsage / 60, totalAppUsage % 60));
+        holder.mButtonShowAll.setText(R.string.show_all);
     }
 
     @Override
