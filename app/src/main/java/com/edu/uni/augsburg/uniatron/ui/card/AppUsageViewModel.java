@@ -53,7 +53,10 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        final LiveData<Map<String, Integer>> data = getAppUsageData(date, calendarType);
+        final LiveData<Map<String, Integer>> data = mRepository.getAppUsageTimeByDate(
+                mDateCache.getDateFrom(date, calendarType),
+                mDateCache.getDateTo(date, calendarType)
+        );
         mDateCache.clearAndRegister(mAppUsages, data);
         mAppUsages.addSource(
                 data,
@@ -111,29 +114,6 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
                     }
                     return null;
                 });
-    }
-
-    @NonNull
-    private LiveData<Map<String, Integer>> getAppUsageData(@NonNull final Date date,
-                                                           final int calendarType) {
-        switch (calendarType) {
-            case Calendar.MONTH:
-                return mRepository.getAppUsageTimeByDate(
-                        DateUtil.getMinDateOfMonth(date),
-                        DateUtil.getMaxDateOfMonth(date)
-                );
-            case Calendar.YEAR:
-                return mRepository.getAppUsageTimeByDate(
-                        DateUtil.getMinMonthOfYear(date),
-                        DateUtil.getMaxMonthOfYear(date)
-                );
-            case Calendar.DATE:
-            default:
-                return mRepository.getAppUsageTimeByDate(
-                        DateUtil.getMinTimeOfDate(date),
-                        DateUtil.getMaxTimeOfDate(date)
-                );
-        }
     }
 
     @NonNull

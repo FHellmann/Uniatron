@@ -33,8 +33,10 @@ import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.about.AboutActivity;
 import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.EmptyCard;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.Utils;
@@ -104,9 +106,17 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 .get(AppUsageViewModel.class);
         modelAppStatistics.getAppStatisticsCard(this).observe(this, mAdapter::addOrUpdateCard);
 
+        final CoinBagViewModel coinBagModel = ViewModelProviders.of(this).get(CoinBagViewModel.class);
+        coinBagModel.getRemainingCoins().observe(this, mAdapter::addOrUpdateCard);
+
+        final TimeAccountViewModel timeAccountModel = ViewModelProviders.of(this).get(TimeAccountViewModel.class);
+        timeAccountModel.getRemainingAppUsageTime().observe(this, mAdapter::addOrUpdateCard);
+
         mModelNavigation = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         mModelNavigation.registerCardViewModel(modelSummary);
         mModelNavigation.registerCardViewModel(modelAppStatistics);
+        mModelNavigation.registerCardViewModel(coinBagModel);
+        mModelNavigation.registerCardViewModel(timeAccountModel);
         mModelNavigation.getCurrentDate().observe(this, date -> {
             mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
             mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
@@ -267,16 +277,21 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         private final List<CardViewHolder> mCardViewHolderList = new ArrayList<>();
         private final Map<Integer, CardViewHolder> mCardViewHolderMap = new LinkedHashMap<>();
-        @NonNull
         private final Context mContext;
+        private Date mDate;
 
         CardListAdapter(@NonNull final Context context) {
             super();
             mContext = context;
+            mDate = new Date();
+        }
+
+        void setDate(@NonNull final Date date) {
+            mDate = date;
         }
 
         void addOrUpdateCard(@Nullable final CardViewHolder cardViewHolder) {
-            if (cardViewHolder == null) {
+            if (cardViewHolder == null || !cardViewHolder.isVisible()) {
                 return;
             } else if (mCardViewHolderList.isEmpty()) {
                 final EmptyCard card = new EmptyCard();

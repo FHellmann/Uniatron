@@ -18,6 +18,7 @@ import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ import butterknife.OnClick;
  */
 public class AppUsageCard implements CardViewHolder {
 
-    private static final int TYPE = 2;
+    private static final int TYPE = 10;
     private final List<AppUsageItem> mAppUsageList = new ArrayList<>();
 
     /**
@@ -70,6 +71,11 @@ public class AppUsageCard implements CardViewHolder {
     @Override
     public int getType() {
         return TYPE;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return true;
     }
 
     @Override

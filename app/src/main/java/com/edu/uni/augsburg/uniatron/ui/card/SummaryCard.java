@@ -15,6 +15,8 @@ import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -68,6 +70,11 @@ public class SummaryCard implements CardViewHolder {
     @Override
     public int getType() {
         return TYPE;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return true;
     }
 
     @Override

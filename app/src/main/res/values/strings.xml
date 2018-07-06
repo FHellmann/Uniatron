@@ -56,4 +56,9 @@
     <string name="feedback_question">Do you like our app?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="coin_bag">Coin Bag</string>
+    <string name="coin_bag_text">You have %d coins available.</string>
+    <string name="time_account">Time Account</string>
+    <string name="time_account_desc">The remaining time: %1$d:%2$02d minutes</string>
+    <string name="appbar_scrolling_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 </resources>

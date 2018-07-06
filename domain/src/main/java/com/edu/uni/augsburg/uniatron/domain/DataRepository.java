@@ -176,19 +176,22 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Integer> getRemainingStepCountsToday() {
-        return getRemainingStepCountsByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getRemainingStepCountsByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the remaining step count by date.
      *
-     * @param date The date to get the remaining steps from.
+     * @param dateFrom The date to get the remaining steps from.
+     * @param dateTo   The date to get the remaining steps to.
      * @return The amount of steps.
      */
     @NonNull
-    public LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+    public LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date dateFrom,
+                                                          @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.stepCountDao().loadRemainingStepCount(dateFrom, dateTo),
                 data -> data > 0 ? data : 0
@@ -307,21 +310,24 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Integer> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
-        return getRemainingAppUsageTimeByDate(new Date(), filter);
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getRemainingAppUsageTimeByDate(dateFrom, dateTo, filter);
     }
 
     /**
      * Get the remaining usage time as sum.
      *
-     * @param date   The date to get this data from.
-     * @param filter The apps to filter.
+     * @param dateFrom The date to start searching from.
+     * @param dateTo   The date to end searching.
+     * @param filter   The apps to filter.
      * @return The remaining usage time.
      */
     @NonNull
-    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date,
-                                                             @NonNull final Set<String> filter) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+    public LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                            @NonNull final Date dateTo,
+                                                            @NonNull final Set<String> filter) {
         return mDatabase.appUsageDao()
                 .loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }

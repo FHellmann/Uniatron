@@ -5,7 +5,10 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,5 +32,29 @@ public class DateCache<T> {
         Stream.of(mCache.entrySet()).forEach(entry -> entry.getKey().removeSource(entry.getValue()));
         mCache.clear();
         mCache.put(liveData, source);
+    }
+
+    Date getDateFrom(@NonNull final Date date, final int calendarType) {
+        switch (calendarType) {
+            case Calendar.MONTH:
+                return DateUtil.getMinDateOfMonth(date);
+            case Calendar.YEAR:
+                return DateUtil.getMinMonthOfYear(date);
+            case Calendar.DATE:
+            default:
+                return DateUtil.getMinTimeOfDate(date);
+        }
+    }
+
+    Date getDateTo(@NonNull final Date date, final int calendarType) {
+        switch (calendarType) {
+            case Calendar.MONTH:
+                return DateUtil.getMaxDateOfMonth(date);
+            case Calendar.YEAR:
+                return DateUtil.getMaxMonthOfYear(date);
+            case Calendar.DATE:
+            default:
+                return DateUtil.getMaxTimeOfDate(date);
+        }
     }
 }

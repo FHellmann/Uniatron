@@ -1,8 +1,11 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+
+import java.util.Date;
 
 /**
  * The card view is implemented by every card.
@@ -20,7 +23,7 @@ public interface CardViewHolder {
     /**
      * Binds the view to the data.
      *
-     * @param context The context.
+     * @param context    The context.
      * @param viewHolder The view holder.
      */
     void onBindView(Context context, RecyclerView.ViewHolder viewHolder);
@@ -33,9 +36,16 @@ public interface CardViewHolder {
     int getType();
 
     /**
+     * Check if the card should be displayed.
+     *
+     * @return {@code true} if the card should be displayed, {@code false} otherwise.
+     */
+    boolean isVisible();
+
+    /**
      * Creates a view holder.
      *
-     * @param context The context.
+     * @param context   The context.
      * @param viewGroup The parent view group.
      * @return The view holder.
      */

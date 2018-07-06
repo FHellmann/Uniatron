@@ -162,4 +162,15 @@ public final class DateUtil {
     public static String formatForYear(@NonNull final Date date) {
         return String.format(Locale.getDefault(), "%tY", date);
     }
+
+    /**
+     * Check whether or not the two dates are at the same date.
+     *
+     * @param date  The first date.
+     * @param date1 The second date.
+     * @return {@code true} if the dates are same, {@code false} otherwise.
+     */
+    public static boolean isSameDate(Date date, Date date1) {
+        return getMinTimeOfDate(date).equals(getMinTimeOfDate(date1));
+    }
 }

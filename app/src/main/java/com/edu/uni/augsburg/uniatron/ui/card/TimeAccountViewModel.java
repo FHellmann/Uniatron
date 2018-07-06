@@ -8,22 +8,25 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * The model is the connection between the {@link DataRepository}
- * and the {@link CoinBagCard}.
+ * and the {@link TimeAccountCard}.
  *
  * @author Fabio Hellmann
  */
-public class CoinBagViewModel extends AndroidViewModel implements CardViewModel {
-    private final MediatorLiveData<Integer> mRemainingCoins;
+public class TimeAccountViewModel extends AndroidViewModel implements CardViewModel {
     private final DateCache<Integer> mDateCache;
+    private final MediatorLiveData<Integer> mRemainingAppUsageTime;
     private final DataRepository mRepository;
+    private final SharedPreferencesHandler mPrefHandler;
     private boolean mIsVisible;
 
     /**
@@ -31,22 +34,24 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
      *
      * @param application The application.
      */
-    public CoinBagViewModel(@NonNull final Application application) {
+    public TimeAccountViewModel(@NonNull final Application application) {
         super(application);
 
         mRepository = MainApplication.getRepository(application);
+        mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
         mDateCache = new DateCache<>();
-        mRemainingCoins = new MediatorLiveData<>();
+        mRemainingAppUsageTime = new MediatorLiveData<>();
     }
 
     @Override
     public void setup(Date date, int calendarType) {
         mIsVisible = DateUtil.isSameDate(date, new Date());
-        final LiveData<Integer> liveData = mRepository.getRemainingStepCountsToday();
-        mDateCache.clearAndRegister(mRemainingCoins, liveData);
-        mRemainingCoins.addSource(
+        final LiveData<Integer> liveData = mRepository
+                .getRemainingAppUsageTimeToday(mPrefHandler.getAppsBlacklist());
+        mDateCache.clearAndRegister(mRemainingAppUsageTime, liveData);
+        mRemainingAppUsageTime.addSource(
                 liveData,
-                mRemainingCoins::setValue
+                mRemainingAppUsageTime::setValue
         );
     }
 
@@ -56,14 +61,14 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
      * @return The remaining step count.
      */
     @NonNull
-    public LiveData<CoinBagCard> getRemainingCoins() {
-        return Transformations.map(mRemainingCoins,
+    public LiveData<TimeAccountCard> getRemainingAppUsageTime() {
+        return Transformations.map(mRemainingAppUsageTime,
                 data -> {
                     if (data != null) {
-                        final CoinBagCard coinBagCard = new CoinBagCard();
-                        coinBagCard.setCoins(data);
-                        coinBagCard.setVisible(mIsVisible);
-                        return coinBagCard;
+                        final TimeAccountCard timeAccountCard = new TimeAccountCard();
+                        timeAccountCard.setTimeLeft(data);
+                        timeAccountCard.setVisible(mIsVisible);
+                        return timeAccountCard;
                     }
                     return null;
                 });
