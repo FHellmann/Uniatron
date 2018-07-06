@@ -36,18 +36,9 @@ public class SummaryCard implements CardView {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
-
-        final String textSteps = String.valueOf(mSummary.getSteps());
-        final String usageTime = String.format(
-                Locale.getDefault(),
-                "%d:%02d",
-                mSummary.getAppUsageTime() / 60,
-                mSummary.getAppUsageTime() % 60
-        );
-
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
-        itemViewHolder.mTextViewSteps.setText(textSteps);
-        itemViewHolder.mTextViewUsageTime.setText(usageTime);
+        itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps, mSummary.getSteps()));
+        itemViewHolder.mTextViewUsageTime.setText(context.getString(R.string.card_summary_app_usage, mSummary.getAppUsageTime() / 60, mSummary.getAppUsageTime() % 60));
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());
         final Drawable drawable = getEmoticonDrawable(context, emotion);
