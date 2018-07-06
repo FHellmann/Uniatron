@@ -140,7 +140,7 @@ public class AppStatisticsCard implements CardView {
 
             viewHolderListItem.mTextAppName.setText(applicationLabel);
             viewHolderListItem.mImageAppIcon.setImageDrawable(applicationIcon);
-            viewHolderListItem.mTextAppUsage.setText(mContext.getString(R.string.app_usage_time, usageTime));
+            viewHolderListItem.mTextAppUsage.setText(mContext.getString(R.string.app_usage_time, usageTime / 60, usageTime % 60));
             viewHolderListItem.mTextAppUsagePercent.setText(String.format(
                     Locale.getDefault(),
                     "%d %%",

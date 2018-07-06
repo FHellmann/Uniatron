@@ -38,7 +38,7 @@
     <string name="group_by_year">Group by year</string>
     <string name="card_summary_title">Summary</string>
     <string name="app_usage">App usage</string>
-    <string name="app_usage_time">App usage time: %d</string>
+    <string name="app_usage_time">Usage time: %1$d:%2$02d min</string>
     <string name="show_all">Show all</string>
     <string name="show_only_top_five">Show only top 5</string>
     <string name="unknwon">Unknown</string>
