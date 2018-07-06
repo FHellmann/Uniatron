@@ -8,4 +8,6 @@
     <color name="secondaryDarkColor">#c56200</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
+    <color name="onboardingBackground1">#61d800</color>
+    <color name="onboardingBackground1Dark">#09af00</color>
 </resources>

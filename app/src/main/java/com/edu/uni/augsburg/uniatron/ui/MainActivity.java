@@ -25,6 +25,7 @@ import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
+import com.edu.uni.augsburg.uniatron.ui.onboarding.OnboardingActivity;
 import com.rvalerio.fgchecker.Utils;
 
 import butterknife.BindView;
@@ -72,8 +73,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         model.getRemainingStepCountToday().observe(this,
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
-        requestUsageStatsPermission();
-        requestBatteryOptimizationDisablePermission();
+
+        Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
+        startActivity(intent);
+
+        //requestUsageStatsPermission();
+        //requestBatteryOptimizationDisablePermission();
         NotificationChannels.setupChannels(this);
         startServices();
     }
