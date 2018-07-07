@@ -19,7 +19,7 @@ import mehdi.sakout.aboutpage.Element;
 public class AboutActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final View aboutPage = new AboutPage(this)

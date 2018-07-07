@@ -53,7 +53,7 @@ public class TimeAccountCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
-        ViewHolder holder = (ViewHolder) viewHolder;
+        final ViewHolder holder = (ViewHolder) viewHolder;
         holder.mTextTimeLeft.setText(context
                 .getString(R.string.time_account_desc, mTimeLeft / 60, mTimeLeft % 60));
     }

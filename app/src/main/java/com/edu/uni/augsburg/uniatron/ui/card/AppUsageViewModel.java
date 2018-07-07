@@ -61,8 +61,14 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
         );
     }
 
+    /**
+     * Get the app usage card.
+     *
+     * @param context The context.
+     * @return The app usage card.
+     */
     @NonNull
-    public LiveData<AppUsageCard> getAppStatisticsCard(@NonNull final Context context) {
+    public LiveData<AppUsageCard> getAppUsageCard(@NonNull final Context context) {
         return Transformations.map(mAppUsages,
                 data -> {
                     if (data != null && !data.isEmpty()) {

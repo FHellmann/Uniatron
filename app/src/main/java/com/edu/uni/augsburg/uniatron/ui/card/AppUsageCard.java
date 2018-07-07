@@ -199,7 +199,7 @@ public class AppUsageCard implements CardViewHolder {
         private int mApplicationUsage;
         private double mApplicationUsagePercent;
 
-        public void setAppLabel(String appLabel) {
+        public void setAppLabel(final String appLabel) {
             this.mAppLabel = appLabel;
         }
 
@@ -207,7 +207,7 @@ public class AppUsageCard implements CardViewHolder {
             return mAppLabel;
         }
 
-        public void setAppIcon(Drawable appIcon) {
+        public void setAppIcon(final Drawable appIcon) {
             this.mAppIcon = appIcon;
         }
 
@@ -215,7 +215,7 @@ public class AppUsageCard implements CardViewHolder {
             return mAppIcon;
         }
 
-        public void setApplicationUsage(int applicationUsage) {
+        public void setApplicationUsage(final int applicationUsage) {
             this.mApplicationUsage = applicationUsage;
         }
 
@@ -223,7 +223,7 @@ public class AppUsageCard implements CardViewHolder {
             return mApplicationUsage;
         }
 
-        public void setApplicationUsagePercent(double applicationUsagePercent) {
+        public void setApplicationUsagePercent(final double applicationUsagePercent) {
             this.mApplicationUsagePercent = applicationUsagePercent;
         }
 

@@ -40,7 +40,7 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
     }
 
     @Override
-    public void setup(Date date, int calendarType) {
+    public void setup(final Date date, final int calendarType) {
         mIsVisible = DateUtil.isSameDate(date, new Date());
         final LiveData<Integer> liveData = mRepository.getRemainingStepCountsToday();
         mDateCache.clearAndRegister(mRemainingCoins, liveData);
