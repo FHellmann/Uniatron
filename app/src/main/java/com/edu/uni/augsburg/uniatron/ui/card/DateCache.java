@@ -18,7 +18,7 @@ import java.util.Map;
  * @param <T> The generic type of the source live data.
  * @author Fabio Hellmann
  */
-public class DateCache<T> {
+class DateCache<T> {
     private final Map<MediatorLiveData<?>, LiveData<T>> mCache = new HashMap<>();
 
     /**

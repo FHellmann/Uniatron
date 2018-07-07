@@ -2,8 +2,6 @@ package com.edu.uni.augsburg.uniatron.model;
 
 import android.support.annotation.NonNull;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

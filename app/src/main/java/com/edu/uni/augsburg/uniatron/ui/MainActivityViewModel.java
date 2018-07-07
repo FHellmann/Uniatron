@@ -207,14 +207,5 @@ public class MainActivityViewModel extends AndroidViewModel {
             mNextAvailable = nextAvailable;
             mPrevAvailable = prevAvailable;
         }
-
-        /**
-         * Get the calendar type.
-         *
-         * @return The calendar type (date/month/year).
-         */
-        public int getCalendarType() {
-            return mCalendarType;
-        }
     }
 }

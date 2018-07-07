@@ -131,7 +131,7 @@ public class AppTrackingService extends LifecycleService {
         mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
         if (isAppNotInBlacklist(appName)) {
             // Will catch all cases, when app name is not in the blacklist
-            commitAppUsageTime(appName, AppTrackingService.DELAY_IN_MILLISECONDS);
+            commitAppUsageTime(appName);
         } else if (mLearningAidHelper.isLearningAidActive()) {
             Logger.d("App '" + appName + "' is blocked by learning aid -> BLOCKED");
             // 1. Priority: Check whether the learning aid is active or not
@@ -148,7 +148,7 @@ public class AppTrackingService extends LifecycleService {
                 showNotificationIfTimeAlmostUp();
             }
             // x. Priority: Every other case...
-            commitAppUsageTime(appName, AppTrackingService.DELAY_IN_MILLISECONDS);
+            commitAppUsageTime(appName);
         }
     }
 
@@ -175,9 +175,9 @@ public class AppTrackingService extends LifecycleService {
         startActivity(blockIntent);
     }
 
-    private void commitAppUsageTime(final String appName, final int timeMillis) {
+    private void commitAppUsageTime(final String appName) {
         if (!TextUtils.isEmpty(appName) && !FILTERS.contains(appName)) {
-            final int time = (int) TimeUnit.SECONDS.convert(timeMillis, TimeUnit.MILLISECONDS);
+            final int time = (int) TimeUnit.SECONDS.convert(AppTrackingService.DELAY_IN_MILLISECONDS, TimeUnit.MILLISECONDS);
             mRepository.addAppUsage(appName, time);
         }
     }

@@ -119,7 +119,7 @@ public final class DataRepository {
      * @return The time credits value.
      */
     @NonNull
-    public LiveData<Integer> getTimeCreditsByDate(@NonNull final Date date) {
+    private LiveData<Integer> getTimeCreditsByDate(@NonNull final Date date) {
         final Date dateFrom = getMinTimeOfDate(date);
         final Date dateTo = getMaxTimeOfDate(date);
         return mDatabase.timeCreditDao().loadTimeCredits(dateFrom, dateTo);
@@ -163,7 +163,7 @@ public final class DataRepository {
      * @return The amount of steps.
      */
     @NonNull
-    public LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
+    private LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
         final Date dateFrom = getMinTimeOfDate(date);
         final Date dateTo = getMaxTimeOfDate(date);
         return mDatabase.stepCountDao().loadStepCounts(dateFrom, dateTo);
@@ -190,8 +190,8 @@ public final class DataRepository {
      * @return The amount of steps.
      */
     @NonNull
-    public LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date dateFrom,
-                                                          @NonNull final Date dateTo) {
+    private LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date dateFrom,
+                                                           @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.stepCountDao().loadRemainingStepCount(dateFrom, dateTo),
                 data -> data > 0 ? data : 0
@@ -289,8 +289,8 @@ public final class DataRepository {
      * @return The app usage time in percent.
      */
     @NonNull
-    public LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date dateFrom,
-                                                                  @NonNull final Date dateTo) {
+    private LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date dateFrom,
+                                                                   @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsagePercent(dateFrom, dateTo),
                 appUsageList -> {
@@ -325,9 +325,9 @@ public final class DataRepository {
      * @return The remaining usage time.
      */
     @NonNull
-    public LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                            @NonNull final Date dateTo,
-                                                            @NonNull final Set<String> filter) {
+    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                             @NonNull final Date dateTo,
+                                                             @NonNull final Set<String> filter) {
         return mDatabase.appUsageDao()
                 .loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }

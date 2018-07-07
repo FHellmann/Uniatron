@@ -9,10 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
-
-import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +46,9 @@ public class CoinBagCard implements CardViewHolder {
 
     @Override
     public void update(@NonNull final CardViewHolder cardViewHolder) {
-        setCoins(((CoinBagCard) cardViewHolder).mCoins);
+        final CoinBagCard holder = (CoinBagCard) cardViewHolder;
+        setCoins(holder.mCoins);
+        setVisible(holder.mVisible);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class CoinBagCard implements CardViewHolder {
         @BindView(R.id.textCoins)
         TextView mTextCoins;
 
-        public ViewHolder(@NonNull final View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

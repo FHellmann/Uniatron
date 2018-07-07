@@ -1,11 +1,8 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
-
-import java.util.Date;
 
 /**
  * The card view is implemented by every card.

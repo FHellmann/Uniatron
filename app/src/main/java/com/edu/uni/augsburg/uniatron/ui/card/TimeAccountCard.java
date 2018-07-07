@@ -45,7 +45,9 @@ public class TimeAccountCard implements CardViewHolder {
 
     @Override
     public void update(@NonNull final CardViewHolder cardViewHolder) {
-        setTimeLeft(((TimeAccountCard) cardViewHolder).mTimeLeft);
+        final TimeAccountCard holder = (TimeAccountCard) cardViewHolder;
+        setTimeLeft(holder.mTimeLeft);
+        setVisible(holder.mVisible);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class TimeAccountCard implements CardViewHolder {
         @BindView(R.id.textTimeLeft)
         TextView mTextTimeLeft;
 
-        public ViewHolder(@NonNull final View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

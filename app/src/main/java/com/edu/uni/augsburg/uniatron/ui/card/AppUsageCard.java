@@ -203,7 +203,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mAppLabel = appLabel;
         }
 
-        public String getAppLabel() {
+        String getAppLabel() {
             return mAppLabel;
         }
 
@@ -211,7 +211,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mAppIcon = appIcon;
         }
 
-        public Drawable getAppIcon() {
+        Drawable getAppIcon() {
             return mAppIcon;
         }
 

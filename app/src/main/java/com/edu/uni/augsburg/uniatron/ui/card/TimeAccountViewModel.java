@@ -14,7 +14,6 @@ import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
 import java.util.Date;
-import java.util.Set;
 
 /**
  * The model is the connection between the {@link DataRepository}

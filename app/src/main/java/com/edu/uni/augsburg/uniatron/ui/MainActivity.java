@@ -282,16 +282,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         private final List<CardViewHolder> mCardViewHolderList = new ArrayList<>();
         private final Map<Integer, CardViewHolder> mCardViewHolderMap = new LinkedHashMap<>();
         private final Context mContext;
-        private Date mDate;
 
         CardListAdapter(@NonNull final Context context) {
             super();
             mContext = context;
-            mDate = new Date();
-        }
-
-        void setDate(@NonNull final Date date) {
-            mDate = date;
         }
 
         void addOrUpdateCard(@Nullable final CardViewHolder cardViewHolder) {

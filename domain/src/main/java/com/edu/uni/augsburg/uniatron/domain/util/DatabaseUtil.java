@@ -48,7 +48,7 @@ public final class DatabaseUtil {
 
         start = System.currentTimeMillis();
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                .mapToObj(index -> getTimeCredit(random, index))
+                .mapToObj(index -> getTimeCredit(index))
                 .forEach(item -> appDatabase.timeCreditDao().add(item));
         Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " time credit data in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -76,7 +76,7 @@ public final class DatabaseUtil {
         return stepCountEntity;
     }
 
-    private static TimeCreditEntity getTimeCredit(Random random, int index) {
+    private static TimeCreditEntity getTimeCredit(int index) {
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
 
         final TimeCredits timeCredits = TimeCredits.CREDIT_100;
