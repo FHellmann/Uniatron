@@ -21,7 +21,6 @@ import com.rvalerio.fgchecker.Utils;
 
 public class OnboardingActivity extends IntroActivity {
 
-    static int currentSlideCallback = 0;
 
 
     @Override
@@ -29,12 +28,6 @@ public class OnboardingActivity extends IntroActivity {
         setFullscreen(true);
         super.onCreate(savedInstanceState);
 
-
-
-
-
-
-        // App usage screenshot und permission
         // time account
         // money bag screenshot + store und whitelist
 
@@ -42,7 +35,6 @@ public class OnboardingActivity extends IntroActivity {
 
 
         // INTRO
-        currentSlideCallback = 1;
         addSlide(new SimpleSlide.Builder()
                 .title("Uniatron")
                 .description("Keep an eye on your health and productivity")
@@ -53,44 +45,8 @@ public class OnboardingActivity extends IntroActivity {
                 .scrollable(true)
                 .build());
 
-/*
-        // intro
-        currentSlideCallback = 1;
-        addSlide(new SimpleSlide.Builder()
-                .background(R.color.onboardingBackground1)
-                .backgroundDark(R.color.onboardingBackground1Dark)
-                .layout(R.layout.activity_onboarding_app_overview).build());
-*/
-/*
-        // INTRO
-        currentSlideCallback = 2;
-        addSlide(new SimpleSlide.Builder()
-                .title("Time Account")
-                .description("To limit excessive smartphone usage, your time account manages how long you can use selected apps")
-                .image(R.drawable.timeaccount)
-                .background(R.color.onboardingBackground1)
-                .backgroundDark(R.color.onboardingBackground1Dark)
-                .scrollable(true)
-                .build());
-                */
-/*
-        // explanation1
-        currentSlideCallback = 3;
-        addSlide(new SimpleSlide.Builder()
-                .title("Count your daily Steps")
-                .description("Your Coin Bag fills up with every step you take.\nVisit the shop to trade them for additional app time")
-                .image(R.drawable.coinbag)
-                .canGoBackward(false)
-                .background(R.color.onboardingBackground1)
-                .backgroundDark(R.color.onboardingBackground1Dark)
-                .scrollable(true)
-                .build());
-
-*/
-
         // MOST USED APPS & USAGE STATS ACCESS
         if (!usageAccessGranted()) {
-            currentSlideCallback = 4;
             addSlide(new SimpleSlide.Builder()
                     //.title("Get an overview of your most used apps")
                     .title("App usage")
@@ -112,18 +68,27 @@ public class OnboardingActivity extends IntroActivity {
                         }
                     })
                     .build());
+        } else {
+            addSlide(new SimpleSlide.Builder()
+                    //.title("Get an overview of your most used apps")
+                    .title("App usage")
+                    .description("We detect and display your most used apps")
+                    .image(R.drawable.app_usage_onboarding)
+                    .background(R.color.onboardingBackground2)
+                    .backgroundDark(R.color.onboardingBackground2Dark)
+                    .scrollable(true)
+                    .build());
         }
 
         // COIN BAG & BATTERY OPTIMIZATION
         if(checkBatteryOptimized()) {
             //currentSlideCallback = 5;
             addSlide(new SimpleSlide.Builder()
-                    .title("Count your steps and get rewards")
-                    .description("Your Coin Bag fills up with every step you take\n" +
-                            "To make sure we don't miss any of your steps, please whitelist"
-                            + " our app from the system power management\nSelect 'All Apps' to "
+                    .title("Your steps become coins")
+                    .description("Use them in the shop!\n\nTo make sure we don't miss any of your steps, please whitelist"
+                            + " our app from the system power management.\nSelect 'All Apps' to "
                             + "find UNIAtron and disable the optimization")
-                    .image(R.drawable.coinbag)
+                    .image(R.drawable.ic_onboarding_coinbag)
                     .background(R.color.onboardingBackground3)
                     .backgroundDark(R.color.onboardingBackground3Dark)
                     .scrollable(true)
@@ -133,9 +98,19 @@ public class OnboardingActivity extends IntroActivity {
                         public void onClick(View v) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
                                 startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+
                             }
                         }
                     })
+                    .build());
+        } else {
+            addSlide(new SimpleSlide.Builder()
+                    .title("Your steps become coins")
+                    .description("Use them in the shop!")
+                    .image(R.drawable.ic_onboarding_coinbag)
+                    .background(R.color.onboardingBackground3)
+                    .backgroundDark(R.color.onboardingBackground3Dark)
+                    .scrollable(true)
                     .build());
         }
 
@@ -143,21 +118,29 @@ public class OnboardingActivity extends IntroActivity {
         addSlide(new SimpleSlide.Builder()
                 .title("Shop: TODO shop image")
                 .description("Visit the shop to trade your collected coins for additional app time")
-                .image(R.drawable.coinbag)
-                .background(R.color.onboardingBackground3)
-                .backgroundDark(R.color.onboardingBackground3Dark)
+                .image(R.drawable.ic_onboarding_check)
+                .background(R.color.onboardingBackground4)
+                .backgroundDark(R.color.onboardingBackground4Dark)
                 .scrollable(true)
                 .build());
 //        "\nVisit the shop to trade them for additional app time\n\n" +
 
+
         // blacklist entries
         addSlide(new SimpleSlide.Builder()
-                .title("Final Step")
-                .description("Select your fitness level and add apps to you blacklist. These apps will be blocked when your time runs out\n\nYou can "
+                .layout(R.layout.activity_onboarding_blacklist)
+                .background(R.color.onboardingBackground5)
+                .backgroundDark(R.color.onboardingBackground5Dark)
+                .build());
+        /*
+        // blacklist entries
+        addSlide(new SimpleSlide.Builder()
+                .title("Almost done")
+                .description("Add apps to you blacklist\nThey will be blocked when your time runs out\n\nYou can "
                         + "always change these settings later")
                 .image(R.drawable.ic_emoticon_fantastic_selected)
-                .background(R.color.onboardingBackground3)
-                .backgroundDark(R.color.onboardingBackground3Dark)
+                .background(R.color.onboardingBackground5)
+                .backgroundDark(R.color.onboardingBackground5Dark)
                 .scrollable(true)
                 .buttonCtaLabel("Choose apps")
                 .buttonCtaClickListener(new View.OnClickListener() {
@@ -167,6 +150,8 @@ public class OnboardingActivity extends IntroActivity {
                     }
                 })
                 .build());
+
+                */
     }
 /*
     @Override
