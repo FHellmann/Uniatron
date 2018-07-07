@@ -33,9 +33,6 @@
     <string name="time_notification">Less than %1$d Minute%2$s left! Tap to get more time".</string>
     <string name="time_credits_header">Choose your time credit!</string>
     <string name="learning_aid_active">The learning aid is active, you still have to wait %d minutes.</string>
-    <string name="group_by_day">Group by day</string>
-    <string name="group_by_month">Group by month</string>
-    <string name="group_by_year">Group by year</string>
     <string name="card_summary_title">Summary</string>
     <string name="app_usage">App usage</string>
     <string name="app_usage_time">Usage time: %1$d:%2$02d min</string>
@@ -62,4 +59,8 @@
     <string name="time_account_desc">%1$d:%2$02d min</string>
     <string name="appbar_scrolling_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="today">Today</string>
+    <string name="group_by">Group by</string>
+    <string name="day">Day</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
 </resources>
