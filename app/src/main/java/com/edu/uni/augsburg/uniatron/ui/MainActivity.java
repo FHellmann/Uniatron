@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
 
 
 
-        // if first launch or checkBatteryOptimized
+        // if first launch or !checkBatteryOptimized or not usage stats allowed
 
         // -> never ask again
         Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
