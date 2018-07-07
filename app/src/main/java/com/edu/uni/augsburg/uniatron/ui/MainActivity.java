@@ -212,6 +212,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     public boolean onMenuItemClick(@NonNull final MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.today:
+                mModelNavigation.setDate(new Date());
+                return true;
             case R.id.group_by_day:
                 menuItem.setChecked(true);
                 mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.DATE);
