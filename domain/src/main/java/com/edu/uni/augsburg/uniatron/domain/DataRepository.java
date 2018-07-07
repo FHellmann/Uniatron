@@ -43,6 +43,7 @@ import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDat
  * @author Fabio Hellmann
  */
 public final class DataRepository {
+    private static final int YEAR_1990 = 1990;
     private final AppDatabase mDatabase;
 
     /**
@@ -230,7 +231,7 @@ public final class DataRepository {
     @NonNull
     public LiveData<Date> getMinDate() {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(1990, 0, 1);
+        calendar.set(YEAR_1990, 0, 1);
         final Date dateFrom = getMinTimeOfDate(calendar.getTime());
         final Date dateTo = getMaxTimeOfDate(new Date());
         return mDatabase.appUsageDao().getMinDate(dateFrom, dateTo);
@@ -252,7 +253,8 @@ public final class DataRepository {
     /**
      * Get the app usage time from date.
      *
-     * @param dateFrom The app usage time from date.
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
      * @return The app usage time.
      */
     @NonNull

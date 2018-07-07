@@ -170,7 +170,7 @@ public final class DateUtil {
      * @param date1 The second date.
      * @return {@code true} if the dates are same, {@code false} otherwise.
      */
-    public static boolean isSameDate(Date date, Date date1) {
+    public static boolean isSameDate(@NonNull final Date date, @NonNull final Date date1) {
         return getMinTimeOfDate(date).equals(getMinTimeOfDate(date1));
     }
 }
