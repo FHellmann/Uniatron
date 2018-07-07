@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
 
+
+        // if first launch or checkBatteryOptimized
+
+        // -> never ask again
         Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
         startActivity(intent);
 
