@@ -1,6 +1,5 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
-import android.Manifest;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
-import com.heinrichreimersoftware.materialintro.slide.Slide;
 import com.rvalerio.fgchecker.Utils;
 
 public class OnboardingActivity extends IntroActivity {
@@ -28,16 +26,10 @@ public class OnboardingActivity extends IntroActivity {
         setFullscreen(true);
         super.onCreate(savedInstanceState);
 
-        // time account
-        // money bag screenshot + store und whitelist
-
-
-
-
         // INTRO
         addSlide(new SimpleSlide.Builder()
-                .title("Uniatron")
-                .description("Keep an eye on your health and productivity")
+                .title(R.string.app_name)
+                .description(R.string.onboarding_intro_description)
                 .image(R.drawable.ic_emoticon_neutral_selected)
                 .canGoBackward(false)
                 .background(R.color.onboardingBackground1)
@@ -49,13 +41,13 @@ public class OnboardingActivity extends IntroActivity {
         if (!usageAccessGranted()) {
             addSlide(new SimpleSlide.Builder()
                     //.title("Get an overview of your most used apps")
-                    .title("App usage")
-                    .description("We need your permission to detect and display your most used apps")
-                    .image(R.drawable.app_usage_onboarding)
+                    .title(R.string.onboarding_app_usage_title)
+                    .description(R.string.onboarding_app_usage_description)
+                    .image(R.drawable.ic_onboarding_app_usage)
                     .background(R.color.onboardingBackground2)
                     .backgroundDark(R.color.onboardingBackground2Dark)
                     .scrollable(true)
-                    .buttonCtaLabel("Grant")
+                    .buttonCtaLabel(R.string.onboarding_btn_grant)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -70,10 +62,9 @@ public class OnboardingActivity extends IntroActivity {
                     .build());
         } else {
             addSlide(new SimpleSlide.Builder()
-                    //.title("Get an overview of your most used apps")
-                    .title("App usage")
-                    .description("We detect and display your most used apps")
-                    .image(R.drawable.app_usage_onboarding)
+                    .title(R.string.onboarding_app_usage_title)
+                    .description(R.string.onboarding_app_usage_granted_description)
+                    .image(R.drawable.ic_onboarding_app_usage)
                     .background(R.color.onboardingBackground2)
                     .backgroundDark(R.color.onboardingBackground2Dark)
                     .scrollable(true)
@@ -82,17 +73,14 @@ public class OnboardingActivity extends IntroActivity {
 
         // COIN BAG & BATTERY OPTIMIZATION
         if(checkBatteryOptimized()) {
-            //currentSlideCallback = 5;
             addSlide(new SimpleSlide.Builder()
-                    .title("Your steps become coins")
-                    .description("Use them in the shop!\n\nTo make sure we don't miss any of your steps, please whitelist"
-                            + " our app from the system power management.\nSelect 'All Apps' to "
-                            + "find UNIAtron and disable the optimization")
+                    .title(R.string.onboarding_coinbag)
+                    .description(R.string.onboarding_coinbag_description)
                     .image(R.drawable.ic_onboarding_coinbag)
                     .background(R.color.onboardingBackground3)
                     .backgroundDark(R.color.onboardingBackground3Dark)
                     .scrollable(true)
-                    .buttonCtaLabel("Whitelist")
+                    .buttonCtaLabel(R.string.onboarding_btn_whitelist)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -105,8 +93,8 @@ public class OnboardingActivity extends IntroActivity {
                     .build());
         } else {
             addSlide(new SimpleSlide.Builder()
-                    .title("Your steps become coins")
-                    .description("Use them in the shop!")
+                    .title(R.string.onboarding_coinbag)
+                    .description(R.string.onboarding_coinbag_granted_description)
                     .image(R.drawable.ic_onboarding_coinbag)
                     .background(R.color.onboardingBackground3)
                     .backgroundDark(R.color.onboardingBackground3Dark)
@@ -114,26 +102,26 @@ public class OnboardingActivity extends IntroActivity {
                     .build());
         }
 
-        // shop
+        // SHOP
         addSlide(new SimpleSlide.Builder()
                 .title("Shop: TODO shop image")
-                .description("Visit the shop to trade your collected coins for additional app time")
-                .image(R.drawable.ic_onboarding_check)
+                .description(R.string.onboarding_shop_description)
+                //.image(R.drawable.ic_onboarding_check)
                 .background(R.color.onboardingBackground4)
                 .backgroundDark(R.color.onboardingBackground4Dark)
                 .scrollable(true)
                 .build());
-//        "\nVisit the shop to trade them for additional app time\n\n" +
 
-
-        // blacklist entries
+/*
+        // BLACKLIST (todo: pretty way)
         addSlide(new SimpleSlide.Builder()
                 .layout(R.layout.activity_onboarding_blacklist)
                 .background(R.color.onboardingBackground5)
                 .backgroundDark(R.color.onboardingBackground5Dark)
                 .build());
-        /*
-        // blacklist entries
+*/
+
+        // BLACKLIST
         addSlide(new SimpleSlide.Builder()
                 .title("Almost done")
                 .description("Add apps to you blacklist\nThey will be blocked when your time runs out\n\nYou can "
@@ -151,7 +139,7 @@ public class OnboardingActivity extends IntroActivity {
                 })
                 .build());
 
-                */
+
     }
 /*
     @Override
