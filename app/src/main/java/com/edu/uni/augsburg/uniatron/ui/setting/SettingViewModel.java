@@ -7,6 +7,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ApplicationInfo;
@@ -87,6 +88,7 @@ public class SettingViewModel extends AndroidViewModel {
                     ))
                     .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
                             | ApplicationInfo.FLAG_SYSTEM)) == 0)
+                    .filter(item -> !item.equals(getDefaultLauncherPackageName()))
                     .collect(Collectors.toMap(
                             key -> key.packageName,
                             value -> packageManager.getApplicationLabel(value).toString()
@@ -110,5 +112,13 @@ public class SettingViewModel extends AndroidViewModel {
                             LinkedHashMap::new
                     ));
         }
+    }
+
+    private String getDefaultLauncherPackageName() {
+        final PackageManager localPackageManager = getApplication().getPackageManager();
+        final Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        return localPackageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                .activityInfo.packageName;
     }
 }
