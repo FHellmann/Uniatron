@@ -40,10 +40,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         super(application);
 
         MainApplication.getRepository(application).getMinDate().observeForever(date -> {
-            final Calendar calendar = GregorianCalendar.getInstance();
-            calendar.setTime(date);
-            mMinCalendar = calendar;
-            notifyDataSetChanged();
+            if (date != null) {
+                final Calendar calendar = GregorianCalendar.getInstance();
+                calendar.setTime(date);
+                mMinCalendar = calendar;
+                notifyDataSetChanged();
+            }
         });
 
         mCardViewModelList = new ArrayList<>();
