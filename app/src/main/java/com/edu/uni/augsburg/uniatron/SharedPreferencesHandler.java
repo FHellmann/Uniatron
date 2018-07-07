@@ -51,7 +51,7 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Add a app to the blacklist.
+     * Add an app to the blacklist.
      *
      * @param packageName The package name of the app.
      */
@@ -67,7 +67,7 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Remove a app from the blacklist.
+     * Remove an app from the blacklist.
      *
      * @param packageName The package name of the app.
      */
@@ -115,5 +115,24 @@ public final class SharedPreferencesHandler {
      */
     public void unregisterOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    /**
+     * Checks if this is the first app launch
+     *
+     * @return The value of the lookup
+     */
+    public boolean isFirstStart() {
+        return mPrefs.getBoolean("firstStart", true);
+    }
+
+    /**
+     * Marks the app as not first start for future launches
+     */
+    public void setFirstStart() {
+        SharedPreferences.Editor e = mPrefs.edit();
+        //  Edit preference to make it false because we don't want this to run again
+        e.putBoolean("firstStart", false);
+        e.apply();
     }
 }

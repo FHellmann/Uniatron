@@ -1,8 +1,11 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.app.AppOpsManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -17,7 +20,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
@@ -74,15 +79,30 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
 
+        //  Declare a new thread to do a preference check
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        // if first launch or !checkBatteryOptimized or not usage stats allowed
+                SharedPreferencesHandler sharedPrefsHandler =
+                        MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-        // -> never ask again
-        Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
-        startActivity(intent);
+                // for future app launches, we ask the user of he ignored some of the permissions
+                if (sharedPrefsHandler.isFirstStart() || !usageAccessGranted() || checkBatteryOptimized()) {
+                    //  Launch onboarding
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
+                        }
+                    });
+                    sharedPrefsHandler.setFirstStart();
+                }
+            }
+        });
+        // Start the thread
+        t.start();
 
-        //requestUsageStatsPermission();
-        //requestBatteryOptimizationDisablePermission();
         NotificationChannels.setupChannels(this);
         startServices();
     }
@@ -130,6 +150,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                 && !Utils.hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
+    }
+
+    private boolean usageAccessGranted() {
+        try {
+            PackageManager packageManager = getApplicationContext().getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+
+            return mode == AppOpsManager.MODE_ALLOWED;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
     }
 
