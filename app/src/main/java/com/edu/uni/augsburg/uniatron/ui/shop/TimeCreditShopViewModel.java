@@ -16,7 +16,9 @@ import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -31,7 +33,8 @@ class TimeCreditShopViewModel extends AndroidViewModel {
     private final List<Emotions> mEmotionCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
     private final MediatorLiveData<LearningAid> mLearningAid;
-    private OnShopChangedListener mListener;
+    private final Map<TimeCredits, OnShopChangedListener> mChangeListener;
+    private OnShopValidListener mListener;
 
     /**
      * Ctr.
@@ -47,6 +50,7 @@ class TimeCreditShopViewModel extends AndroidViewModel {
 
         mShoppingCart = new ArrayList<>();
         mEmotionCart = new ArrayList<>();
+        mChangeListener = new HashMap<>();
 
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
@@ -88,10 +92,13 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      * @param timeCredits The time credit to add.
      */
     public void addToShoppingCart(@NonNull final TimeCredits timeCredits) {
+        Stream.of(mShoppingCart)
+                .map(mChangeListener::get)
+                .forEach(OnShopChangedListener::onChanged);
         mShoppingCart.clear(); // We only want one entry
         mShoppingCart.add(timeCredits);
         if (mListener != null) {
-            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
+            mListener.isValid(!mShoppingCart.isEmpty() && !mEmotionCart.isEmpty());
         }
     }
 
@@ -111,9 +118,10 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      * @param emotion the user emotion.
      */
     public void setEmotion(@NonNull final Emotions emotion) {
+        mEmotionCart.clear();
         mEmotionCart.add(emotion);
         if (mListener != null) {
-            mListener.onChange(mShoppingCart.isEmpty() || mEmotionCart.isEmpty());
+            mListener.isValid(!mShoppingCart.isEmpty() && !mEmotionCart.isEmpty());
         }
     }
 
@@ -134,7 +142,7 @@ class TimeCreditShopViewModel extends AndroidViewModel {
                 final double stepsFactor = mPrefHandler.getStepsFactor();
                 mRepository.addTimeCredit(credit, stepsFactor);
             });
-            mRepository.addEmotion(mEmotionCart.get(0));
+            Stream.of(mEmotionCart).forEach(mRepository::addEmotion);
             clear();
         }
     }
@@ -144,8 +152,19 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      *
      * @param listener The listener.
      */
-    public void setShopChangeListener(@NonNull final OnShopChangedListener listener) {
+    public void setShopValidListener(@NonNull final OnShopValidListener listener) {
         mListener = listener;
+    }
+
+    /**
+     * Add a listener for shop change events.
+     *
+     * @param timeCredits The time credit to listen on.
+     * @param listener The listener.
+     */
+    public void addShopChangedListener(@NonNull final TimeCredits timeCredits,
+                                       @NonNull final OnShopChangedListener listener) {
+        mChangeListener.put(timeCredits, listener);
     }
 
     /**
@@ -153,12 +172,24 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      *
      * @author Fabio Hellmann
      */
-    public interface OnShopChangedListener {
+    public interface OnShopValidListener {
         /**
          * Is called when the shop state changed.
          *
-         * @param empty If the shop is empty or not.
+         * @param valid If the shop is valid.
          */
-        void onChange(boolean empty);
+        void isValid(boolean valid);
+    }
+
+    /**
+     * A listener which will be notified when the selection of the shop changed.
+     *
+     * @author Fabio Hellmann
+     */
+    public interface OnShopChangedListener {
+        /**
+         * Is called when the shop selection changed.
+         */
+        void onChanged();
     }
 }
