@@ -79,6 +79,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
 
 
+        startOnboarding();
+
+        NotificationChannels.setupChannels(this);
+        startServices();
+    }
+
+    private void startOnboarding() {
         //  Declare a new thread to do a preference check
         Thread t = new Thread(new Runnable() {
             @Override
@@ -87,8 +94,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 SharedPreferencesHandler sharedPrefsHandler =
                         MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-                // for future app launches, we ask the user of he ignored some of the permissions
-                if (sharedPrefsHandler.isFirstStart() || !usageAccessGranted() || checkBatteryOptimized()) {
+                // relaunch onboarding if permission request was ignored
+                if (sharedPrefsHandler.isFirstStart()
+                        || needUsageAccessPermission()
+                        || needBatteryWhitelistPermission()) {
                     //  Launch onboarding
                     runOnUiThread(new Runnable() {
                         @Override
@@ -102,9 +111,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         });
         // Start the thread
         t.start();
-
-        NotificationChannels.setupChannels(this);
-        startServices();
     }
 
     /**
@@ -146,34 +152,21 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         startService(new Intent(this, AppTrackingService.class));
     }
 
-    private void requestUsageStatsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !Utils.hasUsageStatsPermission(this)) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-        }
-    }
-
-    private boolean usageAccessGranted() {
+    private boolean needUsageAccessPermission() {
         try {
             PackageManager packageManager = getApplicationContext().getPackageManager();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
             AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
             int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
 
-            return mode == AppOpsManager.MODE_ALLOWED;
+            return !(mode == AppOpsManager.MODE_ALLOWED);
 
         } catch (PackageManager.NameNotFoundException e) {
-            return false;
+            return true;
         }
     }
 
-    private void requestBatteryOptimizationDisablePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
-            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-        }
-    }
-
-    private boolean checkBatteryOptimized() {
+    private boolean needBatteryWhitelistPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
             return !powerManager
