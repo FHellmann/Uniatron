@@ -62,13 +62,11 @@ public class OnboardingActivity extends IntroActivity {
 
         if (needUsageAccessPermission()) {
             userAccessSlideBuilder
-                    .canGoForward(false)
                     .description(R.string.onboarding_app_usage_description)
                     .buttonCtaLabel(R.string.onboarding_btn_grant)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View vew) {
-                            userAccessSlideBuilder.canGoForward(true);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                                     && !Utils.hasUsageStatsPermission(getApplicationContext())) {
                                 startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
@@ -148,18 +146,20 @@ public class OnboardingActivity extends IntroActivity {
     }
 
     private boolean needUsageAccessPermission() {
+        ApplicationInfo applicationInfo;
+        PackageManager packageManager;
+        AppOpsManager appOpsManager;
+        int mode;
         try {
-            final PackageManager packageManager = getApplicationContext().getPackageManager();
-            final ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
-            final AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-            int mode = 0;
+            appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
             if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 // no way to find out. assume we need permission
                 return true;
             } else {
+                packageManager = getApplicationContext().getPackageManager();
+                applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
                 mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
             }
-
             return mode != AppOpsManager.MODE_ALLOWED;
 
         } catch (PackageManager.NameNotFoundException e) {

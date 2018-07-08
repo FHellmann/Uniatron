@@ -145,18 +145,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         ApplicationInfo applicationInfo;
         PackageManager packageManager;
         AppOpsManager appOpsManager;
-        int mode = 0;
+        int mode;
         try {
-            packageManager = getApplicationContext().getPackageManager();
-            applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
             appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
             if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 // no way to find out. assume we need permission
                 return true;
             } else {
+                packageManager = getApplicationContext().getPackageManager();
+                applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
                 mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
             }
-
             return mode != AppOpsManager.MODE_ALLOWED;
 
         } catch (PackageManager.NameNotFoundException e) {
