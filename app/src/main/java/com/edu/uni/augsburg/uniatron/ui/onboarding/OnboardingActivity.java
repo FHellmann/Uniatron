@@ -17,15 +17,26 @@ import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 import com.rvalerio.fgchecker.Utils;
 
+/**
+ * Handles the creation of the App onboarding.
+ *
+ * @author Leon Wöhrl
+ */
 public class OnboardingActivity extends IntroActivity {
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        setFullscreen(true);
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // INTRO
+        addSlideIntro();
+        addSlideAppUsage();
+        addSlideCoinBag();
+        addSlideShop();
+        addSlideBlacklist();
+    }
+
+    private void addSlideIntro() {
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.app_name)
                 .description(R.string.onboarding_intro_description)
@@ -35,8 +46,11 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground1Dark)
                 .scrollable(true)
                 .build());
+    }
 
-        SimpleSlide.Builder userAccessSlideBuilder = new SimpleSlide.Builder();
+    // MOST USED APPS & USAGE STATS ACCESS
+    private void addSlideAppUsage() {
+        final SimpleSlide.Builder userAccessSlideBuilder = new SimpleSlide.Builder();
 
         userAccessSlideBuilder
                 .title(R.string.onboarding_app_usage_title)
@@ -46,27 +60,28 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground2Dark)
                 .scrollable(true);
 
-        // MOST USED APPS & USAGE STATS ACCESS
-        if (!usageAccessGranted()) {
+        if (needUsageAccessPermission()) {
             userAccessSlideBuilder
+                    .canGoForward(false)
                     .description(R.string.onboarding_app_usage_description)
                     .buttonCtaLabel(R.string.onboarding_btn_grant)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
-
+                        public void onClick(final View vew) {
+                            userAccessSlideBuilder.canGoForward(true);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
                                     && !Utils.hasUsageStatsPermission(getApplicationContext())) {
                                 startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                             }
-
                         }
                     });
         }
         addSlide(userAccessSlideBuilder.build());
+    }
 
-        // COIN BAG & BATTERY OPTIMIZATION
-        SimpleSlide.Builder coinbagSlideBuilder = new SimpleSlide.Builder();
+    // COIN BAG & BATTERY OPTIMIZATION
+    private void addSlideCoinBag() {
+        final SimpleSlide.Builder coinbagSlideBuilder = new SimpleSlide.Builder();
         coinbagSlideBuilder
                 .title(R.string.onboarding_coinbag)
                 .description(R.string.onboarding_coinbag_granted_description)
@@ -75,25 +90,23 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground6Dark)
                 .scrollable(true);
 
-
-        if(checkBatteryOptimized()) {
+        if (needBatteryWhitelistPermission()) {
             coinbagSlideBuilder
                     .description(R.string.onboarding_coinbag_description)
                     .buttonCtaLabel(R.string.onboarding_btn_whitelist)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
+                        public void onClick(final View view) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-
                             }
                         }
                     });
-
         }
         addSlide(coinbagSlideBuilder.build());
+    }
 
-        // SHOP
+    private void addSlideShop() {
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_shop_title)
                 .description(R.string.onboarding_shop_description)
@@ -102,8 +115,10 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground4Dark)
                 .scrollable(true)
                 .build());
+    }
 
-        // BLACKLIST
+
+    private void addSlideBlacklist() {
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_blacklist_title)
                 .description(R.string.onboarding_blacklist_description)
@@ -114,35 +129,41 @@ public class OnboardingActivity extends IntroActivity {
                 .buttonCtaLabel(R.string.onboarding_btn_blacklist)
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(final View view) {
                         OnboardingActivity.this.startActivity(new Intent(OnboardingActivity.this, SettingActivity.class));
                     }
                 })
                 .build());
-
-
     }
 
-    private boolean checkBatteryOptimized() {
+    private boolean needBatteryWhitelistPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            return !powerManager
-                    .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+            if (powerManager != null) {
+                return !powerManager
+                        .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+            }
         }
         return true;
     }
 
-    private boolean usageAccessGranted() {
+    private boolean needUsageAccessPermission() {
         try {
-            PackageManager packageManager = getApplicationContext().getPackageManager();
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
-            AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-            int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            final PackageManager packageManager = getApplicationContext().getPackageManager();
+            final ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
+            final AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+            int mode = 0;
+            if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // no way to find out. assume we need permission
+                return true;
+            } else {
+                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            }
 
-            return mode == AppOpsManager.MODE_ALLOWED;
+            return mode != AppOpsManager.MODE_ALLOWED;
 
         } catch (PackageManager.NameNotFoundException e) {
-            return false;
+            return true;
         }
     }
 }

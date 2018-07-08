@@ -2,12 +2,11 @@ package com.edu.uni.augsburg.uniatron;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
 import com.orhanobut.logger.Logger;
-
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -108,6 +107,7 @@ public final class SharedPreferencesHandler {
     public void registerOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.registerOnSharedPreferenceChangeListener(listener);
     }
+
     /**
      * Register a listener for the SharedPreferences.
      *
@@ -118,7 +118,7 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Checks if this is the first app launch
+     * Checks if this is the first app launch.
      *
      * @return The value of the lookup
      */
@@ -127,12 +127,12 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Marks the app as not first start for future launches
+     * Marks the app as not first start for future launches.
      */
     public void setFirstStart() {
-        SharedPreferences.Editor e = mPrefs.edit();
+        final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference to make it false because we don't want this to run again
-        e.putBoolean("firstStart", false);
-        e.apply();
+        editor.putBoolean("firstStart", false);
+        editor.apply();
     }
 }

@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.TabLayout;
@@ -31,7 +30,6 @@ import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
 import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
 import com.edu.uni.augsburg.uniatron.ui.onboarding.OnboardingActivity;
-import com.rvalerio.fgchecker.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,31 +84,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
     }
 
     private void startOnboarding() {
-        //  Declare a new thread to do a preference check
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
+        final SharedPreferencesHandler sharedPrefsHandler =
+                MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-                SharedPreferencesHandler sharedPrefsHandler =
-                        MainApplication.getSharedPreferencesHandler(getApplicationContext());
-
-                // relaunch onboarding if permission request was ignored
-                if (sharedPrefsHandler.isFirstStart()
-                        || needUsageAccessPermission()
-                        || needBatteryWhitelistPermission()) {
-                    //  Launch onboarding
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
-                        }
-                    });
-                    sharedPrefsHandler.setFirstStart();
+        // relaunch onboarding if permission request was ignored
+        if (sharedPrefsHandler.isFirstStart()
+                || needUsageAccessPermission()
+                || needBatteryWhitelistPermission()) {
+            //  Launch onboarding
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
                 }
-            }
-        });
-        // Start the thread
-        t.start();
+            });
+            sharedPrefsHandler.setFirstStart();
+        }
     }
 
     /**
@@ -153,13 +142,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
     }
 
     private boolean needUsageAccessPermission() {
+        ApplicationInfo applicationInfo;
+        PackageManager packageManager;
+        AppOpsManager appOpsManager;
+        int mode = 0;
         try {
-            PackageManager packageManager = getApplicationContext().getPackageManager();
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
-            AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-            int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            packageManager = getApplicationContext().getPackageManager();
+            applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
+            appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+            if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // no way to find out. assume we need permission
+                return true;
+            } else {
+                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            }
 
-            return !(mode == AppOpsManager.MODE_ALLOWED);
+            return mode != AppOpsManager.MODE_ALLOWED;
 
         } catch (PackageManager.NameNotFoundException e) {
             return true;
