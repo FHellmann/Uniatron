@@ -20,7 +20,6 @@ import com.rvalerio.fgchecker.Utils;
 public class OnboardingActivity extends IntroActivity {
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setFullscreen(true);
@@ -37,16 +36,20 @@ public class OnboardingActivity extends IntroActivity {
                 .scrollable(true)
                 .build());
 
+        SimpleSlide.Builder userAccessSlideBuilder = new SimpleSlide.Builder();
+
+        userAccessSlideBuilder
+                .title(R.string.onboarding_app_usage_title)
+                .description(R.string.onboarding_app_usage_granted_description)
+                .image(R.drawable.ic_onboarding_app_usage)
+                .background(R.color.onboardingBackground2)
+                .backgroundDark(R.color.onboardingBackground2Dark)
+                .scrollable(true);
+
         // MOST USED APPS & USAGE STATS ACCESS
         if (!usageAccessGranted()) {
-            addSlide(new SimpleSlide.Builder()
-                    //.title("Get an overview of your most used apps")
-                    .title(R.string.onboarding_app_usage_title)
+            userAccessSlideBuilder
                     .description(R.string.onboarding_app_usage_description)
-                    .image(R.drawable.ic_onboarding_app_usage)
-                    .background(R.color.onboardingBackground2)
-                    .backgroundDark(R.color.onboardingBackground2Dark)
-                    .scrollable(true)
                     .buttonCtaLabel(R.string.onboarding_btn_grant)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
@@ -58,28 +61,24 @@ public class OnboardingActivity extends IntroActivity {
                             }
 
                         }
-                    })
-                    .build());
-        } else {
-            addSlide(new SimpleSlide.Builder()
-                    .title(R.string.onboarding_app_usage_title)
-                    .description(R.string.onboarding_app_usage_granted_description)
-                    .image(R.drawable.ic_onboarding_app_usage)
-                    .background(R.color.onboardingBackground2)
-                    .backgroundDark(R.color.onboardingBackground2Dark)
-                    .scrollable(true)
-                    .build());
+                    });
         }
+        addSlide(userAccessSlideBuilder.build());
 
         // COIN BAG & BATTERY OPTIMIZATION
+        SimpleSlide.Builder coinbagSlideBuilder = new SimpleSlide.Builder();
+        coinbagSlideBuilder
+                .title(R.string.onboarding_coinbag)
+                .description(R.string.onboarding_coinbag_granted_description)
+                .image(R.drawable.ic_onboarding_coin)
+                .background(R.color.onboardingBackground6)
+                .backgroundDark(R.color.onboardingBackground6Dark)
+                .scrollable(true);
+
+
         if(checkBatteryOptimized()) {
-            addSlide(new SimpleSlide.Builder()
-                    .title(R.string.onboarding_coinbag)
+            coinbagSlideBuilder
                     .description(R.string.onboarding_coinbag_description)
-                    .image(R.drawable.ic_onboarding_coinbag)
-                    .background(R.color.onboardingBackground3)
-                    .backgroundDark(R.color.onboardingBackground3Dark)
-                    .scrollable(true)
                     .buttonCtaLabel(R.string.onboarding_btn_whitelist)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
@@ -89,48 +88,30 @@ public class OnboardingActivity extends IntroActivity {
 
                             }
                         }
-                    })
-                    .build());
-        } else {
-            addSlide(new SimpleSlide.Builder()
-                    .title(R.string.onboarding_coinbag)
-                    .description(R.string.onboarding_coinbag_granted_description)
-                    .image(R.drawable.ic_onboarding_coinbag)
-                    .background(R.color.onboardingBackground3)
-                    .backgroundDark(R.color.onboardingBackground3Dark)
-                    .scrollable(true)
-                    .build());
+                    });
+
         }
+        addSlide(coinbagSlideBuilder.build());
 
         // SHOP
         addSlide(new SimpleSlide.Builder()
-                .title("Shop: TODO shop image")
+                .title(R.string.onboarding_shop_title)
                 .description(R.string.onboarding_shop_description)
-                //.image(R.drawable.ic_onboarding_check)
+                .image(R.drawable.ic_onboarding_shopping_cart)
                 .background(R.color.onboardingBackground4)
                 .backgroundDark(R.color.onboardingBackground4Dark)
                 .scrollable(true)
                 .build());
 
-/*
-        // BLACKLIST (todo: pretty way)
-        addSlide(new SimpleSlide.Builder()
-                .layout(R.layout.activity_onboarding_blacklist)
-                .background(R.color.onboardingBackground5)
-                .backgroundDark(R.color.onboardingBackground5Dark)
-                .build());
-*/
-
         // BLACKLIST
         addSlide(new SimpleSlide.Builder()
-                .title("Almost done")
-                .description("Add apps to you blacklist\nThey will be blocked when your time runs out\n\nYou can "
-                        + "always change these settings later")
-                .image(R.drawable.ic_emoticon_fantastic_selected)
+                .title(R.string.onboarding_blacklist_title)
+                .description(R.string.onboarding_blacklist_description)
+                .image(R.drawable.ic_onboarding_blacklist)
                 .background(R.color.onboardingBackground5)
                 .backgroundDark(R.color.onboardingBackground5Dark)
                 .scrollable(true)
-                .buttonCtaLabel("Choose apps")
+                .buttonCtaLabel(R.string.onboarding_btn_blacklist)
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -141,20 +122,6 @@ public class OnboardingActivity extends IntroActivity {
 
 
     }
-/*
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (currentSlideCallback == 2 && usageAccessGranted() ) {
-            nextSlide();
-        }
-
-        if (currentSlideCallback == 3 && checkBatteryOptimized()) {
-            nextSlide();
-        }
-
-    }
-*/
 
     private boolean checkBatteryOptimized() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
