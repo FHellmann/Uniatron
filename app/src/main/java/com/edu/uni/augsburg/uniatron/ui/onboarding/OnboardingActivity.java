@@ -27,6 +27,7 @@ public class OnboardingActivity extends IntroActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        setFullscreen(true);
         super.onCreate(savedInstanceState);
 
         addSlideIntro();
@@ -111,7 +112,13 @@ public class OnboardingActivity extends IntroActivity {
                 .image(R.drawable.ic_onboarding_shopping_cart)
                 .background(R.color.onboardingBackground4)
                 .backgroundDark(R.color.onboardingBackground4Dark)
-                .scrollable(true)
+                .buttonCtaLabel(R.string.onboarding_btn_shop)
+                .buttonCtaClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+                        nextSlide();
+                    }
+                })
                 .build());
     }
 

@@ -51,4 +51,5 @@
     <string name="onboarding_shop_description">Visit the shop to trade your collected coins for additional app time</string>
     <string name="onboarding_blacklist_title">Almost done</string>
     <string name="onboarding_blacklist_description">Add apps to you blacklist\nThey will be blocked when your time runs out\n\nYou can always change these settings later</string>
+    <string name="onboarding_btn_shop">Awesome</string>
 </resources>

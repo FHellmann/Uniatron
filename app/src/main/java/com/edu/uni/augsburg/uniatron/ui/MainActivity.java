@@ -91,13 +91,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         if (sharedPrefsHandler.isFirstStart()
                 || needUsageAccessPermission()
                 || needBatteryWhitelistPermission()) {
-            //  Launch onboarding
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
-                }
-            });
+
+            startActivity(new Intent(this, OnboardingActivity.class));
+
             sharedPrefsHandler.setFirstStart();
         }
     }
