@@ -63,6 +63,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public void registerCardViewModel(@NonNull final CardViewModel cardViewModel) {
         mCardViewModelList.add(cardViewModel);
+        cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType);
     }
 
     /**
