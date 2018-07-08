@@ -39,7 +39,7 @@
     <string name="group_by_year">Group by year</string>
     <string name="onboarding_btn_whitelist">Whitelist</string>
     <string name="onboarding_btn_grant">Grant</string>
-    <string name="onboarding_blacklist_description">Almost done\nAdd apps to your blacklist</string>
+    <string name="onboarding_btn_blacklist">Choose apps</string>
     <string name="onboarding_intro_description">Keep an eye on your health and productivity</string>
     <string name="onboarding_app_usage_title">App usage</string>
     <string name="onboarding_app_usage_description">We need your permission to detect and display your most used apps</string>
@@ -47,5 +47,8 @@
     <string name="onboarding_coinbag">Your steps become coins</string>
     <string name="onboarding_coinbag_description">Use them in the shop!\n\nTo make sure we don\'t miss any, select \'All Apps\' to find UNIAtron and disable the setting</string>
     <string name="onboarding_coinbag_granted_description">Use them in the shop!</string>
+    <string name="onboarding_shop_title">Shop</string>
     <string name="onboarding_shop_description">Visit the shop to trade your collected coins for additional app time</string>
+    <string name="onboarding_blacklist_title">Almost done</string>
+    <string name="onboarding_blacklist_description">Add apps to you blacklist\nThey will be blocked when your time runs out\n\nYou can always change these settings later</string>
 </resources>

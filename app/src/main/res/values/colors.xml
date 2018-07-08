@@ -18,4 +18,6 @@
     <color name="onboardingBackground4Dark">#7e7e7e</color>
     <color name="onboardingBackground5">#28a058</color>
     <color name="onboardingBackground5Dark">#0f7038</color>
+    <color name="onboardingBackground6">#2e9bff</color>
+    <color name="onboardingBackground6Dark">#2768cc</color>
 </resources>
