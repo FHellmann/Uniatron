@@ -65,6 +65,18 @@ public class OnboardingActivity extends IntroActivity {
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View vew) {
+                            // the user gets a sample entry on first onboarding so it's not empty
+                            final SharedPreferencesHandler sharedPrefsHandler =
+                                    MainApplication.getSharedPreferencesHandler(getApplicationContext());
+
+                            if (sharedPrefsHandler.onboardingAppUsageEntryEligible()) {
+                                sharedPrefsHandler.enterOnboardingAppUsage();
+
+                                final DataRepository dataRepository = MainApplication.getRepository(
+                                        getApplicationContext());
+                                dataRepository.addAppUsage(getPackageName(), 60);
+                            }
+
                             PermissionUtil.requestUsageAccess(getApplicationContext());
                         }
                     });
@@ -99,18 +111,6 @@ public class OnboardingActivity extends IntroActivity {
 
     private void addSlideShop() {
 
-        // the user gets a step bonus on first onboarding so it's not empty
-        final SharedPreferencesHandler sharedPrefsHandler =
-                MainApplication.getSharedPreferencesHandler(getApplicationContext());
-
-        if (!sharedPrefsHandler.isOnboardingStepBonusGranted() && sharedPrefsHandler.isFirstStart()) {
-            sharedPrefsHandler.setOnboardingStepBonusGranted();
-
-            final DataRepository dataRepository = MainApplication.getRepository(
-                    getApplicationContext());
-            dataRepository.addStepCount(STEPBONUS);
-        }
-
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_shop_title)
                 .description(R.string.onboarding_shop_description)
@@ -121,6 +121,19 @@ public class OnboardingActivity extends IntroActivity {
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View view) {
+
+                        // the user gets a step bonus on first onboarding so it's not empty
+                        final SharedPreferencesHandler sharedPrefsHandler =
+                                MainApplication.getSharedPreferencesHandler(getApplicationContext());
+
+                        if (sharedPrefsHandler.onboardingStepBonusEligible()) {
+                            sharedPrefsHandler.setOnboardingStepBonusGranted();
+
+                            final DataRepository dataRepository = MainApplication.getRepository(
+                                    getApplicationContext());
+                            dataRepository.addStepCount(STEPBONUS);
+                        }
+
                         nextSlide();
                     }
                 })
@@ -129,18 +142,6 @@ public class OnboardingActivity extends IntroActivity {
 
 
     private void addSlideBlacklist() {
-
-        // the user gets a sample entry on first onboarding so it's not empty
-        final SharedPreferencesHandler sharedPrefsHandler =
-                MainApplication.getSharedPreferencesHandler(getApplicationContext());
-
-        if (!sharedPrefsHandler.isOnboardingAppUsageEntered() && sharedPrefsHandler.isFirstStart()) {
-            sharedPrefsHandler.enterOnboardingAppUsage();
-
-            final DataRepository dataRepository = MainApplication.getRepository(
-                    getApplicationContext());
-            dataRepository.addAppUsage(getPackageName(), 60);
-        }
 
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_blacklist_title)
