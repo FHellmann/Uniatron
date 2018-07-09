@@ -1,14 +1,7 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
-import android.app.AppOpsManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.provider.Settings;
 import android.view.View;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
@@ -19,7 +12,6 @@ import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
-import com.rvalerio.fgchecker.Utils;
 
 /**
  * Handles the creation of the App onboarding.
@@ -28,9 +20,7 @@ import com.rvalerio.fgchecker.Utils;
  */
 public class OnboardingActivity extends IntroActivity {
 
-    boolean bonusGranted = false;
-    boolean sampleEntryAdded = false;
-
+    private static final int STEPBONUS = 500;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -75,8 +65,7 @@ public class OnboardingActivity extends IntroActivity {
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View vew) {
-                            PermissionUtil.requestUsageAccess(
-                                    OnboardingActivity.super.getApplicationContext());
+                            PermissionUtil.requestUsageAccess(getApplicationContext());
                         }
                     });
         }
@@ -101,8 +90,7 @@ public class OnboardingActivity extends IntroActivity {
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View view) {
-                            PermissionUtil.requestIgnoreBatterOptimization(
-                                    OnboardingActivity.super.getApplicationContext());
+                            PermissionUtil.requestIgnoreBatterOptimization(getApplicationContext());
                         }
                     });
         }
@@ -111,14 +99,16 @@ public class OnboardingActivity extends IntroActivity {
 
     private void addSlideShop() {
 
+        // the user gets a step bonus on first onboarding so it's not empty
         final SharedPreferencesHandler sharedPrefsHandler =
                 MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-        if (!bonusGranted && sharedPrefsHandler.isFirstStart()) {
-            bonusGranted = true;
-            DataRepository dataRepository = MainApplication.getRepository(
-                    OnboardingActivity.super.getApplicationContext());
-            dataRepository.addStepCount(500);
+        if (!sharedPrefsHandler.isOnboardingStepBonusGranted() && sharedPrefsHandler.isFirstStart()) {
+            sharedPrefsHandler.setOnboardingStepBonusGranted();
+
+            final DataRepository dataRepository = MainApplication.getRepository(
+                    getApplicationContext());
+            dataRepository.addStepCount(STEPBONUS);
         }
 
         addSlide(new SimpleSlide.Builder()
@@ -140,14 +130,16 @@ public class OnboardingActivity extends IntroActivity {
 
     private void addSlideBlacklist() {
 
+        // the user gets a sample entry on first onboarding so it's not empty
         final SharedPreferencesHandler sharedPrefsHandler =
                 MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-        if (!sampleEntryAdded && sharedPrefsHandler.isFirstStart()) {
-            sampleEntryAdded =  true;
-            DataRepository dataRepository = MainApplication.getRepository(
-                    OnboardingActivity.super.getApplicationContext());
-            dataRepository.addAppUsage(OnboardingActivity.super.getPackageName(), 60);
+        if (!sharedPrefsHandler.isOnboardingAppUsageEntered() && sharedPrefsHandler.isFirstStart()) {
+            sharedPrefsHandler.enterOnboardingAppUsage();
+
+            final DataRepository dataRepository = MainApplication.getRepository(
+                    getApplicationContext());
+            dataRepository.addAppUsage(getPackageName(), 60);
         }
 
         addSlide(new SimpleSlide.Builder()
@@ -161,7 +153,7 @@ public class OnboardingActivity extends IntroActivity {
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View view) {
-                        OnboardingActivity.this.startActivity(new Intent(OnboardingActivity.this,
+                        startActivity(new Intent(OnboardingActivity.this,
                                 SettingActivity.class));
                     }
                 })

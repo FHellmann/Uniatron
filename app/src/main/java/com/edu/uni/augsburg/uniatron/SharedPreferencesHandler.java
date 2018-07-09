@@ -135,4 +135,41 @@ public final class SharedPreferencesHandler {
         editor.putBoolean("firstStart", false);
         editor.apply();
     }
+
+    /**
+     * Checks if the step bonus has already been granted.
+     *
+     * @return true if the bonus has already been granted.
+     */
+    public boolean isOnboardingStepBonusGranted() {
+        return mPrefs.getBoolean("stepBonusGranted", true);
+    }
+
+    /**
+     * Marks the step bonus as granted.
+     */
+    public void setOnboardingStepBonusGranted() {
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        //  Edit preference because we don't want to grant the bonus again
+        editor.putBoolean("stepBonusGranted", false);
+        editor.apply();
+    }
+    /**
+     * Checks if the app usage entry has already been entered.
+     *
+     * @return true if the app usage has already been entered.
+     */
+    public boolean isOnboardingAppUsageEntered() {
+        return mPrefs.getBoolean("appUsageEntered", true);
+    }
+
+    /**
+     * Marks the app usage as entered.
+     */
+    public void enterOnboardingAppUsage() {
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        //  Edit preference because we don't want to enter add the value again
+        editor.putBoolean("appUsageEntered", false);
+        editor.apply();
+    }
 }

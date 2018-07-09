@@ -1,16 +1,10 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
-import android.app.AppOpsManager;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
