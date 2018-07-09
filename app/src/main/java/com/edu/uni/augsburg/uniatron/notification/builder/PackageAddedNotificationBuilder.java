@@ -42,7 +42,7 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
     @Override
     public Notification build() {
         return new NotificationCompat.Builder(mContext, NotificationChannels.BLACKLIST.name())
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.notify_package_added))
                 .setContentText(mContext.getString(
                         R.string.notify_package_added_summary,

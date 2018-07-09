@@ -19,15 +19,14 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -81,7 +80,7 @@ public class AppUsageDaoTest {
         mDao.add(create(appName2, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsageTime(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadAppUsageTime(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -106,7 +105,7 @@ public class AppUsageDaoTest {
         mDao.add(create(appName1, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsagePercent(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadAppUsagePercent(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -139,8 +138,8 @@ public class AppUsageDaoTest {
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
         final LiveData<Integer> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
-                extractMinTimeOfDate(date),
-                extractMaxTimeOfDate(date),
+                getMinTimeOfDate(date),
+                getMaxTimeOfDate(date),
                 filters
         );
 

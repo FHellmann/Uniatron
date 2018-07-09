@@ -11,8 +11,11 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
 
+import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
+import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 import com.rvalerio.fgchecker.Utils;
@@ -23,6 +26,9 @@ import com.rvalerio.fgchecker.Utils;
  * @author Leon Wöhrl
  */
 public class OnboardingActivity extends IntroActivity {
+
+    boolean bonusGranted = false;
+    boolean sampleEntryAdded = false;
 
 
     @Override
@@ -61,17 +67,15 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground2Dark)
                 .scrollable(true);
 
-        if (needUsageAccessPermission()) {
+        if (PermissionUtil.needUsageAccessPermission(this)) {
             userAccessSlideBuilder
                     .description(R.string.onboarding_app_usage_description)
                     .buttonCtaLabel(R.string.onboarding_btn_grant)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View vew) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                                    && !Utils.hasUsageStatsPermission(getApplicationContext())) {
-                                startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                            }
+                            PermissionUtil.requestUsageAccess(
+                                    OnboardingActivity.super.getApplicationContext());
                         }
                     });
         }
@@ -89,16 +93,15 @@ public class OnboardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground6Dark)
                 .scrollable(true);
 
-        if (needBatteryWhitelistPermission()) {
+        if (PermissionUtil.needBatteryWhitelistPermission(this)) {
             coinbagSlideBuilder
                     .description(R.string.onboarding_coinbag_description)
                     .buttonCtaLabel(R.string.onboarding_btn_whitelist)
                     .buttonCtaClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View view) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-                            }
+                            PermissionUtil.requestIgnoreBatterOptimization(
+                                    OnboardingActivity.super.getApplicationContext());
                         }
                     });
         }
@@ -106,6 +109,14 @@ public class OnboardingActivity extends IntroActivity {
     }
 
     private void addSlideShop() {
+
+        if (!bonusGranted) {
+            bonusGranted = true;
+            DataRepository dataRepository = MainApplication.getRepository(
+                    OnboardingActivity.super.getApplicationContext());
+            dataRepository.addStepCount(500);
+        }
+
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_shop_title)
                 .description(R.string.onboarding_shop_description)
@@ -124,6 +135,14 @@ public class OnboardingActivity extends IntroActivity {
 
 
     private void addSlideBlacklist() {
+
+        if (!sampleEntryAdded) {
+            sampleEntryAdded =  true;
+            DataRepository dataRepository = MainApplication.getRepository(
+                    OnboardingActivity.super.getApplicationContext());
+            dataRepository.addAppUsage(OnboardingActivity.super.getPackageName(), 60);
+        }
+
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_blacklist_title)
                 .description(R.string.onboarding_blacklist_description)
@@ -135,42 +154,10 @@ public class OnboardingActivity extends IntroActivity {
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View view) {
-                        OnboardingActivity.this.startActivity(new Intent(OnboardingActivity.this, SettingActivity.class));
+                        OnboardingActivity.this.startActivity(new Intent(OnboardingActivity.this,
+                                SettingActivity.class));
                     }
                 })
                 .build());
-    }
-
-    private boolean needBatteryWhitelistPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            if (powerManager != null) {
-                return !powerManager
-                        .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
-            }
-        }
-        return true;
-    }
-
-    private boolean needUsageAccessPermission() {
-        ApplicationInfo applicationInfo;
-        PackageManager packageManager;
-        AppOpsManager appOpsManager;
-        int mode;
-        try {
-            appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
-            if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                // no way to find out. assume we need permission
-                return true;
-            } else {
-                packageManager = getApplicationContext().getPackageManager();
-                applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
-                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
-            }
-            return mode != AppOpsManager.MODE_ALLOWED;
-
-        } catch (PackageManager.NameNotFoundException e) {
-            return true;
-        }
     }
 }

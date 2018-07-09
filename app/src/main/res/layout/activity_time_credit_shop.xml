@@ -54,7 +54,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textViewHeaderEmotion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
@@ -71,11 +70,9 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:checkedButton="@+id/radioButton3"
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/radioButton"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginEnd="8dp"
@@ -84,7 +81,6 @@
                     android:foreground="@drawable/selector_emoticon_angry" />
 
                 <RadioButton
-                    android:id="@+id/radioButton2"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginEnd="8dp"
@@ -93,7 +89,6 @@
                     android:foreground="@drawable/selector_emoticon_sad" />
 
                 <RadioButton
-                    android:id="@+id/radioButton3"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginEnd="8dp"
@@ -102,7 +97,6 @@
                     android:foreground="@drawable/selector_emoticon_neutral" />
 
                 <RadioButton
-                    android:id="@+id/radioButton4"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginEnd="8dp"
@@ -111,7 +105,6 @@
                     android:foreground="@drawable/selector_emoticon_happy" />
 
                 <RadioButton
-                    android:id="@+id/radioButton5"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginEnd="8dp"

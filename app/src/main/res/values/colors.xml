@@ -10,6 +10,8 @@
     <color name="secondaryTextColor">#000000</color>
     <color name="onboardingBackground1">#00bbcb</color>
     <color name="onboardingBackground1Dark">#01abb9</color>
+    <color name="banner_step_to_time">@color/primaryDarkColor</color>
+    <color name="banner_learning_aid">#FFAA2222</color>
     <color name="onboardingBackground2">#dd5151</color>
     <color name="onboardingBackground2Dark">#d13838</color>
     <color name="onboardingBackground3">#f99c2e</color>

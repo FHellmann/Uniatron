@@ -2,7 +2,6 @@ package com.edu.uni.augsburg.uniatron.domain.converter;
 
 import com.edu.uni.augsburg.uniatron.model.TimeCreditType;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

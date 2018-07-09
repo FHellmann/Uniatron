@@ -21,8 +21,8 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 import java.util.List;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -74,7 +74,7 @@ public class EmotionDaoTest {
 
         final Date date = new Date();
         final LiveData<List<EmotionEntity>> liveData = mDao
-                .getAll(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .getAll(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final List<EmotionEntity> liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
@@ -95,7 +95,7 @@ public class EmotionDaoTest {
 
         final Date date = new Date();
         final LiveData<Double> liveData = mDao
-                .getAverageEmotion(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .getAverageEmotion(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         final double expected = (Emotions.NEUTRAL.ordinal() + Emotions.HAPPINESS.ordinal()) / 2.0;
 
