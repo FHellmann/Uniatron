@@ -49,6 +49,11 @@ You can track your mood afterwards in the History View.
 Configure app settings:
 Select a Fitness Level: How easy/hard do you want it to be to exchange steps for usage time.
 In the Blacklist all apps that you want to get blocked by Uniatron should be selected.
+### Onboarding
+The user will be prompted with an intro screen on the first app launch. This will guide him through the setup process and request all necessary permissions. Upon completion the user will be granted a bonus of 500 steps, so he can try the announced shop for himself. Additionally, one sample entry for the current day will be added, to provide immediate feedback of the just now introduced UI.
+
+![alt text](https://github.com/FHellmann/Uniatron/blob/lw-20-onboarding/doc/Onboarding/banner.png)
+
 
 
 
