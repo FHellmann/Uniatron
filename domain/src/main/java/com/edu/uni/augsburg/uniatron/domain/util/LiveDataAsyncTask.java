@@ -10,8 +10,8 @@ import com.annimon.stream.function.Supplier;
 /**
  * This is a helper class to create an {@link AsyncTask} with lambda expressions.
  *
- * @author Fabio Hellmann
  * @param <T> The type of the return value.
+ * @author Fabio Hellmann
  */
 public final class LiveDataAsyncTask<T> extends AsyncTask<Void, Void, T> {
     private final DoInBackground<T> mBackgroundWorker;
@@ -44,8 +44,9 @@ public final class LiveDataAsyncTask<T> extends AsyncTask<Void, Void, T> {
      * Executes an async task.
      *
      * @param supplier The data which should be processed in the background thread.
-     * @param <T> The type of the data.
-     * @return The live data which will be notified when the background thread is finished.
+     * @param <T>      The type of the data.
+     * @return The live data which will be notified when the background
+     * thread is finished.
      */
     public static <T> LiveData<T> execute(@NonNull final Supplier<T> supplier) {
         final MutableLiveData<T> observable = new MutableLiveData<>();
@@ -56,8 +57,8 @@ public final class LiveDataAsyncTask<T> extends AsyncTask<Void, Void, T> {
     /**
      * A helper interface for lambda usage.
      *
-     * @author Fabio Hellmann
      * @param <T> The type of the return value.
+     * @author Fabio Hellmann
      */
     private interface DoInBackground<T> {
         /**
@@ -71,8 +72,8 @@ public final class LiveDataAsyncTask<T> extends AsyncTask<Void, Void, T> {
     /**
      * A helper interface for lambda usage.
      *
-     * @author Fabio Hellmann
      * @param <T> The type of the parameter.
+     * @author Fabio Hellmann
      */
     private interface OnPostExecute<T> {
         /**
