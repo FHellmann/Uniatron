@@ -13,6 +13,7 @@ import android.view.View;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
@@ -110,7 +111,10 @@ public class OnboardingActivity extends IntroActivity {
 
     private void addSlideShop() {
 
-        if (!bonusGranted) {
+        final SharedPreferencesHandler sharedPrefsHandler =
+                MainApplication.getSharedPreferencesHandler(getApplicationContext());
+
+        if (!bonusGranted && sharedPrefsHandler.isFirstStart()) {
             bonusGranted = true;
             DataRepository dataRepository = MainApplication.getRepository(
                     OnboardingActivity.super.getApplicationContext());
@@ -136,7 +140,10 @@ public class OnboardingActivity extends IntroActivity {
 
     private void addSlideBlacklist() {
 
-        if (!sampleEntryAdded) {
+        final SharedPreferencesHandler sharedPrefsHandler =
+                MainApplication.getSharedPreferencesHandler(getApplicationContext());
+
+        if (!sampleEntryAdded && sharedPrefsHandler.isFirstStart()) {
             sampleEntryAdded =  true;
             DataRepository dataRepository = MainApplication.getRepository(
                     OnboardingActivity.super.getApplicationContext());
