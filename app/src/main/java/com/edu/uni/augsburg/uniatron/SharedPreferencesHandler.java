@@ -129,7 +129,7 @@ public final class SharedPreferencesHandler {
     /**
      * Marks the app as not first start for future launches.
      */
-    public void setFirstStart() {
+    public void setFirstStartDone() {
         final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference to make it false because we don't want this to run again
         editor.putBoolean("firstStart", false);

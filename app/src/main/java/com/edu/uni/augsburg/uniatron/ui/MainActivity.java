@@ -92,9 +92,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
                 || needUsageAccessPermission()
                 || needBatteryWhitelistPermission()) {
 
-            startActivity(new Intent(this, OnboardingActivity.class));
+            final Intent onBoardingIntent = new Intent(this, OnboardingActivity.class);
+            TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(onBoardingIntent)
+                    .startActivities();
 
-            sharedPrefsHandler.setFirstStart();
+            sharedPrefsHandler.setFirstStartDone();
         }
     }
 
@@ -162,8 +165,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
     private boolean needBatteryWhitelistPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            return !powerManager
-                    .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+            if (powerManager != null) {
+                return !powerManager
+                        .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+            }
         }
         return true;
     }
