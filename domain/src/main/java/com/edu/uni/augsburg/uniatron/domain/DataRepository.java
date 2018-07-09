@@ -24,16 +24,18 @@ import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.model.TimeCredit;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 
 /**
  * The data repository wraps the database/service interaction.
@@ -41,6 +43,7 @@ import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeO
  * @author Fabio Hellmann
  */
 public final class DataRepository {
+    private static final int YEAR_1990 = 1990;
     private final AppDatabase mDatabase;
 
     /**
@@ -117,9 +120,9 @@ public final class DataRepository {
      * @return The time credits value.
      */
     @NonNull
-    public LiveData<Integer> getTimeCreditsByDate(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+    private LiveData<Integer> getTimeCreditsByDate(@NonNull final Date date) {
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
         return mDatabase.timeCreditDao().loadTimeCredits(dateFrom, dateTo);
     }
 
@@ -161,9 +164,9 @@ public final class DataRepository {
      * @return The amount of steps.
      */
     @NonNull
-    public LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+    private LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
         return mDatabase.stepCountDao().loadStepCounts(dateFrom, dateTo);
     }
 
@@ -174,19 +177,22 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Integer> getRemainingStepCountsToday() {
-        return getRemainingStepCountsByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getRemainingStepCountsByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the remaining step count by date.
      *
-     * @param date The date to get the remaining steps from.
+     * @param dateFrom The date to get the remaining steps from.
+     * @param dateTo   The date to get the remaining steps to.
      * @return The amount of steps.
      */
     @NonNull
-    public LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+    private LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date dateFrom,
+                                                           @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.stepCountDao().loadRemainingStepCount(dateFrom, dateTo),
                 data -> data > 0 ? data : 0
@@ -218,25 +224,42 @@ public final class DataRepository {
     }
 
     /**
+     * Get the total amount of days since the app was installed.
+     *
+     * @return The amount of days.
+     */
+    @NonNull
+    public LiveData<Date> getMinDate() {
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(YEAR_1990, 0, 1);
+        final Date dateFrom = getMinTimeOfDate(calendar.getTime());
+        final Date dateTo = getMaxTimeOfDate(new Date());
+        return mDatabase.appUsageDao().getMinDate(dateFrom, dateTo);
+    }
+
+    /**
      * Get the app usage time for today.
      *
      * @return The app usage time.
      */
     @NonNull
     public LiveData<Map<String, Integer>> getAppUsageTimeToday() {
-        return getAppUsageTimeByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getAppUsageTimeByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the app usage time from date.
      *
-     * @param date The app usage time from date.
+     * @param dateFrom The date to start searching.
+     * @param dateTo   The date to end searching.
      * @return The app usage time.
      */
     @NonNull
-    public LiveData<Map<String, Integer>> getAppUsageTimeByDate(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+    public LiveData<Map<String, Integer>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                                @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
                 appUsageList -> {
@@ -255,19 +278,21 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Map<String, Double>> getAppUsagePercentToday() {
-        return getAppUsagePercentByDate(new Date());
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getAppUsagePercentByDate(dateFrom, dateTo);
     }
 
     /**
      * Get the app usage time in percent from date.
      *
-     * @param date The app usage time in percent from date.
+     * @param dateFrom The app usage time in percent from date.
      * @return The app usage time in percent.
      */
     @NonNull
-    public LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+    private LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date dateFrom,
+                                                                   @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsagePercent(dateFrom, dateTo),
                 appUsageList -> {
@@ -287,21 +312,24 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Integer> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
-        return getRemainingAppUsageTimeByDate(new Date(), filter);
+        final Date date = new Date();
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
+        return getRemainingAppUsageTimeByDate(dateFrom, dateTo, filter);
     }
 
     /**
      * Get the remaining usage time as sum.
      *
-     * @param date   The date to get this data from.
-     * @param filter The apps to filter.
+     * @param dateFrom The date to start searching from.
+     * @param dateTo   The date to end searching.
+     * @param filter   The apps to filter.
      * @return The remaining usage time.
      */
     @NonNull
-    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date date,
+    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                             @NonNull final Date dateTo,
                                                              @NonNull final Set<String> filter) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
         return mDatabase.appUsageDao()
                 .loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }
@@ -335,8 +363,8 @@ public final class DataRepository {
      * @return The emotions.
      */
     public LiveData<List<Emotion>> getAllEmotions(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAll(dateFrom, dateTo),
                 data -> {
@@ -356,8 +384,8 @@ public final class DataRepository {
      * @return The average emotion for a date.
      */
     public LiveData<Emotions> getAverageEmotion(@NonNull final Date date) {
-        final Date dateFrom = extractMinTimeOfDate(date);
-        final Date dateTo = extractMaxTimeOfDate(date);
+        final Date dateFrom = getMinTimeOfDate(date);
+        final Date dateTo = getMaxTimeOfDate(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAverageEmotion(dateFrom, dateTo),
                 data -> data == null ? Emotions.NEUTRAL : Emotions.getAverage(data)
@@ -404,8 +432,8 @@ public final class DataRepository {
                                                @NonNull final Date dateTo,
                                                @NonNull final BiFunction<Date, Date,
                                                        LiveData<List<SummaryEntity>>> function) {
-        final Date dateFromMin = extractMinTimeOfDate(dateFrom);
-        final Date dateToMax = extractMaxTimeOfDate(dateTo);
+        final Date dateFromMin = getMinTimeOfDate(dateFrom);
+        final Date dateToMax = getMaxTimeOfDate(dateTo);
         return Transformations.map(
                 function.apply(dateFromMin, dateToMax),
                 data -> data == null ? Collections.emptyList()

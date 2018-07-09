@@ -18,7 +18,7 @@ public class DateUtilTest {
     public void extractMinTimeOfDate() {
         final Date now = new Date();
 
-        final Date date = DateUtil.extractMinTimeOfDate(now);
+        final Date date = DateUtil.getMinTimeOfDate(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -32,7 +32,7 @@ public class DateUtilTest {
     public void extractMaxTimeOfDate() {
         final Date now = new Date();
 
-        final Date date = DateUtil.extractMaxTimeOfDate(now);
+        final Date date = DateUtil.getMaxTimeOfDate(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -46,7 +46,7 @@ public class DateUtilTest {
     public void extractMinDateOfMonth() {
         final Date now = new Date();
 
-        final Date date = DateUtil.extractMinDateOfMonth(now);
+        final Date date = DateUtil.getMinDateOfMonth(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -61,7 +61,7 @@ public class DateUtilTest {
     public void extractMinMonthOfYear() {
         final Date now = new Date();
 
-        final Date date = DateUtil.extractMinMonthOfYear(now);
+        final Date date = DateUtil.getMinMonthOfYear(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);

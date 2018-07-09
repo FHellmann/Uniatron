@@ -26,7 +26,7 @@ public final class SharedPreferencesHandler {
     /**
      * Preference for the steps per minute.
      */
-    public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
+    private static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 

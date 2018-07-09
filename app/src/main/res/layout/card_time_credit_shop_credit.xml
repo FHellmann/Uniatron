@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_gravity="center"
@@ -17,17 +17,21 @@
         android:drawablePadding="@dimen/card_vertical_margin"
         card_view:cardCornerRadius="15dp">
 
-        <TextView
+        <com.lid.lib.LabelTextView
             android:id="@+id/textViewTradeOffer"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:drawablePadding="@dimen/card_vertical_margin"
-            android:drawableStart="@drawable/ic_shop_black_24dp"
             android:gravity="center_vertical"
             android:padding="@dimen/card_vertical_margin"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:label_backgroundColor="@color/banner_step_to_time"
+            app:label_distance="40dp"
+            app:label_orientation="RIGHT_TOP"
+            app:label_text="POP"
+            app:label_textSize="13sp"
+            app:label_height="30dp"
             tools:text="TextView" />
     </android.support.v7.widget.CardView>
 </LinearLayout>

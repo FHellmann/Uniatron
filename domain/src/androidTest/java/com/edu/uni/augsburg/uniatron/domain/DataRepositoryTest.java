@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;

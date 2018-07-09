@@ -1,105 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ui.MainActivity">
 
-    <android.support.design.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <FrameLayout
-            android:id="@+id/content_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <android.support.design.bottomappbar.BottomAppBar
-            android:id="@+id/bar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_gravity="bottom"
-            app:backgroundTint="@color/primaryColor"
-            app:fabAlignmentMode="center"
-            app:fabAttached="true"
-            app:fabCradleMargin="8dp"
-            app:fabCradleRoundedCornerRadius="6dp"
-            app:hideOnScroll="true"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:src="@drawable/ic_local_play_black_24dp"
-            app:layout_anchor="@id/bar" />
-    </android.support.design.widget.CoordinatorLayout>
-
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
+        app:elevation="12dp"
+        app:liftOnScroll="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textNavSteps"
-                android:layout_width="0dp"
+            <android.support.design.button.MaterialButton
+                android:id="@+id/prevDateButton"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/card_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_vertical_margin"
-                android:layout_marginStart="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/card_vertical_margin"
-                android:layout_weight="1"
-                android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_directions_walk_white_24dp"
-                android:textAlignment="viewStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@android:color/white"
-                tools:text="387 Steps" />
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:backgroundTint="@android:color/transparent"
+                app:icon="@drawable/ic_chevron_left_gray_24dp" />
 
-            <TextView
-                android:id="@+id/textNavMinutes"
+            <android.support.design.button.MaterialButton
+                android:id="@+id/dateDisplayButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/card_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_vertical_margin"
-                android:layout_marginStart="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/card_vertical_margin"
                 android:layout_weight="1"
-                android:drawableEnd="@drawable/ic_phonelink_lock_white_24dp"
-                android:drawablePadding="@dimen/activity_horizontal_margin"
-                android:textAlignment="viewEnd"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@android:color/white"
-                tools:text="2:31 Minutes" />
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                app:backgroundTint="@android:color/transparent" />
+
+            <android.support.design.button.MaterialButton
+                android:id="@+id/nextDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:backgroundTint="@android:color/transparent"
+                app:icon="@drawable/ic_chevron_right_gray_24dp" />
+
         </LinearLayout>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabTextColor="@android:color/white">
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:icon="@drawable/ic_home_white_24dp"
-                android:text="@string/title_home" />
-
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:icon="@drawable/ic_history_white_24dp"
-                android:text="@string/title_history" />
-        </android.support.design.widget.TabLayout>
     </android.support.design.widget.AppBarLayout>
-</LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_behavior" />
+
+    <android.support.design.bottomappbar.BottomAppBar
+        android:id="@+id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        app:backgroundTint="@color/primaryColor"
+        app:fabAlignmentMode="center"
+        app:fabAttached="true"
+        app:fabCradleMargin="8dp"
+        app:fabCradleRoundedCornerRadius="6dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/ic_shopping_cart_black_24dp"
+        app:layout_anchor="@id/bar" />
+</android.support.design.widget.CoordinatorLayout>

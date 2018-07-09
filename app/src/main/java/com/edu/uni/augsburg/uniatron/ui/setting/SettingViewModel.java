@@ -7,8 +7,6 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -30,31 +28,27 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-public class SettingViewModel extends AndroidViewModel {
+class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;
-    private final OnSharedPreferenceChangeListener mSharedPrefsListener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final  String key) {
-            Log.d(getClass().toString(), "shared prefs changed");
-            mObservable.postValue(getAllInstalledApps(getApplication()));
-        }
-    };
 
     /**
      * Ctr.
      *
      * @param application The application.
      */
-    public SettingViewModel(@NonNull final Application application) {
+    SettingViewModel(@NonNull final Application application) {
         super(application);
 
         mHandler = MainApplication.getSharedPreferencesHandler(application);
 
         // the blacklist will be instantly updated upon saving the selection the user made
         MainApplication.getSharedPreferencesHandler(application)
-                .registerOnPreferenceChangeListener(mSharedPrefsListener);
+                .registerOnPreferenceChangeListener((sharedPreferences, key) -> {
+                    Log.d(getClass().toString(), "shared prefs changed");
+                    mObservable.setValue(getAllInstalledApps(getApplication()));
+                });
 
         mObservable.setValue(getAllInstalledApps(application));
 

@@ -78,4 +78,15 @@ public interface AppUsageDao {
     LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
                                                            Date dateTo,
                                                            Set<String> filter);
+
+    /**
+     * Get the total days for the specified date range.
+     *
+     * @param dateFrom The date to start counting.
+     * @param dateTo The date to end counting.
+     * @return The total days.
+     */
+    @Query("SELECT timestamp FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
+            + "ORDER BY timestamp ASC LIMIT 1")
+    LiveData<Date> getMinDate(Date dateFrom, Date dateTo);
 }

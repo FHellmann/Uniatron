@@ -1,31 +1,41 @@
 package com.edu.uni.augsburg.uniatron.ui;
 
+import android.app.DatePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.provider.Settings;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.button.MaterialButton;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
-import com.edu.uni.augsburg.uniatron.ui.history.HistoryFragment;
-import com.edu.uni.augsburg.uniatron.ui.home.HomeFragment;
-import com.edu.uni.augsburg.uniatron.ui.home.shop.TimeCreditShopActivity;
-import com.rvalerio.fgchecker.Utils;
+import com.edu.uni.augsburg.uniatron.ui.about.AboutActivity;
+import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
+import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
+import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
+import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,21 +46,21 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnTabSelectedListener {
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
-    private static final int NAV_POSITION_HOME = 0;
-    private static final int NAV_POSITION_HISTORY = 1;
-
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
     @BindView(R.id.bar)
     BottomAppBar mBottomAppBar;
-    @BindView(R.id.tabs)
-    TabLayout mTabLayout;
-    @BindView(R.id.textNavSteps)
-    TextView mTextNavSteps;
-    @BindView(R.id.textNavMinutes)
-    TextView mTextNavMinutes;
+    @BindView(R.id.prevDateButton)
+    MaterialButton mPrevDateButton;
+    @BindView(R.id.dateDisplayButton)
+    MaterialButton mDateDisplayButton;
+    @BindView(R.id.nextDateButton)
+    MaterialButton mNextDateButton;
 
-    private FragmentViewChanger mFragmentViewChanger;
+    private MainActivityViewModel mModelNavigation;
+    private MainActivityCardListAdapter mAdapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -58,33 +68,87 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        setSupportActionBar(mBottomAppBar);
+        mBottomAppBar.replaceMenu(R.menu.nav_bottom_bar_menu);
+        mBottomAppBar.setOnMenuItemClickListener(this);
 
-        mFragmentViewChanger = new FragmentViewChanger(getSupportFragmentManager());
-        mFragmentViewChanger.selectHome();
-        mTabLayout.addOnTabSelectedListener(this);
+        final StaggeredGridLayoutManager layout =
+                new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(layout);
 
-        final MainActivityViewModel model = ViewModelProviders.of(this)
-                .get(MainActivityViewModel.class);
-        model.getRemainingAppUsageTime().observe(this,
-                data -> mTextNavMinutes.setText(
-                        getString(R.string.nav_text_minutes, data / 60, data % 60)));
-        model.getRemainingStepCountToday().observe(this,
-                data -> mTextNavSteps.setText(getString(R.string.nav_text_steps, data)));
+        mAdapter = new MainActivityCardListAdapter(this);
+        mRecyclerView.setAdapter(mAdapter);
 
-        requestUsageStatsPermission();
-        requestBatteryOptimizationDisablePermission();
+        setupCardModels();
+
         NotificationChannels.setupChannels(this);
-        startServices();
+        PermissionUtil.requestUsageAccess(this);
+        PermissionUtil.requestIgnoreBatterOptimization(this);
+        startService(new Intent(this, BroadcastService.class));
+        startService(new Intent(this, StepCountService.class));
+        startService(new Intent(this, AppTrackingService.class));
+    }
+
+    private void setupCardModels() {
+        final SummaryViewModel modelSummary = ViewModelProviders.of(this).get(SummaryViewModel.class);
+        modelSummary.getSummaryCard().observe(this, mAdapter::addOrUpdateCard);
+
+        final AppUsageViewModel modelAppStatistics = ViewModelProviders.of(this)
+                .get(AppUsageViewModel.class);
+        modelAppStatistics.getAppUsageCard(this).observe(this, mAdapter::addOrUpdateCard);
+
+        final CoinBagViewModel coinBagModel = ViewModelProviders.of(this).get(CoinBagViewModel.class);
+        coinBagModel.getRemainingCoins().observe(this, mAdapter::addOrUpdateCard);
+
+        final TimeAccountViewModel timeAccountModel = ViewModelProviders.of(this).get(TimeAccountViewModel.class);
+        timeAccountModel.getRemainingAppUsageTime().observe(this, mAdapter::addOrUpdateCard);
+
+        mModelNavigation = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mModelNavigation.registerCardViewModel(modelSummary);
+        mModelNavigation.registerCardViewModel(modelAppStatistics);
+        mModelNavigation.registerCardViewModel(coinBagModel);
+        mModelNavigation.registerCardViewModel(timeAccountModel);
+        mModelNavigation.getCurrentDate().observe(this, date -> {
+            mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
+            mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
+            mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
+            mRecyclerView.smoothScrollToPosition(0);
+        });
     }
 
     /**
-     * Get the bottom app bar.
-     *
-     * @return the bottom app bar.
+     * Called when the button to step to the previous date is clicked.
      */
-    public BottomAppBar getBottomAppBar() {
-        return mBottomAppBar;
+    @OnClick(R.id.prevDateButton)
+    public void onPrevClicked() {
+        mAdapter.clear();
+        mModelNavigation.prevData();
+    }
+
+    /**
+     * Called when the button which displays the date is clicked.
+     */
+    @OnClick(R.id.dateDisplayButton)
+    public void onDateDisplayClicked() {
+        new DatePickerDialog(
+                this,
+                (datePicker, year, month, date) -> {
+                    final Calendar calendar = GregorianCalendar.getInstance();
+                    calendar.set(year, month, date);
+                    mModelNavigation.setDate(calendar.getTime());
+                },
+                mModelNavigation.getCurrentDateValue(Calendar.YEAR),
+                mModelNavigation.getCurrentDateValue(Calendar.MONTH),
+                mModelNavigation.getCurrentDateValue(Calendar.DATE)
+        ).show();
+    }
+
+    /**
+     * Called when the button to step to the next date is clicked.
+     */
+    @OnClick(R.id.nextDateButton)
+    public void onNextClicked() {
+        mAdapter.clear();
+        mModelNavigation.nextData();
     }
 
     /**
@@ -92,104 +156,98 @@ public class MainActivity extends AppCompatActivity implements TabLayout.BaseOnT
      */
     @OnClick(R.id.fab)
     public void onFabClicked() {
-        final Intent nextIntent = new Intent(this, TimeCreditShopActivity.class);
+        startActivityWithParentStack(new Intent(this, TimeCreditShopActivity.class));
+    }
+
+    private String getDateFormatByGroupStrategy(@NonNull final Date date) {
+        switch (mModelNavigation.getGroupByStrategy()) {
+            case MONTH:
+                return DateUtil.formatForMonth(date);
+            case YEAR:
+                return DateUtil.formatForYear(date);
+            case DATE:
+            default:
+                return DateUtil.formatForDate(date);
+        }
+    }
+
+    @Override
+    public boolean onMenuItemClick(@NonNull final MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.today:
+                mModelNavigation.setDate(new Date());
+                return true;
+            case R.id.group_by_day:
+            case R.id.group_by_month:
+            case R.id.group_by_year:
+                menuItem.setChecked(true);
+                return handleGrouping(menuItem.getItemId());
+            case R.id.setting:
+                startActivityWithParentStack(new Intent(this, SettingActivity.class));
+                return true;
+            case R.id.about:
+                startActivityWithParentStack(new Intent(this, AboutActivity.class));
+                return true;
+            case R.id.feedback:
+                startFeedbackDialog();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean handleGrouping(@IdRes final int menuItemId) {
+        switch (menuItemId) {
+            case R.id.group_by_day:
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.DATE);
+                return true;
+            case R.id.group_by_month:
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.MONTH);
+                return true;
+            case R.id.group_by_year:
+                mModelNavigation.setGroupByStrategy(MainActivityViewModel.GroupBy.YEAR);
+                return true;
+            default:
+                return false;
+        }
+
+    }
+
+    private void startFeedbackDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.feedback)
+                .content(R.string.feedback_question)
+                .positiveText(R.string.yes)
+                .positiveColor(getResources().getColor(R.color.secondaryColor))
+                .onPositive((dialog, which) -> {
+                    // Open Play Store for rating
+                    startActivityWithParentStack(getPlayStoreIntent(getPackageName()));
+                })
+                .negativeText(R.string.no)
+                .negativeColor(getResources().getColor(android.R.color.darker_gray))
+                .onNegative((dialog, which) -> {
+                    // Open feedback web page
+                    final Intent feedbackIntent = new Intent(Intent.ACTION_SEND);
+                    feedbackIntent.setType("text/html");
+                    feedbackIntent.putExtra(Intent.EXTRA_EMAIL, "info@fabio-hellmann.de");
+                    feedbackIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback: UNIAtron");
+                    startActivityWithParentStack(feedbackIntent);
+                })
+                .show();
+    }
+
+    @NonNull
+    private Intent getPlayStoreIntent(@NonNull final String appPackageName) {
+        try {
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+        }
+    }
+
+    private void startActivityWithParentStack(@NonNull final Intent intent) {
         TaskStackBuilder.create(this)
-                .addNextIntentWithParentStack(nextIntent)
+                .addNextIntentWithParentStack(intent)
                 .startActivities();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mTabLayout.getSelectedTabPosition() == NAV_POSITION_HOME) {
-            // If the user is currently looking at the home screen,
-            // allow the system to handle the Back button. This
-            // calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the home screen.
-            setNavToHome();
-        }
-    }
-
-    private void startServices() {
-        startService(new Intent(this, BroadcastService.class));
-        startService(new Intent(this, StepCountService.class));
-        startService(new Intent(this, AppTrackingService.class));
-    }
-
-    private void requestUsageStatsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !Utils.hasUsageStatsPermission(this)) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-        }
-    }
-
-    private void requestBatteryOptimizationDisablePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized()) {
-            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-        }
-    }
-
-    private boolean checkBatteryOptimized() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            return !powerManager
-                    .isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
-        }
-        return true;
-    }
-
-    private void setNavToHome() {
-        final TabLayout.Tab tab = mTabLayout.getTabAt(NAV_POSITION_HOME);
-        if (tab != null) {
-            tab.select();
-        }
-    }
-
-    @Override
-    public void onTabSelected(final TabLayout.Tab tab) {
-        if (NAV_POSITION_HOME == tab.getPosition()) {
-            mFragmentViewChanger.selectHome();
-        } else if (NAV_POSITION_HISTORY == tab.getPosition()) {
-            mFragmentViewChanger.selectHistory();
-        }
-    }
-
-    @Override
-    public void onTabUnselected(final TabLayout.Tab tab) {
-        // not relevant
-    }
-
-    @Override
-    public void onTabReselected(final TabLayout.Tab tab) {
-        // not relevant
-    }
-
-    private static final class FragmentViewChanger {
-        @NonNull
-        private final FragmentManager mFragmentManager;
-        private final HomeFragment mHomeFragment;
-        private final HistoryFragment mHistoryFragment;
-
-        FragmentViewChanger(@NonNull final FragmentManager fragmentManager) {
-            mFragmentManager = fragmentManager;
-            mHomeFragment = new HomeFragment();
-            mHistoryFragment = new HistoryFragment();
-        }
-
-        private void selectHome() {
-            setContentFragment(mHomeFragment);
-        }
-
-        private void selectHistory() {
-            setContentFragment(mHistoryFragment);
-        }
-
-        private void setContentFragment(final Fragment fragment) {
-            final FragmentTransaction transaction = mFragmentManager.beginTransaction();
-            transaction.replace(R.id.content_fragment, fragment);
-            transaction.disallowAddToBackStack();
-            transaction.commit();
-        }
     }
 }

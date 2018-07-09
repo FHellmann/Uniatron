@@ -8,4 +8,6 @@
     <color name="secondaryDarkColor">#c56200</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
+    <color name="banner_step_to_time">@color/primaryDarkColor</color>
+    <color name="banner_learning_aid">#FFAA2222</color>
 </resources>

@@ -13,12 +13,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.extractMinTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
+import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -62,7 +60,7 @@ public class TimeCreditDaoTest {
 
         final Date date = getDate(1, 1, 2018);
         final LiveData<Integer> data = mDao
-                .loadTimeCredits(extractMinTimeOfDate(date), extractMaxTimeOfDate(date));
+                .loadTimeCredits(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
         assertThat(getLiveDataValue(data), is(10));
     }
