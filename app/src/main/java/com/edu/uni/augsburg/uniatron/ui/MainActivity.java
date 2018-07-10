@@ -125,15 +125,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         if (sharedPrefsHandler.isFirstStart()
                 || PermissionUtil.needBatteryWhitelistPermission(this)
                 || PermissionUtil.needUsageAccessPermission(this)) {
-
             final Intent onBoardingIntent = new Intent(this, OnboardingActivity.class);
             startActivity(onBoardingIntent);
-
-
             sharedPrefsHandler.setFirstStartDone();
         }
     }
-
 
     /**
      * Called when the button to step to the previous date is clicked.
@@ -171,6 +167,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mModelNavigation.nextData();
     }
 
+    /**
+     * Is called when the fab is clicked.
+     */
+    @OnClick(R.id.fab)
+    public void onFabClicked() {
+        startActivityWithParentStack(new Intent(this, TimeCreditShopActivity.class));
+    }
 
     private String getDateFormatByGroupStrategy(@NonNull final Date date) {
         switch (mModelNavigation.getGroupByStrategy()) {
@@ -189,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         switch (menuItem.getItemId()) {
             case R.id.today:
                 mModelNavigation.setDate(new Date());
-
                 return true;
             case R.id.group_by_day:
             case R.id.group_by_month:
@@ -208,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             default:
                 return false;
         }
-
     }
 
     private boolean handleGrouping(@IdRes final int menuItemId) {
@@ -225,7 +226,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             default:
                 return false;
         }
-
     }
 
     private void startFeedbackDialog() {

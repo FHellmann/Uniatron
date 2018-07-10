@@ -141,7 +141,7 @@ public final class SharedPreferencesHandler {
      *
      * @return true if the user is eligible to earn the step bonus.
      */
-    public boolean onboardingStepBonusEligible() {
+    public boolean isOnboardingStepBonusEligible() {
         return mPrefs.getBoolean("stepBonusGranted", true);
     }
 
@@ -159,7 +159,7 @@ public final class SharedPreferencesHandler {
      *
      * @return true if the user is eligible for the sample app entry.
      */
-    public boolean onboardingAppUsageEntryEligible() {
+    public boolean isOnboardingAppUsageEntryEligible() {
         return mPrefs.getBoolean("appUsageEntered", true);
     }
 

@@ -69,7 +69,7 @@ public class OnboardingActivity extends IntroActivity {
                             final SharedPreferencesHandler sharedPrefsHandler =
                                     MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-                            if (sharedPrefsHandler.onboardingAppUsageEntryEligible()) {
+                            if (sharedPrefsHandler.isOnboardingAppUsageEntryEligible()) {
                                 sharedPrefsHandler.setOnboardingAppUsageEntered();
 
                                 final DataRepository dataRepository = MainApplication.getRepository(
@@ -126,7 +126,7 @@ public class OnboardingActivity extends IntroActivity {
                         final SharedPreferencesHandler sharedPrefsHandler =
                                 MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
-                        if (sharedPrefsHandler.onboardingStepBonusEligible()) {
+                        if (sharedPrefsHandler.isOnboardingStepBonusEligible()) {
                             sharedPrefsHandler.setOnboardingStepBonusGranted();
 
                             final DataRepository dataRepository = MainApplication.getRepository(
