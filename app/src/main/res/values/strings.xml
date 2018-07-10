@@ -33,7 +33,7 @@
     <string name="onboarding_app_usage_description">We need your permission to detect and display your most used apps</string>
     <string name="onboarding_app_usage_granted_description">We detect and display your most used apps</string>
     <string name="onboarding_coinbag">Your steps become coins</string>
-    <string name="onboarding_coinbag_description">Use them in the shop!\n\nTo make sure we don\'t miss any, select \'All Apps\' to find UNIAtron and disable the setting</string>
+    <string name="onboarding_coinbag_description">Use them in the shop!\n\nTo make sure we don\'t miss any steps, you need to whitelist UNIAtron from system battery management. Select \'All Apps\' to find UNIAtron and disable the setting</string>
     <string name="onboarding_coinbag_granted_description">Use them in the shop!</string>
     <string name="onboarding_shop_title">Shop</string>
     <string name="onboarding_shop_description">Visit the shop to trade your collected coins for additional app time\n\nWe will give you a bonus so you can try it out after the intro!</string>
