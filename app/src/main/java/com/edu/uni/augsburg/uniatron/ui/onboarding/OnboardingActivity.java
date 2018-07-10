@@ -1,5 +1,6 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,7 +8,6 @@ import android.view.View;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
@@ -21,11 +21,14 @@ import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 public class OnboardingActivity extends IntroActivity {
 
     private static final int STEPBONUS = 500;
+    private OnboardingViewModel mViewModel;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setFullscreen(true);
         super.onCreate(savedInstanceState);
+
+        mViewModel = ViewModelProviders.of(this).get(OnboardingViewModel.class);
 
         addSlideIntro();
         addSlideAppUsage();
@@ -72,11 +75,8 @@ public class OnboardingActivity extends IntroActivity {
                             if (sharedPrefsHandler.isOnboardingAppUsageEntryEligible()) {
                                 sharedPrefsHandler.setOnboardingAppUsageEntered();
 
-                                final DataRepository dataRepository = MainApplication.getRepository(
-                                        getApplicationContext());
-                                dataRepository.addAppUsage(getPackageName(), 60);
+                                mViewModel.getDataRepository().addAppUsage(getPackageName(), 60);
                             }
-
                             PermissionUtil.requestUsageAccess(getApplicationContext());
                         }
                     });
@@ -110,6 +110,14 @@ public class OnboardingActivity extends IntroActivity {
     }
 
     private void addSlideShop() {
+        // the user gets a step bonus on first onboarding so it's not empty
+        final SharedPreferencesHandler sharedPrefsHandler =
+                MainApplication.getSharedPreferencesHandler(getApplicationContext());
+
+        if (sharedPrefsHandler.isOnboardingStepBonusEligible()) {
+            sharedPrefsHandler.setOnboardingStepBonusGranted();
+            mViewModel.getDataRepository().addStepCount(STEPBONUS);
+        }
 
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.onboarding_shop_title)
@@ -121,19 +129,6 @@ public class OnboardingActivity extends IntroActivity {
                 .buttonCtaClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View view) {
-
-                        // the user gets a step bonus on first onboarding so it's not empty
-                        final SharedPreferencesHandler sharedPrefsHandler =
-                                MainApplication.getSharedPreferencesHandler(getApplicationContext());
-
-                        if (sharedPrefsHandler.isOnboardingStepBonusEligible()) {
-                            sharedPrefsHandler.setOnboardingStepBonusGranted();
-
-                            final DataRepository dataRepository = MainApplication.getRepository(
-                                    getApplicationContext());
-                            dataRepository.addStepCount(STEPBONUS);
-                        }
-
                         nextSlide();
                     }
                 })

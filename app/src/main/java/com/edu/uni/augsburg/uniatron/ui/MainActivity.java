@@ -33,6 +33,7 @@ import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
 import com.edu.uni.augsburg.uniatron.ui.onboarding.OnboardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
+import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 
 import java.util.Calendar;
