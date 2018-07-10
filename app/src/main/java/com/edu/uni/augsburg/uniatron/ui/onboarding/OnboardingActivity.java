@@ -70,7 +70,7 @@ public class OnboardingActivity extends IntroActivity {
                                     MainApplication.getSharedPreferencesHandler(getApplicationContext());
 
                             if (sharedPrefsHandler.onboardingAppUsageEntryEligible()) {
-                                sharedPrefsHandler.enterOnboardingAppUsage();
+                                sharedPrefsHandler.setOnboardingAppUsageEntered();
 
                                 final DataRepository dataRepository = MainApplication.getRepository(
                                         getApplicationContext());

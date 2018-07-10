@@ -137,9 +137,9 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Checks if the step bonus has already been granted.
+     * Checks if the user is eligible for the step bonus.
      *
-     * @return true if the bonus has already been granted.
+     * @return true if the user is eligible to earn the step bonus.
      */
     public boolean onboardingStepBonusEligible() {
         return mPrefs.getBoolean("stepBonusGranted", true);
@@ -155,18 +155,18 @@ public final class SharedPreferencesHandler {
         editor.apply();
     }
     /**
-     * Checks if the app usage entry has already been entered.
+     * Checks if the user is eligible for the sample app entry.
      *
-     * @return true if the app usage has already been entered.
+     * @return true if the user is eligible for the sample app entry.
      */
     public boolean onboardingAppUsageEntryEligible() {
         return mPrefs.getBoolean("appUsageEntered", true);
     }
 
     /**
-     * Marks the app usage as entered.
+     * Marks the sample app usage as entered.
      */
-    public void enterOnboardingAppUsage() {
+    public void setOnboardingAppUsageEntered() {
         final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference because we don't want to enter add the value again
         editor.putBoolean("appUsageEntered", false);
