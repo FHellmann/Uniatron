@@ -65,12 +65,8 @@ public final class DateUtil {
     @NonNull
     public static Date getMinDateOfMonth(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(date);
+        calendar.setTime(getMinTimeOfDate(date));
         calendar.set(Calendar.DATE, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
 
@@ -83,12 +79,8 @@ public final class DateUtil {
     @NonNull
     public static Date getMaxDateOfMonth(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(date);
+        calendar.setTime(getMaxTimeOfDate(date));
         calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        calendar.set(Calendar.HOUR_OF_DAY, HOUR_OF_DAY_MAX);
-        calendar.set(Calendar.MINUTE, MINUTE_MAX);
-        calendar.set(Calendar.SECOND, SECOND_MAX);
-        calendar.set(Calendar.MILLISECOND, MILLISECOND_MAX);
         return calendar.getTime();
     }
 
@@ -101,13 +93,8 @@ public final class DateUtil {
     @NonNull
     public static Date getMinMonthOfYear(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(date);
+        calendar.setTime(getMinDateOfMonth(date));
         calendar.set(Calendar.MONTH, 0);
-        calendar.set(Calendar.DATE, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
 
@@ -120,13 +107,8 @@ public final class DateUtil {
     @NonNull
     public static Date getMaxMonthOfYear(@NonNull final Date date) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(date);
+        calendar.setTime(getMaxDateOfMonth(date));
         calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        calendar.set(Calendar.HOUR_OF_DAY, HOUR_OF_DAY_MAX);
-        calendar.set(Calendar.MINUTE, MINUTE_MAX);
-        calendar.set(Calendar.SECOND, SECOND_MAX);
-        calendar.set(Calendar.MILLISECOND, MILLISECOND_MAX);
         return calendar.getTime();
     }
 
