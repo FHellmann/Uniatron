@@ -26,6 +26,14 @@ public final class SharedPreferencesHandler {
      * Preference for the steps per minute.
      */
     private static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
+    /**
+     * Preference for the intro bonus.
+     */
+    private static final String PREF_INTRO_BONUS = "pref_intro_bonus";
+    /**
+     * Preference for the first start.
+     */
+    private static final String PREF_FIRST_START = "pref_first_start";
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 
@@ -123,7 +131,7 @@ public final class SharedPreferencesHandler {
      * @return The value of the lookup
      */
     public boolean isFirstStart() {
-        return mPrefs.getBoolean("firstStart", true);
+        return mPrefs.getBoolean(PREF_FIRST_START, true);
     }
 
     /**
@@ -132,44 +140,25 @@ public final class SharedPreferencesHandler {
     public void setFirstStartDone() {
         final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference to make it false because we don't want this to run again
-        editor.putBoolean("firstStart", false);
+        editor.putBoolean(PREF_FIRST_START, false);
         editor.apply();
     }
 
     /**
-     * Checks if the user is eligible for the step bonus.
+     * Checks if the user is eligible for the intro bonus.
      *
-     * @return true if the user is eligible to earn the step bonus.
+     * @return true if the user is eligible to earn the intro bonus.
      */
-    public boolean isOnboardingStepBonusEligible() {
-        return mPrefs.getBoolean("stepBonusGranted", true);
+    public boolean isIntroBonusEligible() {
+        return mPrefs.getBoolean(PREF_INTRO_BONUS, true);
     }
 
     /**
-     * Marks the step bonus as granted.
+     * Marks the intro bonus as granted.
      */
-    public void setOnboardingStepBonusGranted() {
+    public void setIntroBonusGranted() {
         final SharedPreferences.Editor editor = mPrefs.edit();
-        //  Edit preference because we don't want to grant the bonus again
-        editor.putBoolean("stepBonusGranted", false);
-        editor.apply();
-    }
-    /**
-     * Checks if the user is eligible for the sample app entry.
-     *
-     * @return true if the user is eligible for the sample app entry.
-     */
-    public boolean isOnboardingAppUsageEntryEligible() {
-        return mPrefs.getBoolean("appUsageEntered", true);
-    }
-
-    /**
-     * Marks the sample app usage as entered.
-     */
-    public void setOnboardingAppUsageEntered() {
-        final SharedPreferences.Editor editor = mPrefs.edit();
-        //  Edit preference because we don't want to enter add the value again
-        editor.putBoolean("appUsageEntered", false);
+        editor.putBoolean(PREF_INTRO_BONUS, false);
         editor.apply();
     }
 }

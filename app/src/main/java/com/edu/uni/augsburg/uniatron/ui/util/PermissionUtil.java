@@ -80,7 +80,11 @@ public final class PermissionUtil {
             } else {
                 packageManager = context.getPackageManager();
                 applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);
-                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+                mode = appOpsManager.checkOpNoThrow(
+                        AppOpsManager.OPSTR_GET_USAGE_STATS,
+                        applicationInfo.uid,
+                        applicationInfo.packageName
+                );
             }
             return mode != AppOpsManager.MODE_ALLOWED;
 

@@ -18,9 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
@@ -31,10 +29,9 @@ import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
-import com.edu.uni.augsburg.uniatron.ui.onboarding.OnboardingActivity;
+import com.edu.uni.augsburg.uniatron.ui.onboarding.OnBoardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
-import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -82,8 +79,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mRecyclerView.setAdapter(mAdapter);
 
         setupCardModels();
-
-        startOnboarding();
+        startOnBoarding();
 
         NotificationChannels.setupChannels(this);
         startService(new Intent(this, BroadcastService.class));
@@ -118,17 +114,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
-    private void startOnboarding() {
-        final SharedPreferencesHandler sharedPrefsHandler =
-                MainApplication.getSharedPreferencesHandler(getApplicationContext());
-
-        // relaunch onboarding if permission request was ignored
-        if (sharedPrefsHandler.isFirstStart()
-                || PermissionUtil.needBatteryWhitelistPermission(this)
-                || PermissionUtil.needUsageAccessPermission(this)) {
-            final Intent onBoardingIntent = new Intent(this, OnboardingActivity.class);
-            startActivity(onBoardingIntent);
-            sharedPrefsHandler.setFirstStartDone();
+    private void startOnBoarding() {
+        if (mModelNavigation.isIntroNeeded(this)) {
+            startActivity(new Intent(this, OnBoardingActivity.class));
+            mModelNavigation.setIntroDone();
         }
     }
 

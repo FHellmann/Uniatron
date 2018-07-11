@@ -61,7 +61,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.onboarding.OnboardingActivity"
+        <activity android:name=".ui.onboarding.OnBoardingActivity"
             android:theme="@style/Theme.Intro"/>
 
         <receiver
