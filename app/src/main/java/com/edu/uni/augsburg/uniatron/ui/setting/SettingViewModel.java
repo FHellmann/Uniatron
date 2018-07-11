@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-class SettingViewModel extends AndroidViewModel {
+public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;
@@ -39,7 +39,7 @@ class SettingViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    SettingViewModel(@NonNull final Application application) {
+    public SettingViewModel(@NonNull final Application application) {
         super(application);
 
         mHandler = MainApplication.getSharedPreferencesHandler(application);
