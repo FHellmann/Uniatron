@@ -1,15 +1,19 @@
 package com.edu.uni.augsburg.uniatron.domain.util;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+
+import com.annimon.stream.function.Supplier;
 
 /**
  * This is a helper class to create an {@link AsyncTask} with lambda expressions.
  *
- * @author Fabio Hellmann
  * @param <T> The type of the return value.
+ * @author Fabio Hellmann
  */
-public class AsyncTaskWrapper<T> extends AsyncTask<Void, Void, T> {
+public final class LiveDataAsyncTask<T> extends AsyncTask<Void, Void, T> {
     private final DoInBackground<T> mBackgroundWorker;
     private final OnPostExecute<T> mForegroundWorker;
 
@@ -19,8 +23,8 @@ public class AsyncTaskWrapper<T> extends AsyncTask<Void, Void, T> {
      * @param backgroundWorker The statement for the background-thread.
      * @param foregroundWorker The statment for the ui-thread.
      */
-    public AsyncTaskWrapper(@NonNull final DoInBackground<T> backgroundWorker,
-                            @NonNull final OnPostExecute<T> foregroundWorker) {
+    private LiveDataAsyncTask(@NonNull final DoInBackground<T> backgroundWorker,
+                              @NonNull final OnPostExecute<T> foregroundWorker) {
         super();
         this.mBackgroundWorker = backgroundWorker;
         this.mForegroundWorker = foregroundWorker;
@@ -37,12 +41,26 @@ public class AsyncTaskWrapper<T> extends AsyncTask<Void, Void, T> {
     }
 
     /**
+     * Executes an async task.
+     *
+     * @param supplier The data which should be processed in the background thread.
+     * @param <T>      The type of the data.
+     * @return The live data which will be notified when the background
+     * thread is finished.
+     */
+    public static <T> LiveData<T> execute(@NonNull final Supplier<T> supplier) {
+        final MutableLiveData<T> observable = new MutableLiveData<>();
+        new LiveDataAsyncTask<>(supplier::get, observable::setValue).execute();
+        return observable;
+    }
+
+    /**
      * A helper interface for lambda usage.
      *
-     * @author Fabio Hellmann
      * @param <T> The type of the return value.
+     * @author Fabio Hellmann
      */
-    public interface DoInBackground<T> {
+    private interface DoInBackground<T> {
         /**
          * Will be executed in a background-thread.
          *
@@ -54,10 +72,10 @@ public class AsyncTaskWrapper<T> extends AsyncTask<Void, Void, T> {
     /**
      * A helper interface for lambda usage.
      *
-     * @author Fabio Hellmann
      * @param <T> The type of the parameter.
+     * @author Fabio Hellmann
      */
-    public interface OnPostExecute<T> {
+    private interface OnPostExecute<T> {
         /**
          * Will be executed in the ui-thread.
          *
