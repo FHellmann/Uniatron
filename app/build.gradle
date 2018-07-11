@@ -3,22 +3,32 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.0'
-
     defaultConfig {
         applicationId "com.edu.uni.augsburg.uniatron"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 2
+        versionCode 5
         versionName project.version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testApplicationId 'com.edu.uni.augsburg.uniatron.test'
     }
     buildTypes {
         debug {
-            testCoverageEnabled true
+            debuggable true
+            jniDebuggable true
+            renderscriptDebuggable true
+            minifyEnabled false
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+            zipAlignEnabled true
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            zipAlignEnabled true
         }
     }
     compileOptions {
@@ -28,19 +38,18 @@ android {
     dataBinding {
         enabled = true
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     implementation project(':domain')
-
     implementation 'com.orhanobut:logger:2.2.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-
-    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
-    implementation "android.arch.persistence.room:runtime:1.1.1"
-
+    implementation 'android.arch.persistence.room:runtime:1.1.1'
     implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
     implementation 'com.android.support:design:28.0.0-alpha3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
@@ -48,7 +57,6 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0-alpha3'
     implementation 'com.android.support:preference-v14:28.0.0-alpha3'
     implementation 'com.android.support:cardview-v7:28.0.0-alpha3'
-
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     implementation 'com.shuhart.stepview:stepview:1.2.6'
     implementation 'com.annimon:stream:1.2.0'
@@ -62,7 +70,6 @@ dependencies {
         exclude module: 'animated-vector-drawable'
         exclude module: 'support-v4'
     }
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

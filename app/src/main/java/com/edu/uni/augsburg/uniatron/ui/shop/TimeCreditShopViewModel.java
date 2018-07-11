@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-class TimeCreditShopViewModel extends AndroidViewModel {
+public class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
     private final DataRepository mRepository;
     private final List<TimeCredits> mShoppingCart;
@@ -41,7 +41,7 @@ class TimeCreditShopViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    TimeCreditShopViewModel(@NonNull final Application application) {
+    public TimeCreditShopViewModel(@NonNull final Application application) {
         super(application);
 
         mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
