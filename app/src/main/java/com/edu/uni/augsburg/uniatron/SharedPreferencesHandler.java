@@ -2,12 +2,11 @@ package com.edu.uni.augsburg.uniatron;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
 import com.orhanobut.logger.Logger;
-
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -27,6 +26,14 @@ public final class SharedPreferencesHandler {
      * Preference for the steps per minute.
      */
     private static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
+    /**
+     * Preference for the intro bonus.
+     */
+    private static final String PREF_INTRO_BONUS = "pref_intro_bonus";
+    /**
+     * Preference for the first start.
+     */
+    private static final String PREF_FIRST_START = "pref_first_start";
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 
@@ -51,7 +58,7 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Add a app to the blacklist.
+     * Add an app to the blacklist.
      *
      * @param packageName The package name of the app.
      */
@@ -67,7 +74,7 @@ public final class SharedPreferencesHandler {
     }
 
     /**
-     * Remove a app from the blacklist.
+     * Remove an app from the blacklist.
      *
      * @param packageName The package name of the app.
      */
@@ -108,6 +115,7 @@ public final class SharedPreferencesHandler {
     public void registerOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.registerOnSharedPreferenceChangeListener(listener);
     }
+
     /**
      * Register a listener for the SharedPreferences.
      *
@@ -115,5 +123,42 @@ public final class SharedPreferencesHandler {
      */
     public void unregisterOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
         mPrefs.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    /**
+     * Checks if this is the first app launch.
+     *
+     * @return The value of the lookup
+     */
+    public boolean isFirstStart() {
+        return mPrefs.getBoolean(PREF_FIRST_START, true);
+    }
+
+    /**
+     * Marks the app as not first start for future launches.
+     */
+    public void setFirstStartDone() {
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        //  Edit preference to make it false because we don't want this to run again
+        editor.putBoolean(PREF_FIRST_START, false);
+        editor.apply();
+    }
+
+    /**
+     * Checks if the user is eligible for the intro bonus.
+     *
+     * @return true if the user is eligible to earn the intro bonus.
+     */
+    public boolean isIntroBonusEligible() {
+        return mPrefs.getBoolean(PREF_INTRO_BONUS, true);
+    }
+
+    /**
+     * Marks the intro bonus as granted.
+     */
+    public void setIntroBonusGranted() {
+        final SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putBoolean(PREF_INTRO_BONUS, false);
+        editor.apply();
     }
 }

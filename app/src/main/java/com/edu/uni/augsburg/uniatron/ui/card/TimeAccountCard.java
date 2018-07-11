@@ -55,7 +55,7 @@ public class TimeAccountCard implements CardViewHolder {
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
         final ViewHolder holder = (ViewHolder) viewHolder;
         holder.mTextTimeLeft.setText(context
-                .getString(R.string.time_account_desc, mTimeLeft / 60, mTimeLeft % 60));
+                .getString(R.string.time_account_desc, mTimeLeft / 60, Math.abs(mTimeLeft % 60)));
     }
 
     @Override
