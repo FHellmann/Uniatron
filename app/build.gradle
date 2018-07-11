@@ -8,7 +8,7 @@ android {
         applicationId "com.edu.uni.augsburg.uniatron"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 2
+        versionCode 3
         versionName project.version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
