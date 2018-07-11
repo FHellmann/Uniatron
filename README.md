@@ -54,8 +54,6 @@ The user will be prompted with an intro screen on the first app launch. This wil
 
 
 
-
-
 ## Schedule
 ### Milestone 1: First prototype (Due date May 31, 2018)
 We will create a first prototype with the basic functionality.
@@ -70,11 +68,11 @@ We will further refine the prototype. Thus, additional functionalities might be 
 
 - Learning aid
 - Group history view by day/month/year
+- Detail history day/month/year view
 
 ### Milestone 3: Final app - RELEASE
 
 - Onboarding
-- Detail history day/month/year view
 - App Icon
 - (Wearables connection)
 
@@ -83,10 +81,16 @@ Considering the fact that the user can reach every content of the app with three
 
 The design of our app complies with the design guidelines of [Google Material Design](https://material.io/guidelines/material-design/introduction.html).
 
-### Final App
-Home | History | History
+### Final App - BETA
+Today | History | Shop
 :---:|:-------:|:------:
-<img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/1_Play-Store.png' /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/2_Play-Store.png' /> | <img src='https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/3_Play-Store.png' />
+![Today](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/Screenshot_Today.png) | ![History](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/Screenshot_History.png) | ![Shop](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/Screenshot_Shop.png)
+Several cards are displayed in the today screen. These cards contain different information, e. g. app usage, summary. At the top, two cards are represented colored to get the users focus on the import cards. In this case it would be the remaining time of app usage and the amount of coins to trade more time. | The history is layouted the same like the today view. The only difference is by not displaying the two upper cards about time account and coin bag. | If the user has enough coins collected, then he is able to trade these coins into more app usage time. Another option would be the "Learning Aid", if there are not enough coins available. The user also states his current mood here.
+
+Settings | About
+:-----:|:----:
+![Settings](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/Screenshot_Settings.png) | ![About](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/Screenshot_About.png)
+By now, there are two settings available. The first one is to set the fitness level of the user. Therefor three levels can be chosen - easy, normal, hard. Of course, the second setting is to select all the apps which should be blocked. | The about view depicts the credit to the contributors.
 
 ### Onboarding
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Onboarding/banner.png)
@@ -95,16 +99,16 @@ Home | History | History
 ### Prototype
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
 
-## Coding
+## Coding Guidelines
 
-### Work Guidelines
+### Work Process
 1. Create Issue
 2. Create Branch (Naming: {first letter of first name + last name}-{issue nr})
 3. Work your task
 4. Create Pullrequest
 5. Review
 
-### Coding Style Guidlines
+### Coding Style
 [Google Android](https://source.android.com/setup/contribute/code-style)
 
 - Use [Optional](http://www.baeldung.com/java-optional) instead of return null
