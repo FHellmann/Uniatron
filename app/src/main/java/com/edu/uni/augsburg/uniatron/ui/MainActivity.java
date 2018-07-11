@@ -29,9 +29,9 @@ import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
+import com.edu.uni.augsburg.uniatron.ui.onboarding.OnBoardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
-import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -79,10 +79,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mRecyclerView.setAdapter(mAdapter);
 
         setupCardModels();
+        startOnBoarding();
 
         NotificationChannels.setupChannels(this);
-        PermissionUtil.requestUsageAccess(this);
-        PermissionUtil.requestIgnoreBatterOptimization(this);
         startService(new Intent(this, BroadcastService.class));
         startService(new Intent(this, StepCountService.class));
         startService(new Intent(this, AppTrackingService.class));
@@ -113,6 +112,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
             mRecyclerView.smoothScrollToPosition(0);
         });
+    }
+
+    private void startOnBoarding() {
+        if (mModelNavigation.isIntroNeeded(this)) {
+            startActivity(new Intent(this, OnBoardingActivity.class));
+            mModelNavigation.setIntroDone();
+        }
     }
 
     /**
@@ -210,7 +216,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             default:
                 return false;
         }
-
     }
 
     private void startFeedbackDialog() {
