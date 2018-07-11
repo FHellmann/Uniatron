@@ -25,26 +25,32 @@ The automatic locking of apps will encourage the user to become more active. Add
 ## Feature descriptions
 ### App time usage
 Collect time for all used apps during the day (whether in blacklist or not).
-The Top 5 apps and their percentages in usage time are displayed in the pie cart on the main page.
+The Top 5 apps in usage time are displayed in a list on the main page (and their percentages).
+You can optionally show every app by clicking on a button "Show all".
 ### Step Counter
 You are rewarded for doing sportive activity (user can exchange steps for additional screen time).
 All steps are being counted during the day via a built-in sensor.
-The amount of recent steps is displayed on the lower left part of the main page.
-After exchange to usage time the amount is decreased by the specified number. 
-(For overview on all steps see History View)
+A coinbag proportional to the amount of recent steps is displayed in the upper right corner.
+After the exchange of coins for usage time the amount is decreased by the specified number. 
 ### App locking
 Lock social/fun apps from Blacklist after a certain amount of time has been spent on the phone.
-After App Lock is active when opening blacklisted apps Uniatron will block the access to these apps. 
+After App Lock is active Uniatron will block the access to blacklisted apps.
+Locking can be disabled by using the Time Credit Shop. 
 ### Learning Aid
-Helps you keep concentrated by locking screen/apps for a certain amount of time.
-You won't be destracted by your phone anymore.
-E.g. screen is locked for 55 minutes before you get access to apps again.
-### History View
-By clicking on history (on main page) you get a list of recent days with info on average emotion, total of app usage time and total amount of steps during this day.
-By selecting "Group by month" or "Group by year" the list consists of entrys with summarys for month or year
+Helps you keep concentrated by immediately locking apps for a certain amount of time.
+Your phone won't destract you from learning anymore.
+E.g. blacklisted apps are locked for 55 minutes before you get access again.
+### Time Credit Shop
+In the shop you're able to chose between the Learning Aid and directly exchanging steps for free app usage time. You can chose the amount of coins that you're willing to sacrifice.
 ### Emotion tracking
 Track emotions after app usage and throughout the day (via emojis on a range from sad to happy).
+Selecting your emotion is mandatory when doing a transaction in the Time Credit Shop.
 You can track your mood afterwards in the History View.
+### History View
+By clicking through different days via the arrows on the upper bar of the screen you get a summary with info on average emotion, total of app usage time and total amount of steps during the specified period.
+The default view is set to the current period.
+By clicking the label on the upper bar you can chose a date from a calendar.
+With selecting a "Group by"-option in the settings you can switch between summarys for day, month or year.
 ### Configurations
 Configure app settings:
 Select a Fitness Level: How easy/hard do you want it to be to exchange steps for usage time.
@@ -85,12 +91,12 @@ The design of our app complies with the design guidelines of [Google Material De
 ### Final App - BETA
 Screenshot | Description
 :---------:|:----------:
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Today.png" width="800"/> | **Start screen/Today**<br/>Several cards are displayed in the today screen. These cards contain different information, e. g. app usage, summary. At the top, two cards are represented colored to get the users focus on the import cards. In this case it would be the remaining time of app usage and the amount of coins to trade more time.
+<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Today.png" width="800"/> | **Start screen/Today**<br/>Several cards are displayed in the today screen. These cards contain different information, e. g. app usage, summary. At the top, two cards are represented colored to get the users focus on the important cards. In this case it would be the remaining time of app usage and the amount of coins to trade more time.
 <img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_History.png" width="800"/> | **History**<br/>The history is layouted the same like the today view. The only difference is by not displaying the two upper cards about time account and coin bag.
 <img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Shop.png" width="800"/> | **Shop**<br/>If the user has enough coins collected, then he is able to trade these coins into more app usage time. Another option would be the "Learning Aid", if there are not enough coins available. The user also states his current mood here.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Settings.png" width="800"/> | **Settings**<br/>By now, there are two settings available. The first one is to set the fitness level of the user. Therefor three levels can be chosen - easy, normal, hard. Of course, the second setting is to select all the apps which should be blocked.
+<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Settings.png" width="800"/> | **Settings**<br/>By now, there are two settings available. The first one is to set the fitness level of the user. Therefore three levels can be chosen - easy, normal, hard. Of course, the second setting is to select all the apps - saved in a blacklist - which should be blocked.
 <img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Onboarding/banner.png" width="800"/> | **On-Boarding (Introduction)**<br/>The On-Boarding is an introduction for the user to get first information about the app and how to use it. The user will also be asked to grant the required permissions to run the app.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_About.png" width="800"/> | **About**<br/>The about view depicts the credit to the contributors.
+<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_About.png" width="800"/> | **About**<br/>The "About" view depicts the credit to the contributors.
 
 ### Prototype
 ![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
