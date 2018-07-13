@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
-import com.edu.uni.augsburg.uniatron.service.StepCountService;
+import com.edu.uni.augsburg.uniatron.service.StickyAppService;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 import com.rvalerio.fgchecker.AppChecker;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Fabio Hellmann
  */
-public final class AppUsageHandler extends BroadcastReceiver {
+public final class AppUsageDetector extends BroadcastReceiver {
 
     private static final int NOTIFICATION_ONE_MINUTE = 1;
     private static final int NOTIFICATION_FIVE_MINUTES = 5;
@@ -37,7 +37,7 @@ public final class AppUsageHandler extends BroadcastReceiver {
      *
      * @param context The context.
      */
-    private AppUsageHandler(@NonNull final Context context) {
+    private AppUsageDetector(@NonNull final Context context) {
         super();
         mModel = new AppUsageModel(context);
         mModel.addNotifyOnTimeUpSoonListeners(
@@ -56,10 +56,10 @@ public final class AppUsageHandler extends BroadcastReceiver {
         final String action = intent.getAction();
         if (Intent.ACTION_SCREEN_OFF.equals(action)) {
             stopAppChecker();
-            context.startService(new Intent(context, StepCountService.class));
+            context.startService(new Intent(context, StickyAppService.class));
         } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
             startAppChecker(context);
-            context.startService(new Intent(context, StepCountService.class));
+            context.startService(new Intent(context, StickyAppService.class));
         }
     }
 
@@ -117,8 +117,8 @@ public final class AppUsageHandler extends BroadcastReceiver {
      * @param context The context.
      * @return The handler.
      */
-    public static AppUsageHandler start(@NonNull final Context context) {
-        final AppUsageHandler handler = new AppUsageHandler(context);
+    public static AppUsageDetector start(@NonNull final Context context) {
+        final AppUsageDetector handler = new AppUsageDetector(context);
         final IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.SCREEN_ON");
         filter.addAction("android.intent.action.SCREEN_OFF");

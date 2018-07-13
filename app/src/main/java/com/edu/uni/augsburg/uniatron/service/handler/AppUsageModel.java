@@ -28,7 +28,7 @@ import java.util.Set;
 
 /**
  * The model is the connection between the {@link DataRepository}
- * and the {@link AppUsageHandler}.
+ * and the {@link AppUsageDetector}.
  *
  * @author Fabio Hellmann
  */

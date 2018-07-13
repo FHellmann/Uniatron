@@ -22,7 +22,6 @@ import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.StickyAppService;
-import com.edu.uni.augsburg.uniatron.service.StepCountService;
 import com.edu.uni.augsburg.uniatron.ui.about.AboutActivity;
 import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
@@ -81,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         startOnBoarding();
 
         NotificationChannels.setupChannels(this);
-        startService(new Intent(this, StepCountService.class));
         startService(new Intent(this, StickyAppService.class));
     }
 

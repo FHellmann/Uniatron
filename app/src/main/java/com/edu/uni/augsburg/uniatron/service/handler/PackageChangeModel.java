@@ -10,7 +10,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 /**
  * The model is the connection between the {@link DataRepository}
- * and the {@link PackageChangeHandler}.
+ * and the {@link PackageChangeDetector}.
  *
  * @author Fabio Hellmann
  */

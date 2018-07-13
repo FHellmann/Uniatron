@@ -18,10 +18,10 @@ import com.orhanobut.logger.Logger;
  *
  * @author Fabio Hellmann
  */
-public final class PackageChangeHandler extends BroadcastReceiver {
+public final class PackageChangeDetector extends BroadcastReceiver {
     private final PackageChangeModel mModel;
 
-    private PackageChangeHandler(@NonNull final Context context) {
+    private PackageChangeDetector(@NonNull final Context context) {
         super();
         mModel = new PackageChangeModel(context);
     }
@@ -85,8 +85,8 @@ public final class PackageChangeHandler extends BroadcastReceiver {
      * @param context  The context.
      * @return The handler.
      */
-    public static PackageChangeHandler start(@NonNull final Context context) {
-        final PackageChangeHandler handler = new PackageChangeHandler(context);
+    public static PackageChangeDetector start(@NonNull final Context context) {
+        final PackageChangeDetector handler = new PackageChangeDetector(context);
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);

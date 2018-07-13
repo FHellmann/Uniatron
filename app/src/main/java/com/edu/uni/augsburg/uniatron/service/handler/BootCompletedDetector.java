@@ -8,22 +8,17 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.service.StickyAppService;
-import com.edu.uni.augsburg.uniatron.service.StepCountService;
 
 /**
  * The BroadCastReceiver starts the StepCountService as soon as boot is completed.
  *
  * @author Leon Wöhrl
  */
-public class BootCompletedHandler extends BroadcastReceiver {
+public class BootCompletedDetector extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction())) {
-            startServices(
-                    context,
-                    StepCountService.class,
-                    StickyAppService.class
-            );
+            startServices(context, StickyAppService.class);
         }
     }
 

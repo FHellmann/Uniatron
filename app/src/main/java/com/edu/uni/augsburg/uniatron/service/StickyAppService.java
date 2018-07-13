@@ -6,8 +6,9 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.edu.uni.augsburg.uniatron.service.handler.AppUsageHandler;
-import com.edu.uni.augsburg.uniatron.service.handler.PackageChangeHandler;
+import com.edu.uni.augsburg.uniatron.service.handler.AppUsageDetector;
+import com.edu.uni.augsburg.uniatron.service.handler.PackageChangeDetector;
+import com.edu.uni.augsburg.uniatron.service.handler.StepCountDetector;
 
 /**
  * A sticky service for all the background tasks.
@@ -16,8 +17,9 @@ import com.edu.uni.augsburg.uniatron.service.handler.PackageChangeHandler;
  */
 public class StickyAppService extends Service {
 
-    private AppUsageHandler mAppUsageHandler;
-    private PackageChangeHandler mPackageAddedReceiver;
+    private AppUsageDetector mAppUsageDetector;
+    private PackageChangeDetector mPackageAddedReceiver;
+    private StepCountDetector mStepHandler;
 
     @Nullable
     @Override
@@ -34,15 +36,17 @@ public class StickyAppService extends Service {
      * @return the way the service is started
      */
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        mPackageAddedReceiver = PackageChangeHandler.start(this);
-        mAppUsageHandler = AppUsageHandler.start(this);
+        mPackageAddedReceiver = PackageChangeDetector.start(this);
+        mAppUsageDetector = AppUsageDetector.start(this);
+        mStepHandler = StepCountDetector.start(this);
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        mAppUsageHandler.destroy(this);
+        mAppUsageDetector.destroy(this);
         mPackageAddedReceiver.destroy(this);
+        mStepHandler.destroy();
         super.onDestroy();
     }
 }
