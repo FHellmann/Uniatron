@@ -1,7 +1,15 @@
 apply plugin: 'jacoco'
 
+jacoco {
+    toolVersion = '0.8.0'
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
-    onlyIf { System.env.'CI' }
+    //onlyIf { System.env.'CI' }
     reports {
         xml.enabled = true
         html.enabled = false
