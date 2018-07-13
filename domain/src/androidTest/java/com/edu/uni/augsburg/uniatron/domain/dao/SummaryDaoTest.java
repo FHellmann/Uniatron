@@ -8,8 +8,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.util.DatabaseUtil;
 import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
+import com.edu.uni.augsburg.uniatron.domain.util.DatabaseUtil;
 
 import org.junit.After;
 import org.junit.Before;

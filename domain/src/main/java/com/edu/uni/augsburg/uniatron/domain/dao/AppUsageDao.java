@@ -35,7 +35,7 @@ public interface AppUsageDao {
      * Load the app usage time of each app summed by the app name.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The app usage time by app.
      */
     @Query("SELECT 0 id, app_name, date('now') timestamp, "
@@ -50,7 +50,7 @@ public interface AppUsageDao {
      * Load the app usage in percent of each app summed by the app name.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The app usage percent by app.
      */
     @Query("SELECT 0 id, app_name, date('now') timestamp, "
@@ -67,8 +67,8 @@ public interface AppUsageDao {
      * Load the remaining app usage time.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
-     * @param filter The filter for observed apps.
+     * @param dateTo   The date to end searching.
+     * @param filter   The filter for observed apps.
      * @return The remaining app usage time.
      */
     @Query("SELECT (SELECT TOTAL(time_bonus) FROM TimeCreditEntity "
@@ -76,14 +76,14 @@ public interface AppUsageDao {
             + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) "
             + "AND app_name IN (:filter)")
     LiveData<Long> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
-                                                           Date dateTo,
-                                                           Set<String> filter);
+                                                        Date dateTo,
+                                                        Set<String> filter);
 
     /**
      * Get the total days for the specified date range.
      *
      * @param dateFrom The date to start counting.
-     * @param dateTo The date to end counting.
+     * @param dateTo   The date to end counting.
      * @return The total days.
      */
     @Query("SELECT timestamp FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "

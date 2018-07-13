@@ -36,7 +36,7 @@ public interface EmotionDao {
      * Load all emotions for a specified time range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The emotions.
      */
     @Query("SELECT * FROM EmotionEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo")
@@ -46,7 +46,7 @@ public interface EmotionDao {
      * Load the average emotion for a specified time range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The average emotion.
      */
     @Query("SELECT AVG(value) FROM EmotionEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo")

@@ -64,7 +64,7 @@ public final class DatabaseUtil {
     private static AppUsageEntity getAppUsage(Random random, int index) {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
         appUsageEntity.setTimestamp(getRandomDate(index));
-        appUsageEntity.setTime(random.nextInt(100));
+        appUsageEntity.setUsageTime(random.nextInt(100));
         appUsageEntity.setAppName(FAVORIT_APPS[random.nextInt(FAVORIT_APPS.length)]);
         return appUsageEntity;
     }
@@ -81,7 +81,7 @@ public final class DatabaseUtil {
 
         final TimeCredits timeCredits = TimeCredits.CREDIT_100;
 
-        timeCreditEntity.setTime(timeCredits.getTimeBonus());
+        timeCreditEntity.setTimeBonus(timeCredits.getTimeBonus());
         timeCreditEntity.setTimestamp(getRandomDate(index));
         timeCreditEntity.setStepCount(timeCredits.getStepCount());
 
@@ -97,7 +97,7 @@ public final class DatabaseUtil {
 
     private static Date getRandomDate(int index) {
         final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, -index%15);
+        calendar.add(Calendar.DATE, -index % 15);
 
         return calendar.getTime();
     }

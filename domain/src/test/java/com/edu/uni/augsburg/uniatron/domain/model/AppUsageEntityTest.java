@@ -62,14 +62,14 @@ public class AppUsageEntityTest {
     @Test
     public void getDefaultTime() {
         final AppUsageEntity entity = new AppUsageEntity();
-        assertThat(entity.getUsageTime(), is(0));
+        assertThat(entity.getUsageTime(), is(0L));
     }
 
     @Test
     public void setAndGetTime() {
         final AppUsageEntity entity = new AppUsageEntity();
-        final int expected = 10;
-        entity.setTime(expected);
+        final long expected = 10L;
+        entity.setUsageTime(expected);
         assertThat(entity.getUsageTime(), is(equalTo(expected)));
     }
 }

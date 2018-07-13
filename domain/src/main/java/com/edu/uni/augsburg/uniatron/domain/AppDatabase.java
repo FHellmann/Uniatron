@@ -15,7 +15,7 @@ import com.edu.uni.augsburg.uniatron.domain.dao.EmotionDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.SummaryDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
-import com.edu.uni.augsburg.uniatron.domain.migration.MigrationV1;
+import com.edu.uni.augsburg.uniatron.domain.migration.Migrations;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -85,7 +85,7 @@ public abstract class AppDatabase extends RoomDatabase {
      */
     public static AppDatabase create(@NonNull final Context context) {
         return Room.databaseBuilder(context, AppDatabase.class, "uniatron")
-                .addMigrations(new MigrationV1())
+                .addMigrations(Migrations.getAll())
                 .build();
     }
 }

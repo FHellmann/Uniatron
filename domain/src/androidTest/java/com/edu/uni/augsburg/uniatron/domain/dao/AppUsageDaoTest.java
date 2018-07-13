@@ -130,20 +130,20 @@ public class AppUsageDaoTest {
 
         final TimeCredits credits = TimeCredits.CREDIT_1000;
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(credits.getTimeBonus());
+        timeCreditEntity.setTimeBonus(credits.getTimeBonus());
         timeCreditEntity.setStepCount(credits.getStepCount());
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
 
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
-        final LiveData<Integer> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
+        final LiveData<Long> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
                 getMinTimeOfDate(date),
                 getMaxTimeOfDate(date),
                 filters
         );
 
-        final Integer liveDataValue = getLiveDataValue(liveData);
+        final Long liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue, is(credits.getTimeBonus() * 60 - test.getUsageTime()));
     }
@@ -152,7 +152,7 @@ public class AppUsageDaoTest {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
         appUsageEntity.setAppName(name);
         appUsageEntity.setTimestamp(date);
-        appUsageEntity.setTime(10);
+        appUsageEntity.setUsageTime(10);
         return appUsageEntity;
     }
 }

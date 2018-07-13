@@ -23,7 +23,7 @@ public interface SummaryDao {
      * Get the summary for each day of a specified date range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The summaries.
      */
     @Query("SELECT MAX(timestamp) as 'mTimestamp', "
@@ -43,7 +43,7 @@ public interface SummaryDao {
      * Get the summary for each day of a specified date range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The summaries.
      */
     @Query("SELECT MAX(timestamp) as 'mTimestamp', "
@@ -63,7 +63,7 @@ public interface SummaryDao {
      * Get the summary for each day of a specified date range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The summaries.
      */
     @Query("SELECT MAX(timestamp) as 'mTimestamp', "

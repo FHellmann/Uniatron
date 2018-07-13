@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
@@ -12,6 +13,7 @@ import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Date;
 
@@ -24,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+@RunWith(AndroidJUnit4.class)
 public class TimeCreditDaoTest {
     private AppDatabase mDb;
     private TimeCreditDao mDao;
@@ -59,23 +62,23 @@ public class TimeCreditDaoTest {
         mDao.add(createTestData(2));
 
         final Date date = getDate(1, 1, 2018);
-        final LiveData<Integer> data = mDao
+        final LiveData<Long> data = mDao
                 .loadTimeCredits(getMinTimeOfDate(date), getMaxTimeOfDate(date));
 
-        assertThat(getLiveDataValue(data), is(10));
+        assertThat(getLiveDataValue(data), is(10L));
     }
 
     @Test
     public void getLatestLearningAidActive() throws Exception {
         final TimeCreditEntity testData = new TimeCreditEntity();
         testData.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData.setTime(TimeCredits.CREDIT_LEARNING.getTimeBonus());
+        testData.setTimeBonus(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData.setTimestamp(new Date());
         mDao.add(testData);
         final TimeCreditEntity testData2 = new TimeCreditEntity();
         testData2.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTimeBonus());
+        testData2.setTimeBonus(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData2.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData2.setTimestamp(new Date());
         mDao.add(testData2);
@@ -88,7 +91,7 @@ public class TimeCreditDaoTest {
 
     private TimeCreditEntity createTestData(int month) {
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(5);
+        timeCreditEntity.setTimeBonus(5);
         timeCreditEntity.setTimestamp(getDate(1, month, 2018));
         return timeCreditEntity;
     }

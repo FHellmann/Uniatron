@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
@@ -12,6 +13,7 @@ import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Date;
 
@@ -23,6 +25,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+@RunWith(AndroidJUnit4.class)
 public class StepCountDaoTest {
     private AppDatabase mDb;
     private StepCountDao mDao;
@@ -77,7 +80,7 @@ public class StepCountDaoTest {
         TimeCreditEntity entry = new TimeCreditEntity();
         entry.setStepCount(count);
         entry.setTimestamp(date);
-        entry.setTime(2);
+        entry.setTimeBonus(2);
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
@@ -97,7 +100,7 @@ public class StepCountDaoTest {
         TimeCreditEntity entry = new TimeCreditEntity();
         entry.setStepCount(count);
         entry.setTimestamp(date);
-        entry.setTime(2);
+        entry.setTimeBonus(2);
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao

@@ -26,7 +26,7 @@ import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDat
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 public class EmotionDaoTest {

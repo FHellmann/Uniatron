@@ -33,7 +33,7 @@ public interface StepCountDao {
      * Load the step count for a specified date range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The step count.
      */
     @Query("SELECT TOTAL(step_count) FROM StepCountEntity "
@@ -44,7 +44,7 @@ public interface StepCountDao {
      * Load the remaining step count for a specified date range.
      *
      * @param dateFrom The date to start searching.
-     * @param dateTo The date to end searching.
+     * @param dateTo   The date to end searching.
      * @return The step count.
      */
     @Query("SELECT TOTAL(step_count) - (SELECT TOTAL(steps) FROM TimeCreditEntity "
