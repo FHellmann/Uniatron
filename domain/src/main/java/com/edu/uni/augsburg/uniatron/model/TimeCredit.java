@@ -28,7 +28,7 @@ public interface TimeCredit {
      *
      * @return The time in minutes.
      */
-    int getTime();
+    long getTimeBonus();
 
     /**
      * Get the step count.

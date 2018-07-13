@@ -35,5 +35,5 @@ public interface AppUsage {
      *
      * @return The usage time.
      */
-    int getTime();
+    long getUsageTime();
 }

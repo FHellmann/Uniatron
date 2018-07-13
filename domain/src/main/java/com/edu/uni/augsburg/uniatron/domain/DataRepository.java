@@ -65,7 +65,7 @@ public final class DataRepository {
                                               final double factor) {
         return LiveDataAsyncTask.execute(() -> {
             final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-            timeCreditEntity.setTime(timeCredit.getTime());
+            timeCreditEntity.setTimeBonus(timeCredit.getTimeBonus());
             timeCreditEntity.setStepCount((int) (timeCredit.getStepCount() * factor));
             timeCreditEntity.setTimestamp(new Date());
             timeCreditEntity.setType(timeCredit.getType());
@@ -87,10 +87,10 @@ public final class DataRepository {
                 data -> {
                     final long timePassed = data == null
                             ? 0 : System.currentTimeMillis() - data.getTime();
-                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedMinutes()
+                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedTime()
                             - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
                     if (timeLeft > 0
-                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedMinutes()) {
+                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedTime()) {
                         return new LearningAid(timePassed > 0, timeLeft);
                     }
                     return new LearningAid(false, 0);
@@ -103,7 +103,7 @@ public final class DataRepository {
      * @return The time credits value.
      */
     @NonNull
-    public LiveData<Integer> getTimeCreditsToday() {
+    public LiveData<Long> getTimeCreditsToday() {
         return getTimeCreditsByDate(new Date());
     }
 
@@ -114,7 +114,7 @@ public final class DataRepository {
      * @return The time credits value.
      */
     @NonNull
-    private LiveData<Integer> getTimeCreditsByDate(@NonNull final Date date) {
+    private LiveData<Long> getTimeCreditsByDate(@NonNull final Date date) {
         final Date dateFrom = getMinTimeOfDate(date);
         final Date dateTo = getMaxTimeOfDate(date);
         return mDatabase.timeCreditDao().loadTimeCredits(dateFrom, dateTo);
@@ -191,17 +191,17 @@ public final class DataRepository {
     /**
      * Add the usage time of an app.
      *
-     * @param appName The name of the app which was used.
-     * @param time    The time of usage.
+     * @param appName   The name of the app which was used.
+     * @param usageTime The time of usage.
      * @return The app usage data.
      */
     public LiveData<AppUsage> addAppUsage(@NonNull final String appName,
-                                          final int time) {
+                                          final long usageTime) {
         return LiveDataAsyncTask.execute(() -> {
             final AppUsageEntity appUsageEntity = new AppUsageEntity();
             appUsageEntity.setAppName(appName);
             appUsageEntity.setTimestamp(new Date());
-            appUsageEntity.setTime(time);
+            appUsageEntity.setUsageTime(usageTime);
             mDatabase.appUsageDao().add(appUsageEntity);
             return appUsageEntity;
         });
@@ -227,7 +227,7 @@ public final class DataRepository {
      * @return The app usage time.
      */
     @NonNull
-    public LiveData<Map<String, Integer>> getAppUsageTimeToday() {
+    public LiveData<Map<String, Long>> getAppUsageTimeToday() {
         final Date date = new Date();
         final Date dateFrom = getMinTimeOfDate(date);
         final Date dateTo = getMaxTimeOfDate(date);
@@ -242,14 +242,14 @@ public final class DataRepository {
      * @return The app usage time.
      */
     @NonNull
-    public LiveData<Map<String, Integer>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                                @NonNull final Date dateTo) {
+    public LiveData<Map<String, Long>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                             @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
                 appUsageList -> {
-                    final HashMap<String, Integer> map = new HashMap<>();
+                    final HashMap<String, Long> map = new HashMap<>();
                     for (final AppUsage usage : appUsageList) {
-                        map.put(usage.getAppName(), usage.getTime());
+                        map.put(usage.getAppName(), usage.getUsageTime());
                     }
                     return map;
                 });
@@ -282,7 +282,7 @@ public final class DataRepository {
                 appUsageList -> {
                     final HashMap<String, Double> map = new HashMap<>();
                     for (final AppUsage usage : appUsageList) {
-                        map.put(usage.getAppName(), usage.getTime() / 100.0);
+                        map.put(usage.getAppName(), usage.getUsageTime() / 100.0);
                     }
                     return map;
                 });
@@ -295,7 +295,7 @@ public final class DataRepository {
      * @return The remaining usage time.
      */
     @NonNull
-    public LiveData<Integer> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
+    public LiveData<Long> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
         final Date date = new Date();
         final Date dateFrom = getMinTimeOfDate(date);
         final Date dateTo = getMaxTimeOfDate(date);
@@ -311,9 +311,9 @@ public final class DataRepository {
      * @return The remaining usage time.
      */
     @NonNull
-    private LiveData<Integer> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                             @NonNull final Date dateTo,
-                                                             @NonNull final Set<String> filter) {
+    private LiveData<Long> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
+                                                          @NonNull final Date dateTo,
+                                                          @NonNull final Set<String> filter) {
         return mDatabase.appUsageDao()
                 .loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }

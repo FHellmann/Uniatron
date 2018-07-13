@@ -7,8 +7,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
-import com.edu.uni.augsburg.uniatron.service.BroadcastService;
+import com.edu.uni.augsburg.uniatron.service.StickyAppService;
 import com.edu.uni.augsburg.uniatron.service.StepCountService;
 
 /**
@@ -23,8 +22,7 @@ public class BootCompletedHandler extends BroadcastReceiver {
             startServices(
                     context,
                     StepCountService.class,
-                    BroadcastService.class,
-                    AppTrackingService.class
+                    StickyAppService.class
             );
         }
     }

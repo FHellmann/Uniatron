@@ -26,8 +26,8 @@ public class AppUsageEntity implements AppUsage {
     private String mAppName;
     @ColumnInfo(name = "timestamp")
     private Date mTimestamp;
-    @ColumnInfo(name = "usage_time_in_seconds")
-    private int mTime;
+    @ColumnInfo(name = "usage_time")
+    private long mUsageTime;
 
     public long getId() {
         return mId;
@@ -53,11 +53,11 @@ public class AppUsageEntity implements AppUsage {
         this.mTimestamp = (Date) timestamp.clone();
     }
 
-    public int getTime() {
-        return mTime;
+    public long getUsageTime() {
+        return mUsageTime;
     }
 
-    public void setTime(final int time) {
-        this.mTime = time;
+    public void setUsageTime(final long usageTime) {
+        this.mUsageTime = usageTime;
     }
 }

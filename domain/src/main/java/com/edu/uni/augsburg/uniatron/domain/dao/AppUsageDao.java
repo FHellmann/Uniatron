@@ -39,11 +39,11 @@ public interface AppUsageDao {
      * @return The app usage time by app.
      */
     @Query("SELECT 0 id, app_name, date('now') timestamp, "
-            + "TOTAL(usage_time_in_seconds) usage_time_in_seconds "
+            + "TOTAL(usage_time) usage_time "
             + "FROM AppUsageEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo "
             + "GROUP BY app_name "
-            + "ORDER BY TOTAL(usage_time_in_seconds) DESC")
+            + "ORDER BY TOTAL(usage_time) DESC")
     LiveData<List<AppUsageEntity>> loadAppUsageTime(Date dateFrom, Date dateTo);
 
     /**
@@ -54,13 +54,13 @@ public interface AppUsageDao {
      * @return The app usage percent by app.
      */
     @Query("SELECT 0 id, app_name, date('now') timestamp, "
-            + "(TOTAL(usage_time_in_seconds) * 100 / aue1.time) usage_time_in_seconds "
+            + "(TOTAL(usage_time) * 100 / aue1.time) usage_time "
             + "FROM AppUsageEntity, "
-            + "(SELECT TOTAL(usage_time_in_seconds) time FROM AppUsageEntity "
+            + "(SELECT TOTAL(usage_time) time FROM AppUsageEntity "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) aue1 "
             + "WHERE timestamp BETWEEN :dateFrom AND :dateTo "
             + "GROUP BY app_name "
-            + "ORDER BY TOTAL(usage_time_in_seconds) DESC")
+            + "ORDER BY TOTAL(usage_time) DESC")
     LiveData<List<AppUsageEntity>> loadAppUsagePercent(Date dateFrom, Date dateTo);
 
     /**
@@ -71,11 +71,11 @@ public interface AppUsageDao {
      * @param filter The filter for observed apps.
      * @return The remaining app usage time.
      */
-    @Query("SELECT (SELECT TOTAL(time_in_minutes * 60) FROM TimeCreditEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time_in_seconds) "
+    @Query("SELECT (SELECT TOTAL(time_bonus) FROM TimeCreditEntity "
+            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time) "
             + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) "
             + "AND app_name IN (:filter)")
-    LiveData<Integer> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
+    LiveData<Long> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
                                                            Date dateTo,
                                                            Set<String> filter);
 

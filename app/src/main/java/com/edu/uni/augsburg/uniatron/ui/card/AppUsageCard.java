@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,7 +45,7 @@ public class AppUsageCard implements CardViewHolder {
     public void addAll(@NonNull final List<AppUsageItem> data) {
         mAppUsageList.addAll(data);
         Collections.sort(mAppUsageList, (usage1, usage2) ->
-                Integer.compare(usage2.getApplicationUsage(), usage1.getApplicationUsage()));
+                Long.compare(usage2.getApplicationUsage(), usage1.getApplicationUsage()));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class AppUsageCard implements CardViewHolder {
         holder.mRecyclerView.setLayoutManager(layout);
         holder.mRecyclerView.setLayoutFrozen(true);
         holder.mRecyclerView.setAdapter(new AppUsageAdapter(context, mAppUsageList));
-        final int totalAppUsage = getTotalAppUsage();
+        final long totalAppUsage = TimeUnit.SECONDS.convert(getTotalAppUsage(), TimeUnit.MILLISECONDS);
         holder.mTextAppUsageTotal.setText(context.getString(R.string.time_in_minutes, totalAppUsage / 60, totalAppUsage % 60));
         holder.mButtonShowAll.setText(R.string.show_all);
     }
@@ -89,8 +90,8 @@ public class AppUsageCard implements CardViewHolder {
                 .inflate(R.layout.card_app_usage, viewGroup, false));
     }
 
-    private int getTotalAppUsage() {
-        return Stream.of(mAppUsageList).mapToInt(AppUsageItem::getApplicationUsage).sum();
+    private long getTotalAppUsage() {
+        return Stream.of(mAppUsageList).mapToLong(AppUsageItem::getApplicationUsage).sum();
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
@@ -154,7 +155,7 @@ public class AppUsageCard implements CardViewHolder {
 
             final String appLabel = item.getAppLabel();
             final Drawable appIcon = item.getAppIcon();
-            final int usageTime = item.getApplicationUsage();
+            final long usageTime = TimeUnit.SECONDS.convert(item.getApplicationUsage(), TimeUnit.MILLISECONDS);
             final double usageTimePercent = item.getApplicationUsagePercent();
 
             viewHolderListItem.mTextAppName.setText(appLabel);
@@ -196,7 +197,7 @@ public class AppUsageCard implements CardViewHolder {
     static final class AppUsageItem {
         private String mAppLabel;
         private Drawable mAppIcon;
-        private int mApplicationUsage;
+        private long mApplicationUsage;
         private double mApplicationUsagePercent;
 
         public void setAppLabel(final String appLabel) {
@@ -215,11 +216,11 @@ public class AppUsageCard implements CardViewHolder {
             return mAppIcon;
         }
 
-        public void setApplicationUsage(final int applicationUsage) {
+        public void setApplicationUsage(final long applicationUsage) {
             this.mApplicationUsage = applicationUsage;
         }
 
-        int getApplicationUsage() {
+        long getApplicationUsage() {
             return mApplicationUsage;
         }
 

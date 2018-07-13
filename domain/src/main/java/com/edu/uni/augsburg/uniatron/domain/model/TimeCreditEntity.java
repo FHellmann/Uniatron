@@ -24,8 +24,8 @@ public class TimeCreditEntity implements TimeCredit {
     private long mId;
     @ColumnInfo(name = "timestamp")
     private Date mTimestamp;
-    @ColumnInfo(name = "time_in_minutes")
-    private int mTime;
+    @ColumnInfo(name = "time_bonus")
+    private long mTimeBonus;
     @ColumnInfo(name = "steps")
     private int mStepCount;
     @ColumnInfo(name = "type")
@@ -47,12 +47,12 @@ public class TimeCreditEntity implements TimeCredit {
         this.mTimestamp = (Date) timestamp.clone();
     }
 
-    public int getTime() {
-        return mTime;
+    public long getTimeBonus() {
+        return mTimeBonus;
     }
 
-    public void setTime(final int time) {
-        this.mTime = time;
+    public void setTimeBonus(final long timeBonus) {
+        this.mTimeBonus = timeBonus;
     }
 
     public int getStepCount() {

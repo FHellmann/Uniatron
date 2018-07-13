@@ -13,7 +13,7 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
  *
  * @author Fabio Hellmann
  */
-public class AddBlacklistEntryService extends Service {
+public class NotificationReceiverService extends Service {
     @Nullable
     @Override
     public IBinder onBind(final Intent intent) {

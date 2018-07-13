@@ -82,20 +82,20 @@ public class DataRepositoryTest {
 
         final TimeCredit liveDataValue = TestUtils.getLiveDataValue(timeCredit);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.getTime(), is(timeCredits.getTime()));
+        assertThat(liveDataValue.getTimeBonus(), is(timeCredits.getTimeBonus()));
         assertThat(liveDataValue.getStepCount(), is(timeCredits.getStepCount()));
     }
 
     @Test
     public void getTimeCredits() throws InterruptedException {
-        final int value = 10;
-        final MutableLiveData<Integer> liveData = new MutableLiveData<>();
+        final long value = 10;
+        final MutableLiveData<Long> liveData = new MutableLiveData<>();
         liveData.setValue(value);
         when(timeCreditDao.loadTimeCredits(any(), any())).thenReturn(liveData);
 
-        final LiveData<Integer> timeCreditsToday = mRepository.getTimeCreditsToday();
+        final LiveData<Long> timeCreditsToday = mRepository.getTimeCreditsToday();
 
-        final Integer liveDataValue = TestUtils.getLiveDataValue(timeCreditsToday);
+        final Long liveDataValue = TestUtils.getLiveDataValue(timeCreditsToday);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue, is(value));
         verify(timeCreditDao, atLeastOnce()).loadTimeCredits(any(), any());
@@ -104,7 +104,7 @@ public class DataRepositoryTest {
     @Test
     public void getLatestLearningAidInactive() throws InterruptedException {
         final MutableLiveData<Date> liveData = new MutableLiveData<>();
-        liveData.setValue(new Date(System.currentTimeMillis() - TimeCredits.CREDIT_LEARNING.getBlockedMinutes() * 60 * 1000 - 1));
+        liveData.setValue(new Date(System.currentTimeMillis() - TimeCredits.CREDIT_LEARNING.getBlockedTime() * 60 * 1000 - 1));
         when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
 
         final LiveData<LearningAid> latestLearningAidDiff = mRepository.getLatestLearningAid();
@@ -181,12 +181,12 @@ public class DataRepositoryTest {
 
     @Test
     public void addAppUsage() throws InterruptedException {
-        final int value = 10;
+        final long value = 10;
         final LiveData<AppUsage> appUsage = mRepository.addAppUsage("test", value);
 
         final AppUsage liveDataValue = TestUtils.getLiveDataValue(appUsage);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.getTime(), is(value));
+        assertThat(liveDataValue.getUsageTime(), is(value));
     }
 
     @Test
@@ -209,14 +209,14 @@ public class DataRepositoryTest {
         final AppUsageEntity entity = new AppUsageEntity();
         entity.setId(0);
         entity.setTimestamp(new Date());
-        entity.setTime(10);
+        entity.setUsageTime(10);
         entity.setAppName("Test");
         list.add(entity);
 
         final AppUsageEntity entity1 = new AppUsageEntity();
         entity1.setId(1);
         entity1.setTimestamp(new Date());
-        entity1.setTime(7);
+        entity1.setUsageTime(7);
         entity1.setAppName("Test1");
         list.add(entity1);
 
@@ -224,12 +224,12 @@ public class DataRepositoryTest {
         liveData.setValue(list);
         when(appUsageDao.loadAppUsageTime(any(), any())).thenReturn(liveData);
 
-        final LiveData<Map<String, Integer>> data = mRepository.getAppUsageTimeToday();
+        final LiveData<Map<String, Long>> data = mRepository.getAppUsageTimeToday();
 
         assertThat(TestUtils.getLiveDataValue(data), is(notNullValue()));
         assertThat(TestUtils.getLiveDataValue(data).size(), is(2));
         assertThat(TestUtils.getLiveDataValue(data).keySet(), hasItems("Test", "Test1"));
-        assertThat(TestUtils.getLiveDataValue(data).values(), hasItems(10, 7));
+        assertThat(TestUtils.getLiveDataValue(data).values(), hasItems(10L, 7L));
         verify(appUsageDao, atLeastOnce()).loadAppUsageTime(any(), any());
     }
 
@@ -240,14 +240,14 @@ public class DataRepositoryTest {
         final AppUsageEntity entity = new AppUsageEntity();
         entity.setId(0);
         entity.setTimestamp(new Date());
-        entity.setTime(90);
+        entity.setUsageTime(90);
         entity.setAppName("Test");
         list.add(entity);
 
         final AppUsageEntity entity1 = new AppUsageEntity();
         entity1.setId(1);
         entity1.setTimestamp(new Date());
-        entity1.setTime(10);
+        entity1.setUsageTime(10);
         entity1.setAppName("Test1");
         list.add(entity1);
 
@@ -267,19 +267,19 @@ public class DataRepositoryTest {
 
     @Test
     public void getRemainingAppUsageTime() throws InterruptedException {
-        final int value = 10;
+        final long value = 10;
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
-        final MutableLiveData<Integer> liveData = new MutableLiveData<>();
+        final MutableLiveData<Long> liveData = new MutableLiveData<>();
         liveData.setValue(value);
         when(appUsageDao.loadRemainingAppUsageTimeByBlacklist(any(), any(), any()))
                 .thenReturn(liveData);
 
-        final LiveData<Integer> data = mRepository.getRemainingAppUsageTimeToday(filters);
+        final LiveData<Long> data = mRepository.getRemainingAppUsageTimeToday(filters);
 
-        final Integer liveDataValue = TestUtils.getLiveDataValue(data);
+        final Long liveDataValue = TestUtils.getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(10));
+        assertThat(liveDataValue, is(value));
     }
 
     @Test

@@ -22,8 +22,8 @@ import java.util.Date;
  * @author Fabio Hellmann
  */
 public class TimeAccountViewModel extends AndroidViewModel implements CardViewModel {
-    private final DateCache<Integer> mDateCache;
-    private final MediatorLiveData<Integer> mRemainingAppUsageTime;
+    private final DateCache<Long> mDateCache;
+    private final MediatorLiveData<Long> mRemainingAppUsageTime;
     private final DataRepository mRepository;
     private final SharedPreferencesHandler mPrefHandler;
     private boolean mIsVisible;
@@ -45,7 +45,7 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
     @Override
     public void setup(final Date date, final int calendarType) {
         mIsVisible = DateUtil.isSameDate(date, new Date());
-        final LiveData<Integer> liveData = mRepository
+        final LiveData<Long> liveData = mRepository
                 .getRemainingAppUsageTimeToday(mPrefHandler.getAppsBlacklist());
         mDateCache.clearAndRegister(mRemainingAppUsageTime, liveData);
         mRemainingAppUsageTime.addSource(

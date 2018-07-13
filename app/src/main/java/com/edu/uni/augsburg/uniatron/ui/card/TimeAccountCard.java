@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
+import java.util.concurrent.TimeUnit;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -22,7 +24,7 @@ import butterknife.ButterKnife;
 public class TimeAccountCard implements CardViewHolder {
 
     private static final int TYPE = 1;
-    private int mTimeLeft;
+    private long mTimeLeft;
     private boolean mVisible;
 
     /**
@@ -30,7 +32,7 @@ public class TimeAccountCard implements CardViewHolder {
      *
      * @param timeLeft The time left.
      */
-    public void setTimeLeft(final int timeLeft) {
+    public void setTimeLeft(final long timeLeft) {
         this.mTimeLeft = timeLeft;
     }
 
@@ -54,8 +56,11 @@ public class TimeAccountCard implements CardViewHolder {
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
         final ViewHolder holder = (ViewHolder) viewHolder;
+
+        final long time = TimeUnit.SECONDS.convert(mTimeLeft, TimeUnit.MILLISECONDS);
+
         holder.mTextTimeLeft.setText(context
-                .getString(R.string.time_account_desc, mTimeLeft / 60, Math.abs(mTimeLeft % 60)));
+                .getString(R.string.time_account_desc, time / 60, Math.abs(time % 60)));
     }
 
     @Override

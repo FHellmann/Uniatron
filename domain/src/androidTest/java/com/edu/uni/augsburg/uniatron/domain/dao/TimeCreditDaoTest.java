@@ -69,13 +69,13 @@ public class TimeCreditDaoTest {
     public void getLatestLearningAidActive() throws Exception {
         final TimeCreditEntity testData = new TimeCreditEntity();
         testData.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData.setTime(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData.setTimestamp(new Date());
         mDao.add(testData);
         final TimeCreditEntity testData2 = new TimeCreditEntity();
         testData2.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData2.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData2.setTimestamp(new Date());
         mDao.add(testData2);

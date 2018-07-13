@@ -42,7 +42,7 @@ public class TimeCreditsTest {
 
     @Test
     public void getTime() {
-        assertThat(mTimeCredits.getTime() > 0, is(true));
+        assertThat(mTimeCredits.getTimeBonus() > 0, is(true));
     }
 
     @Test
@@ -52,6 +52,6 @@ public class TimeCreditsTest {
 
     @Test
     public void getBlockedMinutes() {
-        assertThat(mTimeCredits.getBlockedMinutes() >= 0, is(true));
+        assertThat(mTimeCredits.getBlockedTime() >= 0, is(true));
     }
 }

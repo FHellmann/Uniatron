@@ -88,9 +88,9 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName2)));
         assertThat(liveDataValue.get(2).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getTime(), is(30));
-        assertThat(liveDataValue.get(1).getTime(), is(20));
-        assertThat(liveDataValue.get(2).getTime(), is(10));
+        assertThat(liveDataValue.get(0).getUsageTime(), is(30));
+        assertThat(liveDataValue.get(1).getUsageTime(), is(20));
+        assertThat(liveDataValue.get(2).getUsageTime(), is(10));
     }
 
     @Test
@@ -112,8 +112,8 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.isEmpty(), is(false));
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getTime(), is(75));
-        assertThat(liveDataValue.get(1).getTime(), is(25));
+        assertThat(liveDataValue.get(0).getUsageTime(), is(75));
+        assertThat(liveDataValue.get(1).getUsageTime(), is(25));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class AppUsageDaoTest {
 
         final TimeCredits credits = TimeCredits.CREDIT_1000;
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(credits.getTime());
+        timeCreditEntity.setTime(credits.getTimeBonus());
         timeCreditEntity.setStepCount(credits.getStepCount());
         timeCreditEntity.setTimestamp(date);
         mDb.timeCreditDao().add(timeCreditEntity);
@@ -145,7 +145,7 @@ public class AppUsageDaoTest {
 
         final Integer liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(credits.getTime() * 60 - test.getTime()));
+        assertThat(liveDataValue, is(credits.getTimeBonus() * 60 - test.getUsageTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {

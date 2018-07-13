@@ -5,12 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
 import com.orhanobut.logger.Logger;
@@ -20,7 +18,14 @@ import com.orhanobut.logger.Logger;
  *
  * @author Fabio Hellmann
  */
-public class PackageAddedHandler extends BroadcastReceiver {
+public final class PackageChangeHandler extends BroadcastReceiver {
+    private final PackageChangeModel mModel;
+
+    private PackageChangeHandler(@NonNull final Context context) {
+        super();
+        mModel = new PackageChangeModel(context);
+    }
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
@@ -28,50 +33,30 @@ public class PackageAddedHandler extends BroadcastReceiver {
                 Logger.d("Package updated (added): " + getPackageName(intent));
             } else {
                 Logger.d("Package added: " + getPackageName(intent));
-                postNotification(context, intent);
+                askUserToAddBlacklistEntry(context, getPackageName(intent));
             }
         } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
             if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
                 Logger.d("Package updated (removed): " + getPackageName(intent));
             } else {
                 Logger.d("Package removed: " + getPackageName(intent));
-                removePackageFromBlacklist(context, intent);
+                mModel.removeBlacklistEntry(getPackageName(intent));
             }
         }
     }
 
-    private void postNotification(final Context context, final Intent intent) {
+    private void askUserToAddBlacklistEntry(@NonNull final Context context,
+                                  @NonNull final String packageName) {
         final AppNotificationBuilder builder = new PackageAddedNotificationBuilder(
                 context,
-                getPackageName(intent),
-                getLastInstalledAppLabel(context, intent)
+                packageName,
+                mModel.getAppLabel(context, packageName)
         );
 
         final Notification notification = builder.build();
         final int notificationId = builder.getId();
 
         NotificationManagerCompat.from(context).notify(notificationId, notification);
-    }
-
-    private void removePackageFromBlacklist(final Context context, final Intent intent) {
-        final SharedPreferencesHandler handler = MainApplication.
-                getSharedPreferencesHandler(context);
-        handler.removeAppFromBlacklist(getPackageName(intent));
-    }
-
-    private String getLastInstalledAppLabel(final Context context, final Intent intent) {
-        final PackageManager packageManager = context.getPackageManager();
-        final String addedPackageName = getPackageName(intent);
-        try {
-            return packageManager.getApplicationLabel(
-                    packageManager.getApplicationInfo(
-                            addedPackageName,
-                            0
-                    )).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new IllegalStateException("Unable to find the added package '"
-                    + addedPackageName + "'", e);
-        }
     }
 
     private String getPackageName(final Intent intent) {
@@ -86,15 +71,27 @@ public class PackageAddedHandler extends BroadcastReceiver {
     }
 
     /**
-     * Get the intent filter for this broadcast receiver.
+     * Destroys the handler.
      *
-     * @return The intent filter.
+     * @param context The context.
      */
-    public static IntentFilter getIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        intentFilter.addDataScheme("package");
-        return intentFilter;
+    public void destroy(@NonNull final Context context) {
+        context.unregisterReceiver(this);
+    }
+
+    /**
+     * Starts the handler.
+     *
+     * @param context  The context.
+     * @return The handler.
+     */
+    public static PackageChangeHandler start(@NonNull final Context context) {
+        final PackageChangeHandler handler = new PackageChangeHandler(context);
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        context.registerReceiver(handler, filter);
+        return handler;
     }
 }

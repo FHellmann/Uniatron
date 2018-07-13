@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
  * @author Fabio Hellmann
  */
 public class AppUsageViewModel extends AndroidViewModel implements CardViewModel {
-    private final DateCache<Map<String, Integer>> mDateCache;
-    private final MediatorLiveData<Map<String, Integer>> mAppUsages;
+    private final DateCache<Map<String, Long>> mDateCache;
+    private final MediatorLiveData<Map<String, Long>> mAppUsages;
     private final DataRepository mRepository;
 
     /**
@@ -50,7 +50,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        final LiveData<Map<String, Integer>> data = mRepository.getAppUsageTimeByDate(
+        final LiveData<Map<String, Long>> data = mRepository.getAppUsageTimeByDate(
                 mDateCache.getDateFrom(date, calendarType),
                 mDateCache.getDateTo(date, calendarType)
         );
@@ -74,7 +74,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
                     if (data != null && !data.isEmpty()) {
                         final AppUsageCard card = new AppUsageCard();
 
-                        final int usageTimeSum = Stream.of(data).mapToInt(Map.Entry::getValue).sum();
+                        final long usageTimeSum = Stream.of(data).mapToLong(Map.Entry::getValue).sum();
                         final ExecutorService service = Executors.newCachedThreadPool();
 
                         final List<AppUsageCard.AppUsageItem> appUsageItems = Stream.of(data)

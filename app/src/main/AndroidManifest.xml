@@ -74,8 +74,7 @@
         </receiver>
 
         <service android:name=".service.StepCountService" />
-        <service android:name=".service.BroadcastService" />
-        <service android:name=".service.AddBlacklistEntryService" />
-        <service android:name=".service.AppTrackingService" />
+        <service android:name=".service.NotificationReceiverService" />
+        <service android:name=".service.StickyAppService" />
     </application>
 </manifest>

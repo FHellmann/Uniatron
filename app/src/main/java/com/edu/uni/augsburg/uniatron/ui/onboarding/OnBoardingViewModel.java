@@ -8,6 +8,8 @@ import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * The {@link OnBoardingViewModel} provides the data for
  * the {@link OnBoardingActivity}.
@@ -40,7 +42,7 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public void addIntroBonusIfAvailable(@NonNull final String packageName) {
         if (mSharedPrefsHandler.isIntroBonusEligible()) {
             mSharedPrefsHandler.setIntroBonusGranted();
-            mDataRepository.addAppUsage(packageName, 60);
+            mDataRepository.addAppUsage(packageName, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
             mDataRepository.addStepCount(STEP_BONUS);
         }
     }

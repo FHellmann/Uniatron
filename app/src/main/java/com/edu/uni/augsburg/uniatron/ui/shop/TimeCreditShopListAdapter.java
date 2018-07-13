@@ -15,6 +15,7 @@ import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 import com.lid.lib.LabelTextView;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +44,7 @@ public class TimeCreditShopListAdapter extends
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent,
-                                                                final int viewType) {
+                                         final int viewType) {
         return new ViewHolder(getViewByType(parent, viewType));
     }
 
@@ -61,8 +62,10 @@ public class TimeCreditShopListAdapter extends
     public void onBindViewHolder(@NonNull final ViewHolder holder,
                                  final int position) {
         final TimeCredits timeCredits = getTimeCreditList().get(position);
-        holder.mTextViewTradeOffer.setText(
-                mContext.getString(R.string.minutes_short, timeCredits.getTime()));
+        holder.mTextViewTradeOffer.setText(mContext.getString(
+                R.string.minutes_short,
+                TimeUnit.MINUTES.convert(timeCredits.getTimeBonus(), TimeUnit.MILLISECONDS)
+        ));
         holder.mTextViewTradeOffer.setOnClickListener(view -> {
             mModel.addToShoppingCart(timeCredits);
             final int color = mContext.getResources().getColor(R.color.secondaryLightColor);
@@ -74,8 +77,10 @@ public class TimeCreditShopListAdapter extends
         });
 
         if (timeCredits == TimeCredits.CREDIT_LEARNING) {
-            holder.mTextViewTradeOffer.setLabelText(
-                    mContext.getString(R.string.minutes_short, timeCredits.getBlockedMinutes()));
+            holder.mTextViewTradeOffer.setLabelText(mContext.getString(
+                    R.string.minutes_short,
+                    TimeUnit.MINUTES.convert(timeCredits.getBlockedTime(), TimeUnit.MILLISECONDS)
+            ));
         } else {
             final int coins = (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount());
             holder.mTextViewTradeOffer.setLabelText(mContext.getString(R.string.coin_offer, coins));

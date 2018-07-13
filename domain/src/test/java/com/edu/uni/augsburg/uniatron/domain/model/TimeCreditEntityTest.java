@@ -44,7 +44,7 @@ public class TimeCreditEntityTest {
     @Test
     public void getDefaultTime() {
         final TimeCreditEntity entity = new TimeCreditEntity();
-        assertThat(entity.getTime(), is(0));
+        assertThat(entity.getTimeBonus(), is(0));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TimeCreditEntityTest {
         final TimeCreditEntity entity = new TimeCreditEntity();
         final int expected = 10;
         entity.setTime(expected);
-        assertThat(entity.getTime(), is(equalTo(expected)));
+        assertThat(entity.getTimeBonus(), is(equalTo(expected)));
     }
 
     @Test
