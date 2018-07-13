@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.IntStream;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 
@@ -99,7 +100,7 @@ public final class StepCountDetector {
             // ok
         }
 
-        private void detectPeak(final float[] values) {
+        private void detectPeak(final float... values) {
             final float velocityAvg = getVelocityAvg(values);
             if (isChangedDirection(Float.compare(velocityAvg, mLastValue))) {
                 // Direction changed
@@ -129,12 +130,10 @@ public final class StepCountDetector {
             return changedDirection;
         }
 
-        private float getVelocityAvg(final float[] values) {
-            float velocitySum = 0;
-            for (float value : values) {
-                velocitySum += Y_OFFSET + value * SCALE;
-            }
-            return velocitySum / values.length;
+        private float getVelocityAvg(final float... values) {
+            return (float) ((IntStream.range(0, values.length)
+                    .mapToDouble(index -> values[index])
+                    .sum() + Y_OFFSET * values.length * SCALE) / values.length);
         }
 
         private enum Match {
