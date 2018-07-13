@@ -1,12 +1,14 @@
 package com.edu.uni.augsburg.uniatron.ui.util;
 
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 import com.rvalerio.fgchecker.Utils;
 
@@ -37,16 +39,57 @@ public final class PermissionUtil {
      * @param context The context.
      */
     public static void requestIgnoreBatterOptimization(@NonNull final Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkBatteryOptimized(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && needBatteryWhitelistPermission(context)) {
             context.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private static boolean checkBatteryOptimized(@NonNull final Context context) {
-        final PowerManager powerManager = (PowerManager) context
-                .getSystemService(Context.POWER_SERVICE);
-        final String packageName = context.getApplicationContext().getPackageName();
-        return powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName);
+    /**
+     * Checks if this app is whitelisted in the battery optimization settings.
+     *
+     * @param context The context.
+     * @return true if we need to be added to the battery optimization whitelist.
+     */
+    public static boolean needBatteryWhitelistPermission(@NonNull final Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            if (powerManager != null) {
+                return !powerManager
+                        .isIgnoringBatteryOptimizations(context.getPackageName());
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if usage access is needed or has been granted.
+     *
+     * @param context The context.
+     * @return true if access still needs to be granted.
+     */
+    public static boolean needUsageAccessPermission(@NonNull final Context context) {
+        ApplicationInfo applicationInfo;
+        PackageManager packageManager;
+        AppOpsManager appOpsManager;
+        int mode;
+        try {
+            appOpsManager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // no way to find out. assume we need permission
+                return true;
+            } else {
+                packageManager = context.getPackageManager();
+                applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);
+                mode = appOpsManager.checkOpNoThrow(
+                        AppOpsManager.OPSTR_GET_USAGE_STATS,
+                        applicationInfo.uid,
+                        applicationInfo.packageName
+                );
+            }
+            return mode != AppOpsManager.MODE_ALLOWED;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            return true;
+        }
     }
 }

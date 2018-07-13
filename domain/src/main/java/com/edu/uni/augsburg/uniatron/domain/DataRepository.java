@@ -1,7 +1,6 @@
 package com.edu.uni.augsburg.uniatron.domain;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
@@ -14,7 +13,7 @@ import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.AsyncTaskWrapper;
+import com.edu.uni.augsburg.uniatron.domain.util.LiveDataAsyncTask;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
@@ -64,20 +63,15 @@ public final class DataRepository {
      */
     public LiveData<TimeCredit> addTimeCredit(@NonNull final TimeCredit timeCredit,
                                               final double factor) {
-        final MutableLiveData<TimeCredit> observable = new MutableLiveData<>();
-        new AsyncTaskWrapper<>(
-                () -> {
-                    final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-                    timeCreditEntity.setTime(timeCredit.getTime());
-                    timeCreditEntity.setStepCount((int) (timeCredit.getStepCount() * factor));
-                    timeCreditEntity.setTimestamp(new Date());
-                    timeCreditEntity.setType(timeCredit.getType());
-                    mDatabase.timeCreditDao().add(timeCreditEntity);
-                    return timeCreditEntity;
-                },
-                observable::setValue
-        ).execute();
-        return observable;
+        return LiveDataAsyncTask.execute(() -> {
+            final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
+            timeCreditEntity.setTime(timeCredit.getTime());
+            timeCreditEntity.setStepCount((int) (timeCredit.getStepCount() * factor));
+            timeCreditEntity.setTimestamp(new Date());
+            timeCreditEntity.setType(timeCredit.getType());
+            mDatabase.timeCreditDao().add(timeCreditEntity);
+            return timeCreditEntity;
+        });
     }
 
     /**
@@ -133,18 +127,13 @@ public final class DataRepository {
      * @return The step count.
      */
     public LiveData<StepCount> addStepCount(final int stepCount) {
-        final MutableLiveData<StepCount> observable = new MutableLiveData<>();
-        new AsyncTaskWrapper<>(
-                () -> {
-                    final StepCountEntity stepCountEntity = new StepCountEntity();
-                    stepCountEntity.setStepCount(stepCount);
-                    stepCountEntity.setTimestamp(new Date());
-                    mDatabase.stepCountDao().add(stepCountEntity);
-                    return stepCountEntity;
-                },
-                observable::setValue
-        ).execute();
-        return observable;
+        return LiveDataAsyncTask.execute(() -> {
+            final StepCountEntity stepCountEntity = new StepCountEntity();
+            stepCountEntity.setStepCount(stepCount);
+            stepCountEntity.setTimestamp(new Date());
+            mDatabase.stepCountDao().add(stepCountEntity);
+            return stepCountEntity;
+        });
     }
 
     /**
@@ -208,19 +197,14 @@ public final class DataRepository {
      */
     public LiveData<AppUsage> addAppUsage(@NonNull final String appName,
                                           final int time) {
-        final MutableLiveData<AppUsage> observable = new MutableLiveData<>();
-        new AsyncTaskWrapper<>(
-                () -> {
-                    final AppUsageEntity appUsageEntity = new AppUsageEntity();
-                    appUsageEntity.setAppName(appName);
-                    appUsageEntity.setTimestamp(new Date());
-                    appUsageEntity.setTime(time);
-                    mDatabase.appUsageDao().add(appUsageEntity);
-                    return appUsageEntity;
-                },
-                observable::setValue
-        ).execute();
-        return observable;
+        return LiveDataAsyncTask.execute(() -> {
+            final AppUsageEntity appUsageEntity = new AppUsageEntity();
+            appUsageEntity.setAppName(appName);
+            appUsageEntity.setTimestamp(new Date());
+            appUsageEntity.setTime(time);
+            mDatabase.appUsageDao().add(appUsageEntity);
+            return appUsageEntity;
+        });
     }
 
     /**
@@ -342,18 +326,13 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Emotion> addEmotion(@NonNull final Emotions emotions) {
-        final MutableLiveData<Emotion> observable = new MutableLiveData<>();
-        new AsyncTaskWrapper<>(
-                () -> {
-                    final EmotionEntity emotionEntity = new EmotionEntity();
-                    emotionEntity.setTimestamp(new Date());
-                    emotionEntity.setValue(emotions);
-                    mDatabase.emotionDao().add(emotionEntity);
-                    return emotionEntity;
-                },
-                observable::setValue
-        ).execute();
-        return observable;
+        return LiveDataAsyncTask.execute(() -> {
+            final EmotionEntity emotionEntity = new EmotionEntity();
+            emotionEntity.setTimestamp(new Date());
+            emotionEntity.setValue(emotions);
+            mDatabase.emotionDao().add(emotionEntity);
+            return emotionEntity;
+        });
     }
 
     /**

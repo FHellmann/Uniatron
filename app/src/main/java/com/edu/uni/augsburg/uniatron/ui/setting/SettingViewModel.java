@@ -7,6 +7,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -28,7 +29,7 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-class SettingViewModel extends AndroidViewModel {
+public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<Map<String, String>> mInstalledApps;
     private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
     private final SharedPreferencesHandler mHandler;
@@ -38,7 +39,7 @@ class SettingViewModel extends AndroidViewModel {
      *
      * @param application The application.
      */
-    SettingViewModel(@NonNull final Application application) {
+    public SettingViewModel(@NonNull final Application application) {
         super(application);
 
         mHandler = MainApplication.getSharedPreferencesHandler(application);
@@ -81,6 +82,7 @@ class SettingViewModel extends AndroidViewModel {
                     ))
                     .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
                             | ApplicationInfo.FLAG_SYSTEM)) == 0)
+                    .filter(item -> !item.packageName.equals(getDefaultLauncherPackageName()))
                     .collect(Collectors.toMap(
                             key -> key.packageName,
                             value -> packageManager.getApplicationLabel(value).toString()
@@ -104,5 +106,13 @@ class SettingViewModel extends AndroidViewModel {
                             LinkedHashMap::new
                     ));
         }
+    }
+
+    private String getDefaultLauncherPackageName() {
+        final PackageManager localPackageManager = getApplication().getPackageManager();
+        final Intent intent = new Intent("android.intent.action.MAIN");
+        intent.addCategory("android.intent.category.HOME");
+        return localPackageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                .activityInfo.packageName;
     }
 }

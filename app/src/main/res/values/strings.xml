@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">UNIAtron</string>
+    <string name="app_icon_description">App Icon</string>
     <string name="settings">Settings</string>
     <string name="time_credit_shop_title">Time Credit Shop</string>
     <string name="minutes_short">%1$d min</string>
@@ -24,10 +25,25 @@
     <string name="card_summary_title">Summary</string>
     <string name="app_usage">App usage</string>
     <string name="app_usage_time">Usage time: %1$d:%2$02d min</string>
+    <string name="onboarding_btn_whitelist">Whitelist</string>
+    <string name="onboarding_btn_grant">Grant</string>
+    <string name="onboarding_btn_blacklist">Choose apps</string>
+    <string name="onboarding_intro_description">Keep an eye on your health and productivity</string>
+    <string name="onboarding_app_usage_title">App usage</string>
+    <string name="onboarding_app_usage_description">We need your permission to detect and display your most used apps</string>
+    <string name="onboarding_app_usage_granted_description">We detect and display your most used apps</string>
+    <string name="onboarding_coinbag">Your steps become coins</string>
+    <string name="onboarding_coinbag_description">Use them in the shop!\n\nTo make sure we don\'t miss any steps, you need to whitelist UNIAtron from system battery management. Select \'All Apps\' to find UNIAtron and disable the setting</string>
+    <string name="onboarding_coinbag_granted_description">Use them in the shop!</string>
+    <string name="onboarding_shop_title">Shop</string>
+    <string name="onboarding_shop_description">Visit the shop to trade your collected coins for additional app time\n\nWe will give you a bonus so you can try it out after the intro!</string>
+    <string name="onboarding_blacklist_title">Almost done</string>
+    <string name="onboarding_blacklist_description">Add apps to your blacklist\nThey will be blocked when your time runs out\n\nYou can always change these settings later</string>
+    <string name="onboarding_btn_shop">Awesome</string>
     <string name="show_all">Show all</string>
     <string name="show_only_top_five">Show only top 5</string>
     <string name="time_in_minutes">%1$d:%2$02d minutes</string>
-    <string name="card_summary_steps">You walked %1$d steps and felt %2$s during this day.</string>
+    <string name="card_summary_steps">You walked %1$d steps and felt %2$s during this period.</string>
     <string name="total">Total</string>
     <string name="emotion_angry">angry</string>
     <string name="emotion_sad">sad</string>
