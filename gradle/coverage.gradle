@@ -11,7 +11,7 @@ tasks.coveralls {
 }
 
 task jacocoRootReport(type: JacocoReport, dependsOn: ['app:jacocoTestReport', 'domain:jacocoTestReport']) {
-    //onlyIf { System.env.'CI' }
+    onlyIf { System.env.'CI' }
     reports {
         xml.enabled = true
         html.enabled = false
