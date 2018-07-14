@@ -103,16 +103,6 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     }
 
     /**
-     * Check whether the time credit is already in the shopping cart or not.
-     *
-     * @param timeCredits The time credit to check.
-     * @return <code>true</code> if the time credit is in the shopping cart.
-     */
-    public boolean isInShoppingCart(@NonNull final TimeCredits timeCredits) {
-        return mShoppingCart.contains(timeCredits);
-    }
-
-    /**
      * Set the emotion of the user.
      *
      * @param emotion the user emotion.

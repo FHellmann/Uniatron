@@ -13,7 +13,7 @@ import com.annimon.stream.function.Function;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
-import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
+import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -179,8 +179,8 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public boolean isIntroNeeded(@NonNull final Context context) {
         return mSharedPrefsHandler.isFirstStart()
-                || PermissionUtil.needBatteryWhitelistPermission(context)
-                || PermissionUtil.needUsageAccessPermission(context);
+                || Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(context)
+                || Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(context);
     }
 
     /**

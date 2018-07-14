@@ -75,15 +75,18 @@ public class TimeCreditShopListAdapter extends
             final int color = mContext.getResources().getColor(android.R.color.transparent);
             holder.mTextViewTradeOffer.setBackgroundColor(color);
         });
+        holder.mTextViewTradeOffer.setLabelText(getTradeOffer(timeCredits));
+    }
 
+    private String getTradeOffer(@NonNull final TimeCredits timeCredits) {
         if (timeCredits == TimeCredits.CREDIT_LEARNING) {
-            holder.mTextViewTradeOffer.setLabelText(mContext.getString(
+            return mContext.getString(
                     R.string.minutes_short,
                     TimeUnit.MINUTES.convert(timeCredits.getBlockedTime(), TimeUnit.MILLISECONDS)
-            ));
+            );
         } else {
             final int coins = (int) (mPrefHandler.getStepsFactor() * timeCredits.getStepCount());
-            holder.mTextViewTradeOffer.setLabelText(mContext.getString(R.string.coin_offer, coins));
+            return mContext.getString(R.string.coin_offer, coins);
         }
     }
 
