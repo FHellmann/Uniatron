@@ -13,6 +13,7 @@ import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.util.LiveDataAsyncTask;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
@@ -32,9 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 
 /**
  * The data repository wraps the database/service interaction.
@@ -115,8 +113,8 @@ public final class DataRepository {
      */
     @NonNull
     private LiveData<Long> getTimeCreditsByDate(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return mDatabase.timeCreditDao().loadTimeCredits(dateFrom, dateTo);
     }
 
@@ -154,8 +152,8 @@ public final class DataRepository {
      */
     @NonNull
     private LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return mDatabase.stepCountDao().loadStepCounts(dateFrom, dateTo);
     }
 
@@ -167,8 +165,8 @@ public final class DataRepository {
     @NonNull
     public LiveData<Integer> getRemainingStepCountsToday() {
         final Date date = new Date();
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return getRemainingStepCountsByDate(dateFrom, dateTo);
     }
 
@@ -216,8 +214,8 @@ public final class DataRepository {
     public LiveData<Date> getMinDate() {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.set(YEAR_1990, 0, 1);
-        final Date dateFrom = getMinTimeOfDate(calendar.getTime());
-        final Date dateTo = getMaxTimeOfDate(new Date());
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(calendar.getTime());
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(new Date());
         return mDatabase.appUsageDao().getMinDate(dateFrom, dateTo);
     }
 
@@ -229,8 +227,8 @@ public final class DataRepository {
     @NonNull
     public LiveData<Map<String, Long>> getAppUsageTimeToday() {
         final Date date = new Date();
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return getAppUsageTimeByDate(dateFrom, dateTo);
     }
 
@@ -263,8 +261,8 @@ public final class DataRepository {
     @NonNull
     public LiveData<Map<String, Double>> getAppUsagePercentToday() {
         final Date date = new Date();
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return getAppUsagePercentByDate(dateFrom, dateTo);
     }
 
@@ -297,8 +295,8 @@ public final class DataRepository {
     @NonNull
     public LiveData<Long> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
         final Date date = new Date();
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return getRemainingAppUsageTimeByDate(dateFrom, dateTo, filter);
     }
 
@@ -342,8 +340,8 @@ public final class DataRepository {
      * @return The emotions.
      */
     public LiveData<List<Emotion>> getAllEmotions(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAll(dateFrom, dateTo),
                 data -> {
@@ -363,8 +361,8 @@ public final class DataRepository {
      * @return The average emotion for a date.
      */
     public LiveData<Emotions> getAverageEmotion(@NonNull final Date date) {
-        final Date dateFrom = getMinTimeOfDate(date);
-        final Date dateTo = getMaxTimeOfDate(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
+        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
         return Transformations.map(
                 mDatabase.emotionDao().getAverageEmotion(dateFrom, dateTo),
                 data -> data == null ? Emotions.NEUTRAL : Emotions.getAverage(data)
@@ -411,10 +409,8 @@ public final class DataRepository {
                                                @NonNull final Date dateTo,
                                                @NonNull final BiFunction<Date, Date,
                                                        LiveData<List<SummaryEntity>>> function) {
-        final Date dateFromMin = getMinTimeOfDate(dateFrom);
-        final Date dateToMax = getMaxTimeOfDate(dateTo);
         return Transformations.map(
-                function.apply(dateFromMin, dateToMax),
+                function.apply(dateFrom, dateTo),
                 data -> data == null ? Collections.emptyList()
                         : Stream.of(data).collect(Collectors.toList())
         );

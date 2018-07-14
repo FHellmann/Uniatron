@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.model.TimeCreditType;
 
@@ -21,7 +22,7 @@ public final class TimeCreditTypeConverterUtil {
      * @return The emotion.
      */
     @TypeConverter
-    public static TimeCreditType fromRawValue(final String value) {
+    public static TimeCreditType fromRawValue(@Nullable final String value) {
         return value == null ? null : TimeCreditType.valueOf(value);
     }
 
@@ -32,7 +33,7 @@ public final class TimeCreditTypeConverterUtil {
      * @return The int.
      */
     @TypeConverter
-    public static String fromRealValue(final TimeCreditType type) {
+    public static String fromRealValue(@Nullable final TimeCreditType type) {
         return type == null ? null : type.name();
     }
 }

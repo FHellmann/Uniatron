@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
@@ -57,20 +57,16 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
 
     private LiveData<List<Summary>> getSummarySourceBy(@NonNull final Date date,
                                                        final int calendarType) {
+        final Date dateFrom = DateConverter.getDateConverterMin(calendarType).convert(date);
+        final Date dateTo = DateConverter.getDateConverterMax(calendarType).convert(date);
         switch (calendarType) {
             case Calendar.MONTH:
-                return mRepository.getSummaryByMonth(
-                        DateUtil.getMinDateOfMonth(date),
-                        DateUtil.getMaxDateOfMonth(date)
-                );
+                return mRepository.getSummaryByMonth(dateFrom, dateTo);
             case Calendar.YEAR:
-                return mRepository.getSummaryByYear(
-                        DateUtil.getMinMonthOfYear(date),
-                        DateUtil.getMaxMonthOfYear(date)
-                );
+                return mRepository.getSummaryByYear(dateFrom, dateTo);
             case Calendar.DATE:
             default:
-                return mRepository.getSummaryByDate(date, date);
+                return mRepository.getSummaryByDate(dateFrom, dateTo);
         }
     }
 

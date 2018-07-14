@@ -6,19 +6,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public class DateUtilTest {
+public class DateConverterTest {
 
     @Test
     public void getMinTimeOfDate() {
         final Date now = new Date();
 
-        final Date date = DateUtil.getMinTimeOfDate(now);
+        final Date date = DateConverter.DATE_MIN_TIME.convert(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -32,7 +29,7 @@ public class DateUtilTest {
     public void getMaxTimeOfDate() {
         final Date now = new Date();
 
-        final Date date = DateUtil.getMaxTimeOfDate(now);
+        final Date date = DateConverter.DATE_MAX_TIME.convert(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -46,7 +43,7 @@ public class DateUtilTest {
     public void getMinDateOfMonth() {
         final Date now = new Date();
 
-        final Date date = DateUtil.getMinDateOfMonth(now);
+        final Date date = DateConverter.MONTH_MIN_DATE.convert(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -62,7 +59,7 @@ public class DateUtilTest {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.set(2018, 6, 1);
 
-        final Date date = DateUtil.getMaxDateOfMonth(calendar.getTime());
+        final Date date = DateConverter.MONTH_MAX_DATE.convert(calendar.getTime());
 
         calendar.setTime(date);
 
@@ -76,7 +73,7 @@ public class DateUtilTest {
     public void getMinMonthOfYear() {
         final Date now = new Date();
 
-        final Date date = DateUtil.getMinMonthOfYear(now);
+        final Date date = DateConverter.YEAR_MIN_MONTH.convert(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -92,7 +89,7 @@ public class DateUtilTest {
     public void getMaxMonthOfYear() {
         final Date now = new Date();
 
-        final Date date = DateUtil.getMaxMonthOfYear(now);
+        final Date date = DateConverter.YEAR_MAX_MONTH.convert(now);
 
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
@@ -105,54 +102,12 @@ public class DateUtilTest {
     }
 
     @Test
-    public void formatForDate() {
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2018, 6, 1);
-
-        final String dateString = DateUtil.formatForDate(calendar.getTime());
-
-        assertThat(dateString, is(equalTo("1. Jul 2018")));
-    }
-
-    @Test
-    public void formatForMonth() {
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2018, 6, 1);
-
-        final String dateString = DateUtil.formatForMonth(calendar.getTime());
-
-        assertThat(dateString, is(startsWith("Jul")));
-        assertThat(dateString, is(endsWith("2018")));
-    }
-
-    @Test
-    public void formatForYear() {
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2018, 6, 1);
-
-        final String dateString = DateUtil.formatForYear(calendar.getTime());
-
-        assertThat(dateString, is(equalTo("2018")));
-    }
-
-    @Test
-    public void isSameDate() {
-        final Date date1 = new Date();
-        final Date date2 = new Date();
-
-        final boolean sameDate = DateUtil.isSameDate(date1, date2);
-
-        assertThat(sameDate, is(true));
-    }
-
-    @Test
-    public void isSameDateFalse() {
-        final Date date1 = new Date();
-        final Calendar calendar = GregorianCalendar.getInstance();
-        calendar.add(Calendar.DATE, 1);
-
-        final boolean sameDate = DateUtil.isSameDate(date1, calendar.getTime());
-
-        assertThat(sameDate, is(false));
+    public void getConverters() {
+        assertThat(DateConverter.getDateConverterMin(Calendar.DATE), is(DateConverter.DATE_MIN_TIME));
+        assertThat(DateConverter.getDateConverterMax(Calendar.DATE), is(DateConverter.DATE_MAX_TIME));
+        assertThat(DateConverter.getDateConverterMin(Calendar.MONTH), is(DateConverter.MONTH_MIN_DATE));
+        assertThat(DateConverter.getDateConverterMax(Calendar.MONTH), is(DateConverter.MONTH_MAX_DATE));
+        assertThat(DateConverter.getDateConverterMin(Calendar.YEAR), is(DateConverter.YEAR_MIN_MONTH));
+        assertThat(DateConverter.getDateConverterMax(Calendar.YEAR), is(DateConverter.YEAR_MAX_MONTH));
     }
 }

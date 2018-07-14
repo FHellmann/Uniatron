@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 
 import java.util.Date;
@@ -44,7 +44,8 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
 
     @Override
     public void setup(final Date date, final int calendarType) {
-        mIsVisible = DateUtil.isSameDate(date, new Date());
+        mIsVisible = DateConverter.DATE_MIN_TIME.convert(date)
+                .equals(DateConverter.DATE_MIN_TIME.convert(new Date()));
         final LiveData<Long> liveData = mRepository
                 .getRemainingAppUsageTimeToday(mPrefHandler.getAppsBlacklist());
         mDateCache.clearAndRegister(mRemainingAppUsageTime, liveData);

@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.support.annotation.Nullable;
 
 import java.util.Date;
 
@@ -21,7 +22,7 @@ public final class DateConverterUtil {
      * @return The date.
      */
     @TypeConverter
-    public static Date fromTimestamp(final Long value) {
+    public static Date fromTimestamp(@Nullable final Long value) {
         return value == null ? null : new Date(value);
     }
 
@@ -32,7 +33,7 @@ public final class DateConverterUtil {
      * @return The long.
      */
     @TypeConverter
-    public static Long dateToTimestamp(final Date date) {
+    public static Long dateToTimestamp(@Nullable final Date date) {
         return date == null ? null : date.getTime();
     }
 }

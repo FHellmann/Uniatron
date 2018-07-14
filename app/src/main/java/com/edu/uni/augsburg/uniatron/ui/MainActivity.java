@@ -19,7 +19,7 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.DateFormatter;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.StickyAppService;
 import com.edu.uni.augsburg.uniatron.ui.about.AboutActivity;
@@ -103,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mModelNavigation.registerCardViewModel(coinBagModel);
         mModelNavigation.registerCardViewModel(timeAccountModel);
         mModelNavigation.getCurrentDate().observe(this, date -> {
-            mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
+            if (date != null) {
+                mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
+            }
             mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
             mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
             mRecyclerView.smoothScrollToPosition(0);
@@ -164,12 +166,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private String getDateFormatByGroupStrategy(@NonNull final Date date) {
         switch (mModelNavigation.getGroupByStrategy()) {
             case MONTH:
-                return DateUtil.formatForMonth(date);
+                return DateFormatter.MM_YYYY.format(date);
             case YEAR:
-                return DateUtil.formatForYear(date);
+                return DateFormatter.YYYY.format(date);
             case DATE:
             default:
-                return DateUtil.formatForDate(date);
+                return DateFormatter.DD_MM_YYYY.format(date);
         }
     }
 

@@ -39,6 +39,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -102,6 +103,18 @@ public class DataRepositoryTest {
     }
 
     @Test
+    public void getLatestLearningAidNull() throws InterruptedException {
+        final MutableLiveData<Date> liveData = new MutableLiveData<>();
+        liveData.setValue(null);
+        when(timeCreditDao.getLatestLearningAid()).thenReturn(liveData);
+
+        final LiveData<LearningAid> latestLearningAidDiff = mRepository.getLatestLearningAid();
+
+        final LearningAid liveDataValue = TestUtils.getLiveDataValue(latestLearningAidDiff);
+        assertThat(liveDataValue.isActive(), is(false));
+    }
+
+    @Test
     public void getLatestLearningAidInactive() throws InterruptedException {
         final MutableLiveData<Date> liveData = new MutableLiveData<>();
         liveData.setValue(new Date(System.currentTimeMillis() - TimeCredits.CREDIT_LEARNING.getBlockedTime() * 60 * 1000 - 1));
@@ -123,7 +136,7 @@ public class DataRepositoryTest {
 
         final LearningAid liveDataValue = TestUtils.getLiveDataValue(latestLearningAidDiff);
         assertThat(liveDataValue.isActive(), is(true));
-        assertThat(liveDataValue.getLeftTime() > 0, is(true));
+        assertThat(liveDataValue.getLeftTime(), is(greaterThan(0L)));
     }
 
     @Test
@@ -360,6 +373,20 @@ public class DataRepositoryTest {
         final Emotions liveDataValue = TestUtils.getLiveDataValue(emotion);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue, is(Emotions.HAPPINESS));
+    }
+
+    @Test
+    public void getSummaryNull() throws InterruptedException {
+        final MutableLiveData<List<SummaryEntity>> mutableLiveData = new MutableLiveData<>();
+        mutableLiveData.setValue(null);
+        when(summaryDao.getSummariesByDate(any(), any())).thenReturn(mutableLiveData);
+
+        final Date date = new Date();
+        final LiveData<List<Summary>> summary = mRepository.getSummaryByDate(date, date);
+
+        final List<Summary> liveDataValue = TestUtils.getLiveDataValue(summary);
+        assertThat(liveDataValue, is(notNullValue()));
+        assertThat(liveDataValue.isEmpty(), is(true));
     }
 
     @Test

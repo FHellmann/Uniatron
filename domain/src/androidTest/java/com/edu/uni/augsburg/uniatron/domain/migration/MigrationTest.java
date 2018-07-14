@@ -12,7 +12,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.util.TestUtils;
 
 import org.junit.After;
@@ -70,14 +70,14 @@ public class MigrationTest {
         final AppDatabase migratedDb = getMigratedRoomDatabase();
 
         final LiveData<List<AppUsageEntity>> liveDataAppUsage = migratedDb.appUsageDao()
-                .loadAppUsageTime(DateUtil.getMinTimeOfDate(new Date(time)), DateUtil.getMaxTimeOfDate(new Date(time)));
+                .loadAppUsageTime(DateConverter.DATE_MIN_TIME.convert(new Date(time)), DateConverter.DATE_MAX_TIME.convert(new Date(time)));
         final List<AppUsageEntity> liveDataValueAppUsage = TestUtils.getLiveDataValue(liveDataAppUsage);
         assertThat(liveDataValueAppUsage, is(notNullValue()));
         final List<Long> usageTimeValues = Stream.of(liveDataValueAppUsage).map(AppUsageEntity::getUsageTime).collect(Collectors.toList());
         assertThat(usageTimeValues, hasItems(7 * 1000L, 91 * 1000L, 435 * 1000L, 12 * 1000L, 45 * 1000L));
 
         final LiveData<Long> liveDataTimeCredits = migratedDb.timeCreditDao()
-                .loadTimeCredits(DateUtil.getMinTimeOfDate(new Date(time)), DateUtil.getMaxTimeOfDate(new Date(time)));
+                .loadTimeCredits(DateConverter.DATE_MIN_TIME.convert(new Date(time)), DateConverter.DATE_MAX_TIME.convert(new Date(time)));
         final Long liveDataValueTimeCredits = TestUtils.getLiveDataValue(liveDataTimeCredits);
         assertThat(liveDataValueTimeCredits, is(notNullValue()));
         assertThat(liveDataValueTimeCredits, equalTo(2 * 60 * 1000L + 3 * 60 * 1000L + 10 * 60 * 1000L + 20 * 60 * 1000L + 45 * 60 * 1000L));

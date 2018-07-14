@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 
 import org.junit.After;
@@ -21,8 +22,6 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 import java.util.List;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -74,7 +73,7 @@ public class EmotionDaoTest {
 
         final Date date = new Date();
         final LiveData<List<EmotionEntity>> liveData = mDao
-                .getAll(getMinTimeOfDate(date), getMaxTimeOfDate(date));
+                .getAll(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
 
         final List<EmotionEntity> liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
@@ -95,7 +94,7 @@ public class EmotionDaoTest {
 
         final Date date = new Date();
         final LiveData<Double> liveData = mDao
-                .getAverageEmotion(getMinTimeOfDate(date), getMaxTimeOfDate(date));
+                .getAverageEmotion(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
 
         final double expected = (Emotions.NEUTRAL.ordinal() + Emotions.HAPPINESS.ordinal()) / 2.0;
 

@@ -15,6 +15,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 import com.orhanobut.logger.Logger;
 
@@ -51,8 +52,8 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
         final LiveData<Map<String, Long>> data = mRepository.getAppUsageTimeByDate(
-                mDateCache.getDateFrom(date, calendarType),
-                mDateCache.getDateTo(date, calendarType)
+                DateConverter.getDateConverterMin(calendarType).convert(date),
+                DateConverter.getDateConverterMax(calendarType).convert(date)
         );
         mDateCache.clearAndRegister(mAppUsages, data);
         mAppUsages.addSource(

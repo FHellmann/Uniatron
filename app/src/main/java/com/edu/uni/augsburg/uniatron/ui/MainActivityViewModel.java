@@ -12,7 +12,7 @@ import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.Function;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
 
 import java.util.ArrayList;
@@ -201,8 +201,8 @@ public class MainActivityViewModel extends AndroidViewModel {
          */
         DATE(
                 Calendar.DATE,
-                calendar -> !DateUtil.getMinTimeOfDate(new Date()).before(calendar.getTime()),
-                (calS, calE) -> calE.getTime().after(DateUtil.getMaxTimeOfDate(calS.getTime()))
+                calendar -> !DateConverter.DATE_MIN_TIME.convert(new Date()).before(calendar.getTime()),
+                (calS, calE) -> calE.getTime().after(DateConverter.DATE_MAX_TIME.convert(calS.getTime()))
         ),
         /**
          * Group by month.

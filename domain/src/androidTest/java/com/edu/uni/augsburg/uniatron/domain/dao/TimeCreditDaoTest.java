@@ -8,6 +8,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
@@ -17,8 +18,6 @@ import org.junit.runner.RunWith;
 
 import java.util.Date;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -63,7 +62,7 @@ public class TimeCreditDaoTest {
 
         final Date date = getDate(1, 1, 2018);
         final LiveData<Long> data = mDao
-                .loadTimeCredits(getMinTimeOfDate(date), getMaxTimeOfDate(date));
+                .loadTimeCredits(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
 
         assertThat(getLiveDataValue(data), is(10L));
     }
