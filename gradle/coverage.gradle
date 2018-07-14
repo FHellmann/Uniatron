@@ -1,10 +1,28 @@
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: "jacoco"
 
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+    jacocoReportPath = "${rootProject.buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
 tasks.coveralls {
-    dependsOn 'connectedAndroidTest'
+    dependsOn 'jacocoRootReport'
     onlyIf { System.env.'CI' }
+}
+
+task jacocoRootReport(type: JacocoReport, dependsOn: ['app:jacocoTestReport', 'domain:jacocoTestReport']) {
+    onlyIf { System.env.'CI' }
+    reports {
+        xml.enabled = true
+        html.enabled = false
+    }
+    sourceDirectories = files([tasks.getByPath("app:jacocoTestReport").sourceDirectories,
+                               tasks.getByPath("domain:jacocoTestReport").sourceDirectories])
+
+    classDirectories = files([tasks.getByPath("app:jacocoTestReport").classDirectories,
+                              tasks.getByPath("domain:jacocoTestReport").classDirectories])
+
+    executionData = files([tasks.getByPath("app:jacocoTestReport").executionData,
+                           tasks.getByPath("domain:jacocoTestReport").executionData])
+
 }

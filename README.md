@@ -1,6 +1,10 @@
 # UNIAtron
 [![Build Status](https://travis-ci.org/FHellmann/Uniatron.svg?branch=master)](https://travis-ci.org/FHellmann/Uniatron)
-[![Coverage Status](https://coveralls.io/repos/github/FHellmann/Uniatron/badge.svg?branch=master)](https://coveralls.io/github/FHellmann/Uniatron?branch=master)
+[![codecov](https://codecov.io/gh/FHellmann/Uniatron/branch/master/graph/badge.svg)](https://codecov.io/gh/FHellmann/Uniatron)
+[![codebeat badge](https://codebeat.co/badges/dee2387f-1e03-49e4-84e9-3f8fc95d1e81)](https://codebeat.co/projects/github-com-fhellmann-uniatron-master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/59acfe0f478548479a3213daf8d78d1b)](https://www.codacy.com/app/fhellmann93/Uniatron?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=FHellmann/Uniatron&amp;utm_campaign=Badge_Grade)
+[![BCH compliance](https://bettercodehub.com/edge/badge/FHellmann/Uniatron?branch=master)](https://bettercodehub.com/)
+
 
 ![Banner](https://github.com/FHellmann/Uniatron/blob/master/doc/Play%20Store/0_Play-Store_Functiongraph.png)
 

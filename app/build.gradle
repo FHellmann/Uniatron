@@ -21,6 +21,7 @@ android {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEBUG'
             zipAlignEnabled true
+            testCoverageEnabled true
         }
         release {
             minifyEnabled false
@@ -38,7 +39,12 @@ android {
     dataBinding {
         enabled = true
     }
-    productFlavors {
+    testOptions {
+        animationsDisabled true
+
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -87,3 +93,5 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/static-analysis.gradle')
+apply from: rootProject.file('gradle/coverage-submodule.gradle')
+apply from: rootProject.file('gradle/test-logging.gradle')
