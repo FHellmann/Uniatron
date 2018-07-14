@@ -144,7 +144,7 @@ public class AppUsageDaoTest {
 
         final Long liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(credits.getTimeBonus() * 60L - test.getUsageTime()));
+        assertThat(liveDataValue, is(credits.getTimeBonus() - test.getUsageTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {
