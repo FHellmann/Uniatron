@@ -14,10 +14,10 @@ coverage:
 flags:
   frontend:
     paths:
-      - app/
+      - app/src/main
   backend:
     paths:
-      - domain/
+      - domain/src/main
 
 comment:
   layout: "reach, diff, flags, files"
