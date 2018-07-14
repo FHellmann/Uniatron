@@ -30,10 +30,10 @@ public class StickyAppService extends Service {
     /**
      * Executes the start of the service.
      *
-     * @param intent  the intent
-     * @param flags   the flags
-     * @param startId the startid
-     * @return the way the service is started
+     * @param intent  The intent.
+     * @param flags   The flags.
+     * @param startId The start id.
+     * @return The way the service is started.
      */
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         mPackageAddedReceiver = PackageChangeDetector.start(this);
