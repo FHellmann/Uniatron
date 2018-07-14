@@ -9,23 +9,38 @@ public enum Emotions {
     /**
      * The emotion state ANGRY.
      **/
-    ANGRY,
+    ANGRY(0),
     /**
      * The emotion state SADNESS.
      **/
-    SADNESS,
+    SADNESS(1),
     /**
      * The emotion state NEUTRAL.
      **/
-    NEUTRAL,
+    NEUTRAL(2),
     /**
      * The emotion state HAPPINESS.
      **/
-    HAPPINESS,
+    HAPPINESS(3),
     /**
      * The emotion state FANTASTIC.
      **/
-    FANTASTIC;
+    FANTASTIC(4);
+
+    private final int mIndex;
+
+    Emotions(final int index) {
+        mIndex = index;
+    }
+
+    /**
+     * Get the index.
+     *
+     * @return The index.
+     */
+    public int getIndex() {
+        return mIndex;
+    }
 
     /**
      * Get the average emotion.
