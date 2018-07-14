@@ -1,0 +1,25 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+        base: auto
+      frontend:
+        flags: frontend
+      backend:
+        target: 90%
+        flags: backend
+
+flags:
+  frontend:
+    paths:
+      - app/src/main
+  backend:
+    paths:
+      - domain/src/main
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: new
+  require_changes: false
