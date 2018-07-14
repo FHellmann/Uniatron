@@ -1,46 +1,33 @@
 language: android
 
-sudo: false
+# https://docs.travis-ci.com/user/reference/overview/#Virtualisation-Environment-vs-Operating-System
+sudo: required
+dist: trusty
 
 jdk:
   - oraclejdk8
 
-env:
-  global:
-    - ANDROID_API_LEVEL=28
-    - ANDROID_BUILD_TOOLS_VERSION=28.0.0
-    - ANDROID_EMU_API_LEVEL=22
-    - ANDROID_ABI=armeabi-v7a
-    - ADB_INSTALL_TIMEOUT=8
-    - GRADLE_OPTS="-Xmx2048m -XX:MaxPermSize=1024m"
-
-before_install:
-  - chmod +x gradlew
-  # Install SDK license so Android Gradle plugin can install deps.
-  - mkdir "$ANDROID_HOME/licenses" || true
-  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
-  # Install the rest of tools (e.g., avdmanager).
-  - sdkmanager tools
-  # Install the system image.
-  - sdkmanager "system-images;android-$ANDROID_EMU_API_LEVEL;default;$ANDROID_ABI"
-  # Create and start emulator for the script. Meant to race the install task.
-  - echo no | avdmanager create avd --force -n test -k "system-images;android-$ANDROID_EMU_API_LEVEL;default;$ANDROID_ABI"
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
-
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
+    # Below codes are for using latest Android SDK Tools
     - tools
     - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
     - platform-tools
 
-    # The BuildTools version used by your project
-    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+    # build-tools
+    - build-tools-28.0.0
 
     # The SDK version used to compile your project
-    - android-$ANDROID_API_LEVEL
-    - android-$ANDROID_EMU_API_LEVEL
+    - android-19
+    - android-28
+
+    # Extras
+    - extra-android-m2repository
+
+env:
+  global:
+    - GRADLE_OPTS="-Xmx2048m -XX:MaxPermSize=1024m"
+    - API=android-19 ABI=armeabi-v7a
 
 notifications:
   email: false
@@ -56,11 +43,12 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
 
+# Emulator Management: Create, Start and Wait
 before_script:
+  - android-update-sdk --components=sys-img-$ABI-$API --accept-licenses='android-sdk-license-[0-9a-f]{8}'
+  - echo no | android create avd --force -n test -t $API --abi $ABI
+  - emulator -avd test -no-audio -no-window
   - android-wait-for-emulator
-  - adb shell settings put global window_animation_scale 0 &
-  - adb shell settings put global transition_animation_scale 0 &
-  - adb shell settings put global animator_duration_scale 0 &
   - adb shell input keyevent 82 &
 
 script:
