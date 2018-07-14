@@ -87,9 +87,9 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName2)));
         assertThat(liveDataValue.get(2).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getUsageTime(), is(30));
-        assertThat(liveDataValue.get(1).getUsageTime(), is(20));
-        assertThat(liveDataValue.get(2).getUsageTime(), is(10));
+        assertThat(liveDataValue.get(0).getUsageTime(), is(30L));
+        assertThat(liveDataValue.get(1).getUsageTime(), is(20L));
+        assertThat(liveDataValue.get(2).getUsageTime(), is(10L));
     }
 
     @Test
@@ -111,8 +111,8 @@ public class AppUsageDaoTest {
         assertThat(liveDataValue.isEmpty(), is(false));
         assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
         assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getUsageTime(), is(75));
-        assertThat(liveDataValue.get(1).getUsageTime(), is(25));
+        assertThat(liveDataValue.get(0).getUsageTime(), is(75L));
+        assertThat(liveDataValue.get(1).getUsageTime(), is(25L));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class AppUsageDaoTest {
 
         final Long liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(credits.getTimeBonus() * 60 - test.getUsageTime()));
+        assertThat(liveDataValue, is(credits.getTimeBonus() * 60L - test.getUsageTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {
