@@ -32,10 +32,10 @@ public enum DateConverter {
     DATE_MAX_TIME(date -> {
         final Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
+        calendar.set(Calendar.HOUR_OF_DAY, Constants.MAX_HOUR_OF_DAY);
+        calendar.set(Calendar.MINUTE, Constants.MAX_MINUTE);
+        calendar.set(Calendar.SECOND, Constants.MAX_SECOND);
+        calendar.set(Calendar.MILLISECOND, Constants.MAX_MILLISECOND);
         return calendar.getTime();
     }),
     /**
@@ -130,5 +130,12 @@ public enum DateConverter {
             default:
                 return DateConverter.DATE_MAX_TIME;
         }
+    }
+
+    private static final class Constants {
+        private static final int MAX_HOUR_OF_DAY = 23;
+        private static final int MAX_MINUTE = 59;
+        private static final int MAX_SECOND = 59;
+        private static final int MAX_MILLISECOND = 999;
     }
 }

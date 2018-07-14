@@ -14,15 +14,15 @@ import java.util.Locale;
  */
 public enum DateFormatter {
     /**
-     * Formats the date in the format: d. MM yyyy
+     * Formats the date in the format "d. MM yyyy".
      */
     DD_MM_YYYY(date -> String.format(Locale.getDefault(), "%te. %tb %tY", date, date, date)),
     /**
-     * Formats the date in the format: MMM yyyy
+     * Formats the date in the format "MMM yyyy".
      */
     MM_YYYY(date -> String.format(Locale.getDefault(), "%tB %tY", date, date)),
     /**
-     * Formats the date in the format: yyyy
+     * Formats the date in the format "yyyy".
      */
     YYYY(date -> String.format(Locale.getDefault(), "%tY", date));
 

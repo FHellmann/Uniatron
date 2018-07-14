@@ -3,8 +3,8 @@ package com.edu.uni.augsburg.uniatron.domain.migration;
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory;
-import android.arch.persistence.room.Room;
 import android.arch.persistence.room.testing.MigrationTestHelper;
+import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -16,6 +16,7 @@ import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.util.TestUtils;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,23 +33,27 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 public class MigrationTest {
-    private static final String TEST_DB = "migration-test";
-
     @Rule
     public MigrationTestHelper mMigrationHelper = new MigrationTestHelper(
             InstrumentationRegistry.getInstrumentation(),
             AppDatabase.class.getCanonicalName(),
             new FrameworkSQLiteOpenHelperFactory()
     );
+    private Context mContext;
+
+    @Before
+    public void setUp() {
+        mContext = InstrumentationRegistry.getTargetContext();
+    }
 
     @After
     public void tearDown() {
-        InstrumentationRegistry.getTargetContext().deleteDatabase(TEST_DB);
+        mContext.deleteDatabase(mContext.getPackageName());
     }
 
     @Test
     public void migrationFrom1To2() throws IOException, InterruptedException {
-        final SupportSQLiteDatabase db = mMigrationHelper.createDatabase(TEST_DB, 1);
+        final SupportSQLiteDatabase db = mMigrationHelper.createDatabase(mContext.getPackageName(), 1);
 
         final long time = new Date().getTime();
         db.execSQL("INSERT INTO AppUsageEntity (`app_name`, `timestamp`, `usage_time_in_seconds`) VALUES ('com.test.app', " + time + ", 7)");
@@ -65,7 +70,7 @@ public class MigrationTest {
 
         db.close();
 
-        mMigrationHelper.runMigrationsAndValidate(TEST_DB, 2, true, Migrations.V1_TO_V2.getMigration());
+        mMigrationHelper.runMigrationsAndValidate(mContext.getPackageName(), 2, true, Migrations.V1_TO_V2.getMigration());
 
         final AppDatabase migratedDb = getMigratedRoomDatabase();
 
@@ -84,9 +89,7 @@ public class MigrationTest {
     }
 
     private AppDatabase getMigratedRoomDatabase() {
-        final AppDatabase database = Room.databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase.class, TEST_DB)
-                .addMigrations(Migrations.getAll())
-                .build();
+        final AppDatabase database = AppDatabase.create(mContext);
         mMigrationHelper.closeWhenFinished(database);
         return database;
     }
