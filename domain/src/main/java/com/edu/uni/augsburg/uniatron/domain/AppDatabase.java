@@ -84,7 +84,7 @@ public abstract class AppDatabase extends RoomDatabase {
      * @return the database.
      */
     public static AppDatabase create(@NonNull final Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "uniatron")
+        return Room.databaseBuilder(context, AppDatabase.class, context.getPackageName())
                 .addMigrations(Migrations.getAll())
                 .build();
     }
