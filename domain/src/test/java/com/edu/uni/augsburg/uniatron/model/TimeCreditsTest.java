@@ -25,16 +25,6 @@ public class TimeCreditsTest {
         mTimeCredits = timeCredits;
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void getId() {
-        mTimeCredits.getId();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void getTimestamp() {
-        mTimeCredits.getTimestamp();
-    }
-
     @Test
     public void getSteps() {
         assertThat(mTimeCredits.getStepCount() >= 0, is(true));

@@ -1,6 +1,5 @@
 package com.edu.uni.augsburg.uniatron.model;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,16 +68,6 @@ public enum TimeCredits implements TimeCredit {
         this.mStepCount = stepCount;
         this.mTimeBonus = timeBonus;
         this.mTimeBlocked = timeBlocked;
-    }
-
-    @Override
-    public long getId() {
-        throw new IllegalStateException("Method not supported");
-    }
-
-    @Override
-    public Date getTimestamp() {
-        throw new IllegalStateException("Method not supported");
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.edu.uni.augsburg.uniatron.model;
 
-import java.util.Date;
-
 /**
  * The interface for the model
  * {@link com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity}.
@@ -9,13 +7,6 @@ import java.util.Date;
  * @author Fabio Hellmann
  */
 public interface Summary {
-    /**
-     * Get the timestamp.
-     *
-     * @return the timestamp.
-     */
-    Date getTimestamp();
-
     /**
      * Get the app usage time.
      *
