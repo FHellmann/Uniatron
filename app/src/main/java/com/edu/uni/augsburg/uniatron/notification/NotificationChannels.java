@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.annimon.stream.Stream;
@@ -32,12 +33,10 @@ public enum NotificationChannels {
             NotificationManagerCompat.IMPORTANCE_DEFAULT
     );
 
-
-
     private final int mChannelNameResId;
     private final int mImportance;
 
-    NotificationChannels(final int channelNameResId,
+    NotificationChannels(@StringRes final int channelNameResId,
                          final int importance) {
         this.mChannelNameResId = channelNameResId;
         this.mImportance = importance;

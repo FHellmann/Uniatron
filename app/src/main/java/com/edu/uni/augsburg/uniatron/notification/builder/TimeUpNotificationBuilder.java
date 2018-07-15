@@ -18,6 +18,7 @@ import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;
     private final Integer remainingTime;
+    private final int requestId;
 
     /**
      * Build Notification to inform user that times running out.
@@ -28,6 +29,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     public TimeUpNotificationBuilder(@NonNull final Context context, final Integer remainingTime) {
         this.mContext = context;
         this.remainingTime = remainingTime;
+        this.requestId = (int) System.currentTimeMillis();
     }
 
     @Override
@@ -41,7 +43,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
-                        0,
+                        requestId,
                         new Intent(mContext, TimeCreditShopActivity.class),
                         PendingIntent.FLAG_CANCEL_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -53,6 +55,6 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public int getId() {
-        return 0;
+        return requestId;
     }
 }
