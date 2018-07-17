@@ -17,7 +17,9 @@
         android:title="@string/settings"
         app:showAsAction="never" />
 
-    <item android:title="@string/group_by">
+    <item
+        android:title="@string/group_by"
+        app:showAsAction="never">
         <menu>
             <group
                 android:checkableBehavior="single"
@@ -38,7 +40,6 @@
 
     <item
         android:id="@+id/today"
-        android:icon="@drawable/ic_today_white_24dp"
         android:title="@string/today"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>
