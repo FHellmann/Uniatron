@@ -3,8 +3,10 @@ package com.edu.uni.augsburg.uniatron.ui.setting;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.edu.uni.augsburg.uniatron.R;
 
@@ -29,19 +31,24 @@ public class SettingActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mToolbar.setOnMenuItemClickListener(menuItem -> {
-            if (android.R.id.home == menuItem.getItemId()) {
-                finish();
-                return true;
-            }
-            return false;
-        });
+        final ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayShowHomeEnabled(true);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // Display the fragment as the main content.
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.setting_content, new SettingFragment())
                 .commit();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (android.R.id.home == item.getItemId()) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
