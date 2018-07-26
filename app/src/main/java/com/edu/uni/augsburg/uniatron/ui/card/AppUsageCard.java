@@ -113,13 +113,15 @@ public class AppUsageCard implements CardViewHolder {
         @OnClick(R.id.buttonShowAll)
         public void onShowAllClicked() {
             final AppUsageAdapter adapter = (AppUsageAdapter) mRecyclerView.getAdapter();
-            if (adapter.mShowSmallVisibleAmount) {
-                mButtonShowAll.setText(R.string.show_only_top_five);
-            } else {
-                mButtonShowAll.setText(R.string.show_all);
+            if (adapter != null) {
+                if (adapter.mShowSmallVisibleAmount) {
+                    mButtonShowAll.setText(R.string.show_only_top_five);
+                } else {
+                    mButtonShowAll.setText(R.string.show_all);
+                }
+                adapter.setShowSomeItems(!adapter.mShowSmallVisibleAmount);
+                adapter.notifyDataSetChanged();
             }
-            adapter.setShowSomeItems(!adapter.mShowSmallVisibleAmount);
-            adapter.notifyDataSetChanged();
         }
     }
 
@@ -204,7 +206,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mAppLabel = appLabel;
         }
 
-        String getAppLabel() {
+        private String getAppLabel() {
             return mAppLabel;
         }
 
@@ -212,7 +214,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mAppIcon = appIcon;
         }
 
-        Drawable getAppIcon() {
+        private Drawable getAppIcon() {
             return mAppIcon;
         }
 
@@ -220,7 +222,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mApplicationUsage = applicationUsage;
         }
 
-        long getApplicationUsage() {
+        private long getApplicationUsage() {
             return mApplicationUsage;
         }
 
@@ -228,7 +230,7 @@ public class AppUsageCard implements CardViewHolder {
             this.mApplicationUsagePercent = applicationUsagePercent;
         }
 
-        double getApplicationUsagePercent() {
+        private double getApplicationUsagePercent() {
             return mApplicationUsagePercent;
         }
     }
