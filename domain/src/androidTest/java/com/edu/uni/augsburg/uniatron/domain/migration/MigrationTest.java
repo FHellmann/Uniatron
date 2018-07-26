@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -80,12 +79,6 @@ public class MigrationTest {
         assertThat(liveDataValueAppUsage, is(notNullValue()));
         final List<Long> usageTimeValues = Stream.of(liveDataValueAppUsage).map(AppUsageEntity::getUsageTime).collect(Collectors.toList());
         assertThat(usageTimeValues, hasItems(7 * 1000L, 91 * 1000L, 435 * 1000L, 12 * 1000L, 45 * 1000L));
-
-        final LiveData<Long> liveDataTimeCredits = migratedDb.timeCreditDao()
-                .loadTimeCredits(DateConverter.DATE_MIN_TIME.convert(new Date(time)), DateConverter.DATE_MAX_TIME.convert(new Date(time)));
-        final Long liveDataValueTimeCredits = TestUtils.getLiveDataValue(liveDataTimeCredits);
-        assertThat(liveDataValueTimeCredits, is(notNullValue()));
-        assertThat(liveDataValueTimeCredits, equalTo(2 * 60 * 1000L + 3 * 60 * 1000L + 10 * 60 * 1000L + 20 * 60 * 1000L + 45 * 60 * 1000L));
     }
 
     private AppDatabase getMigratedRoomDatabase() {
