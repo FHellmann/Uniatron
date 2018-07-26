@@ -7,6 +7,14 @@ package com.edu.uni.augsburg.uniatron.ui.card;
  */
 public enum CardPriority {
     /**
+     * Priority only for time account!
+     */
+    TIME_ACCOUNT,
+    /**
+     * Priority only for coin bag!
+     */
+    COIN_BAG,
+    /**
      * Very high priority.
      */
     VERY_HIGH,

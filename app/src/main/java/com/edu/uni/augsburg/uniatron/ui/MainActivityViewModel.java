@@ -14,6 +14,7 @@ import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
+import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
 import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
 import java.util.ArrayList;
@@ -110,8 +111,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         } else if (!mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
             calendar.setTime(mMinCalendar.getTime());
         }
-        mCalendar = calendar;
-        notifyDataSetChanged();
+        // Only notify if the date was really changed
+        if (DateConverter.DATE_MIN_TIME.convert(mCalendar.getTime())
+                .compareTo(DateConverter.DATE_MIN_TIME.convert(calendar.getTime())) != 0) {
+            mCalendar = calendar;
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -133,12 +138,12 @@ public class MainActivityViewModel extends AndroidViewModel {
     public String getDateFormatByGroupStrategy(@NonNull final Date date) {
         switch (mGroupByStrategy) {
             case MONTH:
-                return DateUtil.formatForMonth(date);
+                return DateFormatter.MM_YYYY.format(date);
             case YEAR:
-                return DateUtil.formatForYear(date);
+                return DateFormatter.YYYY.format(date);
             case DATE:
             default:
-                return DateUtil.formatForDate(date);
+                return DateFormatter.DD_MM_YYYY.format(date);
         }
     }
 

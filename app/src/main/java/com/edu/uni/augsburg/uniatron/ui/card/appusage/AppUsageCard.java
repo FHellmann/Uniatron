@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.card.CardHelper;
+import com.edu.uni.augsburg.uniatron.ui.card.CardUtil;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class AppUsageCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
-        CardHelper.setFullSpan(viewHolder);
+        CardUtil.setFullSpan(viewHolder);
         final ViewHolder holder = (ViewHolder) viewHolder;
 
         final LinearLayoutManager layout = new LinearLayoutManager(context);

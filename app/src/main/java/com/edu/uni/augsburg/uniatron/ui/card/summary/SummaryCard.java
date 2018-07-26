@@ -15,8 +15,8 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.edu.uni.augsburg.uniatron.ui.card.CardHelper;
 import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
+import com.edu.uni.augsburg.uniatron.ui.card.CardUtil;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
 import butterknife.BindView;
@@ -28,7 +28,6 @@ import butterknife.ButterKnife;
  * @author Fabio Hellmann
  */
 public class SummaryCard implements CardViewHolder {
-    private static final int TYPE = Integer.MIN_VALUE + 1;
     private Summary mSummary;
 
     SummaryCard(@NonNull final Summary summary) {
@@ -43,7 +42,7 @@ public class SummaryCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
-        CardHelper.setFullSpan(viewHolder);
+        CardUtil.setFullSpan(viewHolder);
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());

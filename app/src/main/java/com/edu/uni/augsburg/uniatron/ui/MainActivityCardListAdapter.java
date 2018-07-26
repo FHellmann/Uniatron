@@ -48,7 +48,7 @@ public class MainActivityCardListAdapter
                 mCardViewHolderList.add(cardViewHolder);
                 Collections.sort(
                         mCardViewHolderList,
-                        (card1, card2) -> card2.getPriority().compareTo(card1.getPriority())
+                        (card1, card2) -> card1.getPriority().compareTo(card2.getPriority())
                 );
                 notifyItemInserted(mCardViewHolderList.indexOf(cardViewHolder));
             }

@@ -64,7 +64,7 @@ public class CoinBagCard implements CardViewHolder {
 
     @Override
     public CardPriority getPriority() {
-        return CardPriority.VERY_HIGH;
+        return CardPriority.COIN_BAG;
     }
 
     @Override

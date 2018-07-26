@@ -9,8 +9,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
  *
  * @author Fabio Hellmann
  */
-public final class CardHelper {
-    private CardHelper() {
+public final class CardUtil {
+    private CardUtil() {
         // Ignore
     }
 

@@ -70,7 +70,7 @@ public class TimeAccountCard implements CardViewHolder {
 
     @Override
     public CardPriority getPriority() {
-        return CardPriority.VERY_HIGH;
+        return CardPriority.TIME_ACCOUNT;
     }
 
     @Override

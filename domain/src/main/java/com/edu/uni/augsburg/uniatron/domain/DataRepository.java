@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -168,14 +167,10 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<AppUsageCollection> getAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                             @NonNull final Date dateTo) {
-        return Transformations.map(
-                mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
-                appUsageList -> {
-                    final Map<String, Long> map = Stream.ofNullable(appUsageList)
-                            .collect(Collectors.toMap(AppUsageEntity::getAppName, AppUsageEntity::getUsageTime));
-                    return new AppUsageCollection(map);
-                });
+                                                              @NonNull final Date dateTo) {
+        return Transformations.map(mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
+                appUsageList -> new AppUsageCollection(Stream.ofNullable(appUsageList)
+                        .collect(Collectors.toMap(AppUsageEntity::getAppName, AppUsageEntity::getUsageTime))));
     }
 
     /**

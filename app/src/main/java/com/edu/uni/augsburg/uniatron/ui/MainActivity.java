@@ -29,7 +29,6 @@ import com.edu.uni.augsburg.uniatron.ui.card.timeaccount.TimeAccountViewModel;
 import com.edu.uni.augsburg.uniatron.ui.onboarding.OnBoardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
-import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
 
 import java.util.Calendar;
 import java.util.Date;
