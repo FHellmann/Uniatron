@@ -47,23 +47,6 @@ public interface AppUsageDao {
     LiveData<List<AppUsageEntity>> loadAppUsageTime(Date dateFrom, Date dateTo);
 
     /**
-     * Load the app usage in percent of each app summed by the app name.
-     *
-     * @param dateFrom The date to start searching.
-     * @param dateTo   The date to end searching.
-     * @return The app usage percent by app.
-     */
-    @Query("SELECT 0 id, app_name, date('now') timestamp, "
-            + "(TOTAL(usage_time) * 100 / aue1.time) usage_time "
-            + "FROM AppUsageEntity, "
-            + "(SELECT TOTAL(usage_time) time FROM AppUsageEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) aue1 "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "GROUP BY app_name "
-            + "ORDER BY TOTAL(usage_time) DESC")
-    LiveData<List<AppUsageEntity>> loadAppUsagePercent(Date dateFrom, Date dateTo);
-
-    /**
      * Load the remaining app usage time.
      *
      * @param dateFrom The date to start searching.

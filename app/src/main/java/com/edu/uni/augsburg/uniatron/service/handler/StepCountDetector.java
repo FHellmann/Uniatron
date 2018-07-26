@@ -124,7 +124,7 @@ public final class StepCountDetector {
             mLastValue = velocityAvg;
         }
 
-        private boolean isApplicable(@NonNull final Match minOrMax, final float diff, final float[] values) {
+        private boolean isApplicable(@NonNull final Match minOrMax, final float diff, final float... values) {
             final boolean isNotContra = mLastMatch != minOrMax.invert();
             final boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff * 2 / values.length);
             final boolean isPreviousLargeEnough = mLastDiff > (diff / values.length);

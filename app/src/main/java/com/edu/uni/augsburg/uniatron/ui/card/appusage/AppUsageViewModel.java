@@ -12,16 +12,14 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
+import com.edu.uni.augsburg.uniatron.model.AppUsageCollection;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -30,8 +28,8 @@ import java.util.Map;
  * @author Fabio Hellmann
  */
 public class AppUsageViewModel extends AndroidViewModel implements CardViewModel {
-    private final DateCache<Map<String, Long>> mDateCache;
-    private final MediatorLiveData<Map<String, Long>> mAppUsages;
+    private final DateCache<AppUsageCollection> mDateCache;
+    private final MediatorLiveData<AppUsageCollection> mAppUsages;
     private final DataRepository mRepository;
 
     /**
@@ -48,7 +46,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        final LiveData<Map<String, Long>> data = mRepository.getAppUsageTimeByDate(
+        final LiveData<AppUsageCollection> data = mRepository.getAppUsageTimeByDate(
                 DateConverter.getDateConverterMin(calendarType).convert(date),
                 DateConverter.getDateConverterMax(calendarType).convert(date)
         );
@@ -71,38 +69,23 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     }
 
     @NonNull
-    private AppUsageCard getAppUsageCard(final @NonNull Context context, final Map<String, Long> data) {
+    private AppUsageCard getAppUsageCard(@NonNull final Context context, @NonNull final AppUsageCollection data) {
         final AppUsageCard card = new AppUsageCard();
-        card.addAll(getAllAppUsageItems(context, data, Stream.of(data).mapToLong(Map.Entry::getValue).sum()));
+        card.addAll(data.getEntries()
+                .map(entry -> new AppUsageViewItem(
+                        getApplicationLabel(context, entry.getPackageName()),
+                        getApplicationIcon(context, entry.getPackageName()),
+                        entry.getApplicationUsage(),
+                        entry.getApplicationUsagePercent()))
+                .collect(Collectors.toList()));
         return card;
     }
 
-    private List<AppUsageCard.AppUsageItem> getAllAppUsageItems(@NonNull final Context context,
-                                                                @NonNull final Map<String, Long> data,
-                                                                final long usageTimeSum) {
-        return Stream.of(data)
-                .map(entry -> {
-                    final AppUsageCard.AppUsageItem item = new AppUsageCard.AppUsageItem();
-                    item.setAppLabel(getApplicationLabel(
-                            context.getPackageManager(),
-                            entry.getKey()
-                    ));
-                    item.setAppIcon(getApplicationIcon(
-                            context.getPackageManager(),
-                            context.getResources().getDrawable(android.R.drawable.sym_def_app_icon),
-                            entry.getKey()
-                    ));
-                    item.setApplicationUsage(entry.getValue());
-                    item.setApplicationUsagePercent(entry.getValue() * 100.0 / usageTimeSum);
-                    return item;
-                })
-                .collect(Collectors.toList());
-    }
-
     @NonNull
-    private String getApplicationLabel(@NonNull final PackageManager packageManager,
+    private String getApplicationLabel(@NonNull final Context context,
                                        @NonNull final String packageName) {
         try {
+            final PackageManager packageManager = context.getPackageManager();
             final ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);
             return packageManager.getApplicationLabel(info).toString();
         } catch (PackageManager.NameNotFoundException e) {
@@ -111,13 +94,12 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     }
 
     @NonNull
-    private Drawable getApplicationIcon(@NonNull final PackageManager packageManager,
-                                        @NonNull final Drawable placeHolderIcon,
+    private Drawable getApplicationIcon(@NonNull final Context context,
                                         @NonNull final String packageName) {
         try {
-            return packageManager.getApplicationIcon(packageName);
+            return context.getPackageManager().getApplicationIcon(packageName);
         } catch (PackageManager.NameNotFoundException e) {
-            return placeHolderIcon;
+            return context.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
         }
     }
 }

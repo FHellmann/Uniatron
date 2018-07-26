@@ -8,7 +8,6 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
@@ -50,21 +49,6 @@ public class TimeCreditDaoTest {
         mDao.add(timeCreditEntity1);
 
         assertThat(timeCreditEntity1.getId(), is(notNullValue()));
-    }
-
-    @Test
-    public void loadTimeCredits() throws Exception {
-        mDao.add(createTestData(1));
-        mDao.add(createTestData(1));
-        mDao.add(createTestData(2));
-        mDao.add(createTestData(3));
-        mDao.add(createTestData(2));
-
-        final Date date = getDate(1, 1, 2018);
-        final LiveData<Long> data = mDao
-                .loadTimeCredits(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
-
-        assertThat(getLiveDataValue(data), is(10L));
     }
 
     @Test

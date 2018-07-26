@@ -93,29 +93,6 @@ public class AppUsageDaoTest {
     }
 
     @Test
-    public void loadAppUsagePercent() throws Exception {
-        final String appName0 = "Test";
-        final Date date = getDate(1, 1, 2018);
-        mDao.add(create(appName0, date));
-        mDao.add(create(appName0, date));
-        mDao.add(create(appName0, date));
-
-        final String appName1 = "Test1";
-        mDao.add(create(appName1, date));
-
-        final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsagePercent(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
-
-        final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
-        assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.isEmpty(), is(false));
-        assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
-        assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getUsageTime(), is(75L));
-        assertThat(liveDataValue.get(1).getUsageTime(), is(25L));
-    }
-
-    @Test
     public void loadRemainingAppUsageTime() throws InterruptedException {
         final Date date = new Date();
 

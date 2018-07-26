@@ -16,6 +16,7 @@ import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.util.LiveDataAsyncTask;
 import com.edu.uni.augsburg.uniatron.model.AppUsage;
+import com.edu.uni.augsburg.uniatron.model.AppUsageCollection;
 import com.edu.uni.augsburg.uniatron.model.Emotion;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.LearningAid;
@@ -28,7 +29,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,29 +96,6 @@ public final class DataRepository {
     }
 
     /**
-     * Get the time credits for today.
-     *
-     * @return The time credits value.
-     */
-    @NonNull
-    public LiveData<Long> getTimeCreditsToday() {
-        return getTimeCreditsByDate(new Date());
-    }
-
-    /**
-     * Get the time credits for a specific date.
-     *
-     * @param date The date to get the time credits from.
-     * @return The time credits value.
-     */
-    @NonNull
-    private LiveData<Long> getTimeCreditsByDate(@NonNull final Date date) {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
-        return mDatabase.timeCreditDao().loadTimeCredits(dateFrom, dateTo);
-    }
-
-    /**
      * Add an amount of steps.
      *
      * @param stepCount The amount of steps.
@@ -135,29 +112,6 @@ public final class DataRepository {
     }
 
     /**
-     * Get the step counts for today.
-     *
-     * @return The amount of steps.
-     */
-    @NonNull
-    public LiveData<Integer> getStepCountsToday() {
-        return getStepCountsByDate(new Date());
-    }
-
-    /**
-     * Get the step counts by date.
-     *
-     * @param date The date to get the steps from.
-     * @return The amount of steps.
-     */
-    @NonNull
-    private LiveData<Integer> getStepCountsByDate(@NonNull final Date date) {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
-        return mDatabase.stepCountDao().loadStepCounts(dateFrom, dateTo);
-    }
-
-    /**
      * Get the remaining step count for today.
      *
      * @return The amount of steps.
@@ -166,19 +120,6 @@ public final class DataRepository {
     public LiveData<Integer> getRemainingStepCountsToday() {
         final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
         final Date dateTo = DateConverter.DATE_MAX_TIME.now();
-        return getRemainingStepCountsByDate(dateFrom, dateTo);
-    }
-
-    /**
-     * Get the remaining step count by date.
-     *
-     * @param dateFrom The date to get the remaining steps from.
-     * @param dateTo   The date to get the remaining steps to.
-     * @return The amount of steps.
-     */
-    @NonNull
-    private LiveData<Integer> getRemainingStepCountsByDate(@NonNull final Date dateFrom,
-                                                           @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.stepCountDao().loadRemainingStepCount(dateFrom, dateTo),
                 data -> data > 0 ? data : 0
@@ -219,18 +160,6 @@ public final class DataRepository {
     }
 
     /**
-     * Get the app usage time for today.
-     *
-     * @return The app usage time.
-     */
-    @NonNull
-    public LiveData<Map<String, Long>> getAppUsageTimeToday() {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
-        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
-        return getAppUsageTimeByDate(dateFrom, dateTo);
-    }
-
-    /**
      * Get the app usage time from date.
      *
      * @param dateFrom The date to start searching.
@@ -238,48 +167,14 @@ public final class DataRepository {
      * @return The app usage time.
      */
     @NonNull
-    public LiveData<Map<String, Long>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
+    public LiveData<AppUsageCollection> getAppUsageTimeByDate(@NonNull final Date dateFrom,
                                                              @NonNull final Date dateTo) {
         return Transformations.map(
                 mDatabase.appUsageDao().loadAppUsageTime(dateFrom, dateTo),
                 appUsageList -> {
-                    final HashMap<String, Long> map = new HashMap<>();
-                    for (final AppUsage usage : appUsageList) {
-                        map.put(usage.getAppName(), usage.getUsageTime());
-                    }
-                    return map;
-                });
-    }
-
-    /**
-     * Get the app usage time in percent for today.
-     *
-     * @return The app usage time in percent.
-     */
-    @NonNull
-    public LiveData<Map<String, Double>> getAppUsagePercentToday() {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
-        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
-        return getAppUsagePercentByDate(dateFrom, dateTo);
-    }
-
-    /**
-     * Get the app usage time in percent from date.
-     *
-     * @param dateFrom The app usage time in percent from date.
-     * @return The app usage time in percent.
-     */
-    @NonNull
-    private LiveData<Map<String, Double>> getAppUsagePercentByDate(@NonNull final Date dateFrom,
-                                                                   @NonNull final Date dateTo) {
-        return Transformations.map(
-                mDatabase.appUsageDao().loadAppUsagePercent(dateFrom, dateTo),
-                appUsageList -> {
-                    final HashMap<String, Double> map = new HashMap<>();
-                    for (final AppUsage usage : appUsageList) {
-                        map.put(usage.getAppName(), usage.getUsageTime() / 100.0);
-                    }
-                    return map;
+                    final Map<String, Long> map = Stream.ofNullable(appUsageList)
+                            .collect(Collectors.toMap(AppUsageEntity::getAppName, AppUsageEntity::getUsageTime));
+                    return new AppUsageCollection(map);
                 });
     }
 
@@ -327,42 +222,6 @@ public final class DataRepository {
             mDatabase.emotionDao().add(emotionEntity);
             return emotionEntity;
         });
-    }
-
-    /**
-     * Get the emotions for a specified date.
-     *
-     * @param date The date to get this data from.
-     * @return The emotions.
-     */
-    public LiveData<List<Emotion>> getAllEmotions(@NonNull final Date date) {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
-        return Transformations.map(
-                mDatabase.emotionDao().getAll(dateFrom, dateTo),
-                data -> {
-                    if (data == null) {
-                        return Collections.emptyList();
-                    } else {
-                        return Stream.of(data).map(item -> item).collect(Collectors.toList());
-                    }
-                }
-        );
-    }
-
-    /**
-     * Get the average emotion for a specified date.
-     *
-     * @param date The date to get this data from.
-     * @return The average emotion for a date.
-     */
-    public LiveData<Emotions> getAverageEmotion(@NonNull final Date date) {
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
-        return Transformations.map(
-                mDatabase.emotionDao().getAverageEmotion(dateFrom, dateTo),
-                data -> data == null ? Emotions.NEUTRAL : Emotions.getAverage(data)
-        );
     }
 
     /**

@@ -54,24 +54,6 @@ public class StepCountDaoTest {
     }
 
     @Test
-    public void loadStepCounts() throws Exception {
-        final int count = 10;
-        final Date date = getDate(1, 1, 2018);
-        mDao.add(create(count, date));
-        mDao.add(create(count, date));
-        mDao.add(create(count, getDate(3, 1, 2018)));
-        mDao.add(create(count, getDate(1, 2, 2018)));
-        mDao.add(create(count, date));
-
-        final LiveData<Integer> data = mDao
-                .loadStepCounts(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
-
-        final Integer liveDataValue = getLiveDataValue(data);
-        assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(count * 3));
-    }
-
-    @Test
     public void loadRemainingStepCountsNegative() throws Exception {
         final int count = 10;
         final Date date = getDate(1, 1, 2018);

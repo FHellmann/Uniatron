@@ -31,17 +31,6 @@ public interface TimeCreditDao {
     void add(TimeCreditEntity timeCreditEntity);
 
     /**
-     * Query the sum of remaining time credits for the current date.
-     *
-     * @param dateFrom The date to start searching.
-     * @param dateTo   The date to end searching.
-     * @return the remaining time credits.
-     */
-    @Query("SELECT TOTAL(time_bonus) FROM TimeCreditEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
-    LiveData<Long> loadTimeCredits(Date dateFrom, Date dateTo);
-
-    /**
      * Query whether the learning aid is active or not.
      *
      * @return The difference in time to the latest learning aid.

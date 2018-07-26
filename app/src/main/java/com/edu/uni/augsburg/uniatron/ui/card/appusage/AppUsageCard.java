@@ -35,14 +35,14 @@ import butterknife.OnClick;
 public class AppUsageCard implements CardViewHolder {
 
     private static final int TYPE = 10;
-    private final List<AppUsageItem> mAppUsageList = new ArrayList<>();
+    private final List<AppUsageViewItem> mAppUsageList = new ArrayList<>();
 
     /**
      * Add all the entries to display.
      *
      * @param data The data to display.
      */
-    public void addAll(@NonNull final List<AppUsageItem> data) {
+    public void addAll(@NonNull final List<AppUsageViewItem> data) {
         mAppUsageList.addAll(data);
         Collections.sort(mAppUsageList, (usage1, usage2) ->
                 Long.compare(usage2.getApplicationUsage(), usage1.getApplicationUsage()));
@@ -85,7 +85,7 @@ public class AppUsageCard implements CardViewHolder {
     }
 
     private long getTotalAppUsage() {
-        return Stream.of(mAppUsageList).mapToLong(AppUsageItem::getApplicationUsage).sum();
+        return Stream.of(mAppUsageList).mapToLong(AppUsageViewItem::getApplicationUsage).sum();
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
@@ -122,11 +122,11 @@ public class AppUsageCard implements CardViewHolder {
     static final class AppUsageAdapter extends RecyclerView.Adapter<AppUsageCard.ViewHolderListItem> {
         private static final int SMALL_VISIBLE_AMOUNT = 5;
         private final Context mContext;
-        private final List<AppUsageItem> mAppData;
+        private final List<AppUsageViewItem> mAppData;
         private boolean mShowSmallVisibleAmount = true;
 
         AppUsageAdapter(@NonNull final Context context,
-                        @NonNull final List<AppUsageItem> appData) {
+                        @NonNull final List<AppUsageViewItem> appData) {
             super();
             mContext = context;
             mAppData = appData;
@@ -147,7 +147,7 @@ public class AppUsageCard implements CardViewHolder {
         @Override
         public void onBindViewHolder(@NonNull final ViewHolderListItem viewHolderListItem,
                                      final int position) {
-            final AppUsageItem item = mAppData.get(position);
+            final AppUsageViewItem item = mAppData.get(position);
 
             final String appLabel = item.getAppLabel();
             final Drawable appIcon = item.getAppIcon();
@@ -187,45 +187,6 @@ public class AppUsageCard implements CardViewHolder {
         ViewHolderListItem(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-        }
-    }
-
-    static final class AppUsageItem {
-        private String mAppLabel;
-        private Drawable mAppIcon;
-        private long mApplicationUsage;
-        private double mApplicationUsagePercent;
-
-        public void setAppLabel(final String appLabel) {
-            this.mAppLabel = appLabel;
-        }
-
-        private String getAppLabel() {
-            return mAppLabel;
-        }
-
-        public void setAppIcon(final Drawable appIcon) {
-            this.mAppIcon = appIcon;
-        }
-
-        private Drawable getAppIcon() {
-            return mAppIcon;
-        }
-
-        public void setApplicationUsage(final long applicationUsage) {
-            this.mApplicationUsage = applicationUsage;
-        }
-
-        private long getApplicationUsage() {
-            return mApplicationUsage;
-        }
-
-        public void setApplicationUsagePercent(final double applicationUsagePercent) {
-            this.mApplicationUsagePercent = applicationUsagePercent;
-        }
-
-        private double getApplicationUsagePercent() {
-            return mApplicationUsagePercent;
         }
     }
 }
