@@ -48,10 +48,10 @@ public class SettingViewModel extends AndroidViewModel {
         MainApplication.getSharedPreferencesHandler(application)
                 .registerOnPreferenceChangeListener((sharedPreferences, key) -> {
                     Log.d(getClass().toString(), "shared prefs changed");
-                    mObservable.setValue(getInstalledAppsPacked(getApplication()));
+                    mObservable.setValue(getInstalledAppsDataSorted(getApplication()));
                 });
 
-        mObservable.setValue(getInstalledAppsPacked(application));
+        mObservable.setValue(getInstalledAppsDataSorted(application));
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
@@ -68,7 +68,7 @@ public class SettingViewModel extends AndroidViewModel {
                 data -> data == null ? Collections.emptyMap() : data);
     }
 
-    private Map<String, String> getInstalledAppsPacked(@NonNull final Context context) {
+    private Map<String, String> getInstalledAppsDataSorted(@NonNull final Context context) {
         final PackageManager packageManager = context.getPackageManager();
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
@@ -76,7 +76,7 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyMap();
         } else {
-            final Map<String, String> linkedElements = getInstalledApps(context, packageManager, installedApplications);
+            final Map<String, String> linkedElements = getInstalledAppsData(context, packageManager, installedApplications);
             return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
@@ -88,9 +88,9 @@ public class SettingViewModel extends AndroidViewModel {
     }
 
     @NonNull
-    private Map<String, String> getInstalledApps(@NonNull final Context context,
-                                                 @NonNull final PackageManager packageManager,
-                                                 @NonNull final List<ApplicationInfo> installedApplications) {
+    private Map<String, String> getInstalledAppsData(@NonNull final Context context,
+                                                     @NonNull final PackageManager packageManager,
+                                                     @NonNull final List<ApplicationInfo> installedApplications) {
         return Stream.of(installedApplications)
                 .filter(item -> !item.packageName.equals(
                         context.getApplicationInfo().packageName
