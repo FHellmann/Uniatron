@@ -121,16 +121,25 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public void setGroupByStrategy(@NonNull final GroupBy groupBy) {
         mGroupByStrategy = groupBy;
-        notifyDataSetChanged();
+        setDate(new Date());
     }
 
     /**
-     * Get the group by strategy.
+     * Get the date formatted as defined in the group strategy.
      *
-     * @return The strategy.
+     * @param date The date to format.
+     * @return The formatted date.
      */
-    public GroupBy getGroupByStrategy() {
-        return mGroupByStrategy;
+    public String getDateFormatByGroupStrategy(@NonNull final Date date) {
+        switch (mGroupByStrategy) {
+            case MONTH:
+                return DateUtil.formatForMonth(date);
+            case YEAR:
+                return DateUtil.formatForYear(date);
+            case DATE:
+            default:
+                return DateUtil.formatForDate(date);
+        }
     }
 
     /**
