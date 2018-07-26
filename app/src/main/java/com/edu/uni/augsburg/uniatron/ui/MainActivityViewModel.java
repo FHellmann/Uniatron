@@ -111,12 +111,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         } else if (!mGroupByStrategy.mPrevAvailable.apply(mMinCalendar, calendar)) {
             calendar.setTime(mMinCalendar.getTime());
         }
-        // Only notify if the date was really changed
-        if (DateConverter.DATE_MIN_TIME.convert(mCalendar.getTime())
-                .compareTo(DateConverter.DATE_MIN_TIME.convert(calendar.getTime())) != 0) {
-            mCalendar = calendar;
-            notifyDataSetChanged();
-        }
+        mCalendar = calendar;
+        notifyDataSetChanged();
     }
 
     /**
