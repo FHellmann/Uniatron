@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.card;
+package com.edu.uni.augsburg.uniatron.ui.card.coinbag;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
-import java.util.concurrent.TimeUnit;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -21,19 +19,20 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class TimeAccountCard implements CardViewHolder {
+public class CoinBagCard implements CardViewHolder {
 
-    private static final int TYPE = 1;
-    private long mTimeLeft;
+    private static final int TYPE = 2;
+
+    private int mCoins;
     private boolean mVisible;
 
     /**
-     * Set the time left.
+     * Set the coins.
      *
-     * @param timeLeft The time left.
+     * @param coins The coins to set.
      */
-    public void setTimeLeft(final long timeLeft) {
-        this.mTimeLeft = timeLeft;
+    public void setCoins(final int coins) {
+        mCoins = coins;
     }
 
     /**
@@ -47,8 +46,8 @@ public class TimeAccountCard implements CardViewHolder {
 
     @Override
     public void update(@NonNull final CardViewHolder cardViewHolder) {
-        final TimeAccountCard holder = (TimeAccountCard) cardViewHolder;
-        setTimeLeft(holder.mTimeLeft);
+        final CoinBagCard holder = (CoinBagCard) cardViewHolder;
+        setCoins(holder.mCoins);
         setVisible(holder.mVisible);
     }
 
@@ -56,11 +55,7 @@ public class TimeAccountCard implements CardViewHolder {
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
         final ViewHolder holder = (ViewHolder) viewHolder;
-
-        final long time = TimeUnit.SECONDS.convert(mTimeLeft, TimeUnit.MILLISECONDS);
-
-        holder.mTextTimeLeft.setText(context
-                .getString(R.string.time_account_desc, time / 60, Math.abs(time % 60)));
+        holder.mTextCoins.setText(String.valueOf(mCoins));
     }
 
     @Override
@@ -77,12 +72,12 @@ public class TimeAccountCard implements CardViewHolder {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
         return new ViewHolder(LayoutInflater.from(context)
-                .inflate(R.layout.card_time_account, viewGroup, false));
+                .inflate(R.layout.card_coins, viewGroup, false));
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.textTimeLeft)
-        TextView mTextTimeLeft;
+        @BindView(R.id.textCoins)
+        TextView mTextCoins;
 
         ViewHolder(@NonNull final View itemView) {
             super(itemView);

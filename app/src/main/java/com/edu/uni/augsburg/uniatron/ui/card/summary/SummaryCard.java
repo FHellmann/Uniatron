@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.card;
+package com.edu.uni.augsburg.uniatron.ui.card.summary;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

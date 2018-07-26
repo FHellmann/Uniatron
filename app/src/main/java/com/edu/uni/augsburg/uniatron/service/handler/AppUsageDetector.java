@@ -39,15 +39,17 @@ public final class AppUsageDetector extends BroadcastReceiver {
      */
     private AppUsageDetector(@NonNull final Context context) {
         super();
-        mModel = new AppUsageModel(context);
+        mModel = new AppUsageModel(
+                context,
+                packageName -> blockByTimeCreditIfTimeUp(context),
+                packageName -> blockByLearningAid(context)
+        );
         mModel.addNotifyOnTimeUpSoonListeners(
                 remainingTime -> showNotificationIfTimeAlmostUp(context, remainingTime),
                 (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_ONE_MINUTE, TimeUnit.MINUTES),
                 (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_FIVE_MINUTES, TimeUnit.MINUTES),
                 (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_TEN_MINUTES, TimeUnit.MINUTES)
         );
-        mModel.setBlockByLearningAidListener(packageName -> blockByLearningAid(context));
-        mModel.setBlockByTimeOutListener(packageName -> blockByTimeCreditIfTimeUp(context));
         startAppChecker(context);
     }
 

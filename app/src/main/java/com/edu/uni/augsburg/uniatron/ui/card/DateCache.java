@@ -15,7 +15,7 @@ import java.util.Map;
  * @param <T> The generic type of the source live data.
  * @author Fabio Hellmann
  */
-class DateCache<T> {
+public class DateCache<T> {
     private final Map<MediatorLiveData<?>, LiveData<T>> mCache = new HashMap<>();
 
     /**
@@ -24,7 +24,7 @@ class DateCache<T> {
      * @param liveData The live data to listen on.
      * @param source   The source live data.
      */
-    void clearAndRegister(@NonNull final MediatorLiveData<?> liveData,
+    public void clearAndRegister(@NonNull final MediatorLiveData<?> liveData,
                           @NonNull final LiveData<T> source) {
         Stream.of(mCache.entrySet()).forEach(entry -> entry.getKey().removeSource(entry.getValue()));
         mCache.clear();

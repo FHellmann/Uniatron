@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui.card;
+package com.edu.uni.augsburg.uniatron.ui.card.timeaccount;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -12,6 +12,7 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.CardViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
 import java.util.Date;
 

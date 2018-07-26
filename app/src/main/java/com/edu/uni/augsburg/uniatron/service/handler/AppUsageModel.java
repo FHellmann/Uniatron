@@ -38,19 +38,26 @@ public class AppUsageModel {
     private final DataRepository mRepository;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
-    private final SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener;
-
     private final Map<Integer, Consumer<Integer>> mNotifyListeners = new LinkedHashMap<>();
-    private Consumer<String> mBlockTimeOutListener;
-    private Consumer<String> mBlockLearningAidListener;
+    private final Consumer<String> mBlockTimeOutListener;
+    private final Consumer<String> mBlockLearningAidListener;
+    private SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener;
 
-    AppUsageModel(@NonNull final Context context) {
+    AppUsageModel(@NonNull final Context context,
+                  @NonNull final Consumer<String> blockTimeOutListener,
+                  @NonNull final Consumer<String> blockLearningAidListener) {
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(context);
         mRepository = MainApplication.getRepository(context);
+        mBlockTimeOutListener = blockTimeOutListener;
+        mBlockLearningAidListener = blockLearningAidListener;
 
         mUsageTimeHelper.addLiveData(mRepository.getRemainingAppUsageTimeToday(getAppsBlacklist()));
         mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
 
+        registerPreferenceListener();
+    }
+
+    private void registerPreferenceListener() {
         mPrefChangeListener = (sharedPreferences, key) -> {
             final Set<String> blacklist = getAppsBlacklist();
             mUsageTimeHelper.addLiveData(mRepository.getRemainingAppUsageTimeToday(blacklist));
@@ -81,15 +88,11 @@ public class AppUsageModel {
         } else if (mLearningAidHelper.isLearningAidActive()) {
             Logger.d("App '" + packageName + "' is blocked by learning aid -> BLOCKED");
             // 1. Priority: Check whether the learning aid is active or not
-            if (mBlockLearningAidListener != null) {
-                mBlockLearningAidListener.accept(packageName);
-            }
+            mBlockLearningAidListener.accept(packageName);
         } else if (mUsageTimeHelper.getRemainingUsageTime() <= 0) {
             //Logger.d("App '" + appName + "' is blocked by time credit up -> BLOCKED");
             // 2. Priority: Check whether the time credit time is up or not
-            if (mBlockTimeOutListener != null) {
-                mBlockTimeOutListener.accept(packageName);
-            }
+            mBlockTimeOutListener.accept(packageName);
         } else {
             Stream.of(mNotifyListeners.entrySet())
                     .filter(entry -> entry.getKey() == mUsageTimeHelper.getRemainingUsageTime())
@@ -110,24 +113,6 @@ public class AppUsageModel {
         Stream.ofNullable(timeToEnds)
                 .filter(Objects::nonNull)
                 .forEach(value -> mNotifyListeners.put(value, listener));
-    }
-
-    /**
-     * Set listener for block by time out.
-     *
-     * @param listener The listener.
-     */
-    public void setBlockByTimeOutListener(@NonNull final Consumer<String> listener) {
-        mBlockTimeOutListener = listener;
-    }
-
-    /**
-     * Set listener for block by learning aid.
-     *
-     * @param listener The listener.
-     */
-    public void setBlockByLearningAidListener(@NonNull final Consumer<String> listener) {
-        mBlockLearningAidListener = listener;
     }
 
     private void commitAppUsageTime(final String appName, final int usageTime) {

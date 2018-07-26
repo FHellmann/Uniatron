@@ -97,6 +97,15 @@ public enum DateConverter {
     }
 
     /**
+     * Convers the current date.
+     *
+     * @return The converted date.
+     */
+    public Date now() {
+        return convert(new Date());
+    }
+
+    /**
      * Get the date converter for the calendar grouping.
      *
      * @param calendarGrouping The calendar grouping by date, month or year.

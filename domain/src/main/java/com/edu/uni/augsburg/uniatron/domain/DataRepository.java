@@ -164,9 +164,8 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Integer> getRemainingStepCountsToday() {
-        final Date date = new Date();
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
+        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
         return getRemainingStepCountsByDate(dateFrom, dateTo);
     }
 
@@ -226,9 +225,8 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Map<String, Long>> getAppUsageTimeToday() {
-        final Date date = new Date();
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
+        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
         return getAppUsageTimeByDate(dateFrom, dateTo);
     }
 
@@ -260,9 +258,8 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Map<String, Double>> getAppUsagePercentToday() {
-        final Date date = new Date();
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
+        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
         return getAppUsagePercentByDate(dateFrom, dateTo);
     }
 
@@ -294,9 +291,8 @@ public final class DataRepository {
      */
     @NonNull
     public LiveData<Long> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
-        final Date date = new Date();
-        final Date dateFrom = DateConverter.DATE_MIN_TIME.convert(date);
-        final Date dateTo = DateConverter.DATE_MAX_TIME.convert(date);
+        final Date dateFrom = DateConverter.DATE_MIN_TIME.now();
+        final Date dateTo = DateConverter.DATE_MAX_TIME.now();
         return getRemainingAppUsageTimeByDate(dateFrom, dateTo, filter);
     }
 

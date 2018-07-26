@@ -28,25 +28,19 @@ public final class PackageChangeDetector extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
-            if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
-                Logger.d("Package updated (added): " + getPackageName(intent));
-            } else {
-                Logger.d("Package added: " + getPackageName(intent));
-                askUserToAddBlacklistEntry(context, getPackageName(intent));
-            }
-        } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
-            if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
-                Logger.d("Package updated (removed): " + getPackageName(intent));
-            } else {
-                Logger.d("Package removed: " + getPackageName(intent));
-                mModel.removeBlacklistEntry(getPackageName(intent));
-            }
+        if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())
+                && !intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
+            Logger.d("Package added: " + getPackageName(intent));
+            askUserToAddBlacklistEntry(context, getPackageName(intent));
+        } else if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())
+                && !intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
+            Logger.d("Package removed: " + getPackageName(intent));
+            mModel.removeBlacklistEntry(getPackageName(intent));
         }
     }
 
     private void askUserToAddBlacklistEntry(@NonNull final Context context,
-                                  @NonNull final String packageName) {
+                                            @NonNull final String packageName) {
         final AppNotificationBuilder builder = new PackageAddedNotificationBuilder(
                 context,
                 packageName,
@@ -82,7 +76,7 @@ public final class PackageChangeDetector extends BroadcastReceiver {
     /**
      * Starts the handler.
      *
-     * @param context  The context.
+     * @param context The context.
      * @return The handler.
      */
     public static PackageChangeDetector start(@NonNull final Context context) {
