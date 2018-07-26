@@ -10,9 +10,6 @@ coverage:
       backend:
         target: 90%
         flags: backend
-    patch:
-      default:
-        enabled: no
 
 flags:
   frontend:
