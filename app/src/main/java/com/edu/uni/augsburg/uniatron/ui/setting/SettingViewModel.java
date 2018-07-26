@@ -48,10 +48,10 @@ public class SettingViewModel extends AndroidViewModel {
         MainApplication.getSharedPreferencesHandler(application)
                 .registerOnPreferenceChangeListener((sharedPreferences, key) -> {
                     Log.d(getClass().toString(), "shared prefs changed");
-                    mObservable.setValue(getAllInstalledApps(getApplication()));
+                    mObservable.setValue(getInstalledAppsPacked(getApplication()));
                 });
 
-        mObservable.setValue(getAllInstalledApps(application));
+        mObservable.setValue(getInstalledAppsPacked(application));
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
@@ -68,7 +68,7 @@ public class SettingViewModel extends AndroidViewModel {
                 data -> data == null ? Collections.emptyMap() : data);
     }
 
-    private Map<String, String> getAllInstalledApps(@NonNull final Context context) {
+    private Map<String, String> getInstalledAppsPacked(@NonNull final Context context) {
         final PackageManager packageManager = context.getPackageManager();
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
@@ -88,22 +88,6 @@ public class SettingViewModel extends AndroidViewModel {
     }
 
     @NonNull
-    private Stream<Map.Entry<String, String>> getUnselectedItems(@NonNull final Map<String, String> linkedElements) {
-        return Stream
-                .of(linkedElements.entrySet())
-                .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
-                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-    }
-
-    @NonNull
-    private Stream<Map.Entry<String, String>> getSelectedItems(@NonNull final Map<String, String> linkedElements) {
-        return Stream
-                .of(linkedElements.entrySet())
-                .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
-                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-    }
-
-    @NonNull
     private Map<String, String> getInstalledApps(@NonNull final Context context,
                                                  @NonNull final PackageManager packageManager,
                                                  @NonNull final List<ApplicationInfo> installedApplications) {
@@ -118,6 +102,22 @@ public class SettingViewModel extends AndroidViewModel {
                         key -> key.packageName,
                         value -> packageManager.getApplicationLabel(value).toString()
                 ));
+    }
+
+    @NonNull
+    private Stream<Map.Entry<String, String>> getSelectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+    }
+
+    @NonNull
+    private Stream<Map.Entry<String, String>> getUnselectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
     }
 
     @NonNull
