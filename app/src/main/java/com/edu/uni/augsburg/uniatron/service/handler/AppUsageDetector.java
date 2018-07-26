@@ -66,6 +66,8 @@ public final class AppUsageDetector extends BroadcastReceiver {
     }
 
     private void startAppChecker(@NonNull final Context context) {
+        stopAppChecker(); // In case the checker is already running
+
         final AppChecker checker = mAppChecker
                 .whenOther(packageName -> mModel.onAppUsed(packageName, DELAY_IN_MILLISECONDS))
                 .timeout(DELAY_IN_MILLISECONDS);

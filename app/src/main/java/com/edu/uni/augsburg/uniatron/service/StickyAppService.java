@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import com.edu.uni.augsburg.uniatron.service.handler.AppUsageDetector;
 import com.edu.uni.augsburg.uniatron.service.handler.PackageChangeDetector;
 import com.edu.uni.augsburg.uniatron.service.handler.StepCountDetector;
+import com.orhanobut.logger.Logger;
 
 /**
  * A sticky service for all the background tasks.
@@ -27,23 +28,23 @@ public class StickyAppService extends Service {
         return null;
     }
 
-    /**
-     * Executes the start of the service.
-     *
-     * @param intent  The intent.
-     * @param flags   The flags.
-     * @param startId The start id.
-     * @return The way the service is started.
-     */
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Logger.d("Start main service");
         mPackageAddedReceiver = PackageChangeDetector.start(this);
         mAppUsageDetector = AppUsageDetector.start(this);
         mStepHandler = StepCountDetector.start(this);
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        Logger.d("Destroy main service");
         mAppUsageDetector.destroy(this);
         mPackageAddedReceiver.destroy(this);
         mStepHandler.destroy();
