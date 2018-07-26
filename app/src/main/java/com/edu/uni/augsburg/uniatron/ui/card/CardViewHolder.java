@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui;
+package com.edu.uni.augsburg.uniatron.ui.card;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -26,11 +26,22 @@ public interface CardViewHolder {
     void onBindView(Context context, RecyclerView.ViewHolder viewHolder);
 
     /**
+     * Creates a view holder.
+     *
+     * @param context   The context.
+     * @param viewGroup The parent view group.
+     * @return The view holder.
+     */
+    RecyclerView.ViewHolder onCreateViewHolder(Context context, ViewGroup viewGroup);
+
+    /**
      * Get the card type.
      *
      * @return The type.
      */
-    int getType();
+    default int getType() {
+        return getClass().getName().hashCode();
+    }
 
     /**
      * Check if the card should be displayed.
@@ -42,11 +53,11 @@ public interface CardViewHolder {
     }
 
     /**
-     * Creates a view holder.
+     * Get the priority.
      *
-     * @param context   The context.
-     * @param viewGroup The parent view group.
-     * @return The view holder.
+     * @return The priority.
      */
-    RecyclerView.ViewHolder onCreateViewHolder(Context context, ViewGroup viewGroup);
+    default CardPriority getPriority() {
+        return CardPriority.NORMAL;
+    }
 }

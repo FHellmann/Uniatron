@@ -35,30 +35,46 @@ public final class DatabaseUtil {
         Log.i("Database", "### Starting Database mockup data creation! ###");
 
         long start = System.currentTimeMillis();
-        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                .mapToObj(index -> getAppUsage(random, index))
-                .forEach(item -> appDatabase.appUsageDao().add(item));
+        createTestDataAppUsage(appDatabase, random);
         Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " app usage data in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                .mapToObj(index -> getStepCount(random, index))
-                .forEach(item -> appDatabase.stepCountDao().add(item));
+        createTestDataSteps(appDatabase, random);
         Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " step count data in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                .mapToObj(index -> getTimeCredit(index))
-                .forEach(item -> appDatabase.timeCreditDao().add(item));
+        createTestDataTimeCredit(appDatabase);
         Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " time credit data in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
-                .mapToObj(index -> getEmotion(random, index))
-                .forEach(item -> appDatabase.emotionDao().add(item));
+        createTestDataEmotion(appDatabase, random);
         Log.i("Database", "### Added " + MOCK_DATA_ITEM_COUNT + " emotion data in " + (System.currentTimeMillis() - start) + "ms");
 
         Log.i("Database", "### Database mockup data finished! ###");
+    }
+
+    private static void createTestDataEmotion(final @NonNull AppDatabase appDatabase, final Random random) {
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getEmotion(random, index))
+                .forEach(item -> appDatabase.emotionDao().add(item));
+    }
+
+    private static void createTestDataTimeCredit(final @NonNull AppDatabase appDatabase) {
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(DatabaseUtil::getTimeCredit)
+                .forEach(item -> appDatabase.timeCreditDao().add(item));
+    }
+
+    private static void createTestDataSteps(final @NonNull AppDatabase appDatabase, final Random random) {
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getStepCount(random, index))
+                .forEach(item -> appDatabase.stepCountDao().add(item));
+    }
+
+    private static void createTestDataAppUsage(final @NonNull AppDatabase appDatabase, final Random random) {
+        IntStream.range(0, MOCK_DATA_ITEM_COUNT)
+                .mapToObj(index -> getAppUsage(random, index))
+                .forEach(item -> appDatabase.appUsageDao().add(item));
     }
 
     private static AppUsageEntity getAppUsage(Random random, int index) {

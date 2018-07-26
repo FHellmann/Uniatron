@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 import com.edu.uni.augsburg.uniatron.ui.card.EmptyCard;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class MainActivityCardListAdapter
                 mCardViewHolderList.add(cardViewHolder);
                 Collections.sort(
                         mCardViewHolderList,
-                        (card1, card2) -> Integer.compare(card1.getType(), card2.getType())
+                        (card1, card2) -> card2.getPriority().compareTo(card1.getPriority())
                 );
                 notifyItemInserted(mCardViewHolderList.indexOf(cardViewHolder));
             }

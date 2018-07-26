@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.domain.util;
+package com.edu.uni.augsburg.uniatron.ui.util;
 
 import org.junit.Test;
 

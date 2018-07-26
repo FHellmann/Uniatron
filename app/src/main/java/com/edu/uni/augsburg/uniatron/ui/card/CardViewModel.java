@@ -1,4 +1,4 @@
-package com.edu.uni.augsburg.uniatron.ui;
+package com.edu.uni.augsburg.uniatron.ui.card;
 
 import java.util.Date;
 

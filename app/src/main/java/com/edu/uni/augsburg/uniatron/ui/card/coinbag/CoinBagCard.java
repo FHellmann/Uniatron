@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
+import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
+import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,8 +21,6 @@ import butterknife.ButterKnife;
  * @author Fabio Hellmann
  */
 public class CoinBagCard implements CardViewHolder {
-
-    private static final int TYPE = 2;
 
     private int mCoins;
     private boolean mVisible;
@@ -59,13 +58,13 @@ public class CoinBagCard implements CardViewHolder {
     }
 
     @Override
-    public int getType() {
-        return TYPE;
+    public boolean isVisible() {
+        return mVisible;
     }
 
     @Override
-    public boolean isVisible() {
-        return mVisible;
+    public CardPriority getPriority() {
+        return CardPriority.VERY_HIGH;
     }
 
     @Override

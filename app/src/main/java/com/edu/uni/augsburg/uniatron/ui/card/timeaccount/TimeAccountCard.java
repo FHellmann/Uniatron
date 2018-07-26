@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
+import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
+import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +24,6 @@ import butterknife.ButterKnife;
  */
 public class TimeAccountCard implements CardViewHolder {
 
-    private static final int TYPE = 1;
     private long mTimeLeft;
     private boolean mVisible;
 
@@ -64,13 +64,13 @@ public class TimeAccountCard implements CardViewHolder {
     }
 
     @Override
-    public int getType() {
-        return TYPE;
+    public boolean isVisible() {
+        return mVisible;
     }
 
     @Override
-    public boolean isVisible() {
-        return mVisible;
+    public CardPriority getPriority() {
+        return CardPriority.VERY_HIGH;
     }
 
     @Override

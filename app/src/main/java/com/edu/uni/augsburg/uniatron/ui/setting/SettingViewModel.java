@@ -68,7 +68,7 @@ public class SettingViewModel extends AndroidViewModel {
                 data -> data == null ? Collections.emptyMap() : data);
     }
 
-    private Map<String, String> getAllInstalledApps(final @NonNull Context context) {
+    private Map<String, String> getAllInstalledApps(@NonNull final Context context) {
         final PackageManager packageManager = context.getPackageManager();
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
@@ -76,29 +76,8 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyMap();
         } else {
-            final Map<String, String> linkedElements = Stream.of(installedApplications)
-                    .filter(item -> !item.packageName.equals(
-                            context.getApplicationInfo().packageName
-                    ))
-                    .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
-                            | ApplicationInfo.FLAG_SYSTEM)) == 0)
-                    .filter(item -> !item.packageName.equals(getDefaultLauncherPackageName()))
-                    .collect(Collectors.toMap(
-                            key -> key.packageName,
-                            value -> packageManager.getApplicationLabel(value).toString()
-                    ));
-
-            final Stream<Map.Entry<String, String>> selectedItems = Stream
-                    .of(linkedElements.entrySet())
-                    .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
-                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-
-            final Stream<Map.Entry<String, String>> unselectedItems = Stream
-                    .of(linkedElements.entrySet())
-                    .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
-                    .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-
-            return Stream.concat(selectedItems, unselectedItems)
+            final Map<String, String> linkedElements = getInstalledApps(context, packageManager, installedApplications);
+            return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
@@ -108,6 +87,40 @@ public class SettingViewModel extends AndroidViewModel {
         }
     }
 
+    @NonNull
+    private Stream<Map.Entry<String, String>> getUnselectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+    }
+
+    @NonNull
+    private Stream<Map.Entry<String, String>> getSelectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+    }
+
+    @NonNull
+    private Map<String, String> getInstalledApps(@NonNull final Context context,
+                                                 @NonNull final PackageManager packageManager,
+                                                 @NonNull final List<ApplicationInfo> installedApplications) {
+        return Stream.of(installedApplications)
+                .filter(item -> !item.packageName.equals(
+                        context.getApplicationInfo().packageName
+                ))
+                .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+                        | ApplicationInfo.FLAG_SYSTEM)) == 0)
+                .filter(item -> !item.packageName.equals(getDefaultLauncherPackageName()))
+                .collect(Collectors.toMap(
+                        key -> key.packageName,
+                        value -> packageManager.getApplicationLabel(value).toString()
+                ));
+    }
+
+    @NonNull
     private String getDefaultLauncherPackageName() {
         final PackageManager localPackageManager = getApplication().getPackageManager();
         final Intent intent = new Intent("android.intent.action.MAIN");

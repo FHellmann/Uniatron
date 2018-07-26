@@ -6,7 +6,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,9 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.Summary;
-import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
+import com.edu.uni.augsburg.uniatron.ui.card.CardHelper;
+import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
+import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +28,7 @@ import butterknife.ButterKnife;
  * @author Fabio Hellmann
  */
 public class SummaryCard implements CardViewHolder {
-    private static final int TYPE = Integer.MAX_VALUE - 1;
+    private static final int TYPE = Integer.MIN_VALUE + 1;
     private Summary mSummary;
 
     SummaryCard(@NonNull final Summary summary) {
@@ -42,10 +43,7 @@ public class SummaryCard implements CardViewHolder {
     @Override
     public void onBindView(@NonNull final Context context,
                            @NonNull final RecyclerView.ViewHolder viewHolder) {
-        final StaggeredGridLayoutManager.LayoutParams layoutParams =
-                (StaggeredGridLayoutManager.LayoutParams) viewHolder.itemView.getLayoutParams();
-        layoutParams.setFullSpan(true);
-
+        CardHelper.setFullSpan(viewHolder);
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());
@@ -59,8 +57,8 @@ public class SummaryCard implements CardViewHolder {
     }
 
     @Override
-    public int getType() {
-        return TYPE;
+    public CardPriority getPriority() {
+        return CardPriority.VERY_LOW;
     }
 
     @Override
@@ -80,7 +78,6 @@ public class SummaryCard implements CardViewHolder {
                 return R.string.emotion_happy;
             case FANTASTIC:
                 return R.string.emotion_fantastic;
-            case NEUTRAL:
             default:
                 return R.string.emotion_neutral;
         }
@@ -97,7 +94,6 @@ public class SummaryCard implements CardViewHolder {
                 return R.drawable.ic_emoticon_happy_selected;
             case FANTASTIC:
                 return R.drawable.ic_emoticon_fantastic_selected;
-            case NEUTRAL:
             default:
                 return R.drawable.ic_emoticon_neutral_selected;
         }
