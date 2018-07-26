@@ -9,17 +9,16 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.button.MaterialButton;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
 import com.edu.uni.augsburg.uniatron.service.BroadcastService;
@@ -107,11 +106,17 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mModelNavigation.registerCardViewModel(coinBagModel);
         mModelNavigation.registerCardViewModel(timeAccountModel);
         mModelNavigation.getCurrentDate().observe(this, date -> {
-            mDateDisplayButton.setText(getDateFormatByGroupStrategy(date.getTime()));
-            mNextDateButton.setEnabled(mModelNavigation.isNextAvailable());
-            mPrevDateButton.setEnabled(mModelNavigation.isPrevAvailable());
-            mRecyclerView.smoothScrollToPosition(0);
+            if (date != null) {
+                mDateDisplayButton.setText(mModelNavigation.getDateFormatByGroupStrategy(date.getTime()));
+                mNextDateButton.setVisibility(getButtonVisibility(mModelNavigation.isNextAvailable()));
+                mPrevDateButton.setVisibility(getButtonVisibility(mModelNavigation.isPrevAvailable()));
+                mRecyclerView.smoothScrollToPosition(0);
+            }
         });
+    }
+
+    private int getButtonVisibility(final boolean isAvailable) {
+        return isAvailable ? View.VISIBLE : View.INVISIBLE;
     }
 
     private void startOnBoarding() {
@@ -140,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 (datePicker, year, month, date) -> {
                     final Calendar calendar = GregorianCalendar.getInstance();
                     calendar.set(year, month, date);
+                    mAdapter.clear();
                     mModelNavigation.setDate(calendar.getTime());
                 },
                 mModelNavigation.getCurrentDateValue(Calendar.YEAR),
@@ -162,19 +168,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      */
     @OnClick(R.id.fab)
     public void onFabClicked() {
-        startActivityWithParentStack(new Intent(this, TimeCreditShopActivity.class));
-    }
-
-    private String getDateFormatByGroupStrategy(@NonNull final Date date) {
-        switch (mModelNavigation.getGroupByStrategy()) {
-            case MONTH:
-                return DateUtil.formatForMonth(date);
-            case YEAR:
-                return DateUtil.formatForYear(date);
-            case DATE:
-            default:
-                return DateUtil.formatForDate(date);
-        }
+        startActivity(new Intent(this, TimeCreditShopActivity.class));
     }
 
     @Override
@@ -189,10 +183,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 menuItem.setChecked(true);
                 return handleGrouping(menuItem.getItemId());
             case R.id.setting:
-                startActivityWithParentStack(new Intent(this, SettingActivity.class));
+                startActivity(new Intent(this, SettingActivity.class));
                 return true;
             case R.id.about:
-                startActivityWithParentStack(new Intent(this, AboutActivity.class));
+                startActivity(new Intent(this, AboutActivity.class));
                 return true;
             case R.id.feedback:
                 startFeedbackDialog();
@@ -226,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 .positiveColor(getResources().getColor(R.color.secondaryColor))
                 .onPositive((dialog, which) -> {
                     // Open Play Store for rating
-                    startActivityWithParentStack(getPlayStoreIntent(getPackageName()));
+                    startActivity(getPlayStoreIntent(getPackageName()));
                 })
                 .negativeText(R.string.no)
                 .negativeColor(getResources().getColor(android.R.color.darker_gray))
@@ -236,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                     feedbackIntent.setType("text/html");
                     feedbackIntent.putExtra(Intent.EXTRA_EMAIL, "info@fabio-hellmann.de");
                     feedbackIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback: UNIAtron");
-                    startActivityWithParentStack(feedbackIntent);
+                    startActivity(feedbackIntent);
                 })
                 .show();
     }
@@ -248,11 +242,5 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         } catch (android.content.ActivityNotFoundException anfe) {
             return new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
         }
-    }
-
-    private void startActivityWithParentStack(@NonNull final Intent intent) {
-        TaskStackBuilder.create(this)
-                .addNextIntentWithParentStack(intent)
-                .startActivities();
     }
 }
