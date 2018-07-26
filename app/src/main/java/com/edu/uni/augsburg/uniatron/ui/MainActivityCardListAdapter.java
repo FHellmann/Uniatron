@@ -73,7 +73,9 @@ public class MainActivityCardListAdapter
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder,
                                  final int position) {
-        mCardViewHolderList.get(position).onBindView(mContext, viewHolder);
+        if (mCardViewHolderList.size() > position) {
+            mCardViewHolderList.get(position).onBindView(mContext, viewHolder);
+        }
     }
 
     @Override

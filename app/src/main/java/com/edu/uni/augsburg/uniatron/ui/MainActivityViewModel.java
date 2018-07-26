@@ -76,8 +76,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     private void notifyDataSetChanged() {
         Stream.of(mCardViewModelList)
-                .forEach(cardViewModel ->
-                        cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType));
+                .forEach(cardViewModel -> cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType));
         mDateLoaded.setValue(mCalendar);
     }
 
