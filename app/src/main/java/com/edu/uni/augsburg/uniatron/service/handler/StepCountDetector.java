@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.IntStream;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
+import com.orhanobut.logger.Logger;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -34,17 +35,21 @@ public final class StepCountDetector {
         // grab step detector and register the listener
         mSensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
 
-        // not all phones have a step sensor. fallback to accelerometer when necessary
-        final Sensor stepDetectorSensor =
-                mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) == null
-                        ? mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-                        : mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        if (mSensorManager == null) {
+            Logger.w("The sensor manager is not available!");
+        } else {
+            // not all phones have a step sensor. fallback to accelerometer when necessary
+            final Sensor stepDetectorSensor =
+                    mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) == null
+                            ? mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+                            : mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
-        mSensorManager.registerListener(
-                mStepDetector,
-                stepDetectorSensor,
-                SensorManager.SENSOR_DELAY_FASTEST
-        );
+            mSensorManager.registerListener(
+                    mStepDetector,
+                    stepDetectorSensor,
+                    SensorManager.SENSOR_DELAY_FASTEST
+            );
+        }
     }
 
     /**
@@ -105,14 +110,9 @@ public final class StepCountDetector {
             if (isChangedDirection(Float.compare(velocityAvg, mLastValue))) {
                 // Direction changed
                 final float diff = Math.abs(mLastValue - velocityAvg);
-
                 if (diff > LIMIT) {
                     final Match minOrMax = Match.getMinOrMax(mLastDirection);
-                    final boolean isNotContra = mLastMatch != minOrMax.invert();
-                    final boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff * 2 / values.length);
-                    final boolean isPreviousLargeEnough = mLastDiff > (diff / values.length);
-
-                    if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
+                    if (isApplicable(minOrMax, diff, values)) {
                         mStepConsumer.accept(1);
                     }
                     mLastMatch = minOrMax;
@@ -122,6 +122,13 @@ public final class StepCountDetector {
                 mLastDiff = diff;
             }
             mLastValue = velocityAvg;
+        }
+
+        private boolean isApplicable(@NonNull final Match minOrMax, final float diff, final float[] values) {
+            final boolean isNotContra = mLastMatch != minOrMax.invert();
+            final boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff * 2 / values.length);
+            final boolean isPreviousLargeEnough = mLastDiff > (diff / values.length);
+            return isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra;
         }
 
         private boolean isChangedDirection(final float direction) {

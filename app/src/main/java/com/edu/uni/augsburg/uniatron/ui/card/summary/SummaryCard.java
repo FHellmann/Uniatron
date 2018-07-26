@@ -2,7 +2,9 @@ package com.edu.uni.augsburg.uniatron.ui.card.summary;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -47,27 +49,13 @@ public class SummaryCard implements CardViewHolder {
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
 
         final Emotions emotion = Emotions.getAverage(mSummary.getEmotionAvg());
-        final Drawable drawable = getEmoticonDrawable(context, emotion);
+        final Drawable drawable = context.getResources().getDrawable(getEmoticonDrawable(emotion));
 
         itemViewHolder.mImageViewEmoticon.setImageDrawable(drawable);
-        itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps, mSummary.getSteps(), getEmotionText(context, emotion)));
-    }
-
-    private String getEmotionText(@NonNull final Context context,
-                                  @NonNull final Emotions emotion) {
-        switch (emotion) {
-            case ANGRY:
-                return context.getString(R.string.emotion_angry);
-            case SADNESS:
-                return context.getString(R.string.emotion_sad);
-            case HAPPINESS:
-                return context.getString(R.string.emotion_happy);
-            case FANTASTIC:
-                return context.getString(R.string.emotion_fantastic);
-            case NEUTRAL:
-            default:
-                return context.getString(R.string.emotion_neutral);
-        }
+        itemViewHolder.mTextViewSteps.setText(context.getString(R.string.card_summary_steps,
+                mSummary.getSteps(),
+                context.getString(getEmotionText(emotion))
+        ));
     }
 
     @Override
@@ -76,36 +64,42 @@ public class SummaryCard implements CardViewHolder {
     }
 
     @Override
-    public boolean isVisible() {
-        return true;
-    }
-
-    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
-        return new ViewHolder(LayoutInflater.from(context)
-                .inflate(R.layout.card_summary, viewGroup, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.card_summary, viewGroup, false));
     }
 
-    private Drawable getEmoticonDrawable(@NonNull final Context context,
-                                         @NonNull final Emotions emotion) {
+    @StringRes
+    private int getEmotionText(@NonNull final Emotions emotion) {
         switch (emotion) {
             case ANGRY:
-                return context.getResources()
-                        .getDrawable(R.drawable.ic_emoticon_angry_selected);
+                return R.string.emotion_angry;
             case SADNESS:
-                return context.getResources()
-                        .getDrawable(R.drawable.ic_emoticon_sad_selected);
+                return R.string.emotion_sad;
             case HAPPINESS:
-                return context.getResources()
-                        .getDrawable(R.drawable.ic_emoticon_happy_selected);
+                return R.string.emotion_happy;
             case FANTASTIC:
-                return context.getResources()
-                        .getDrawable(R.drawable.ic_emoticon_fantastic_selected);
+                return R.string.emotion_fantastic;
             case NEUTRAL:
             default:
-                return context.getResources()
-                        .getDrawable(R.drawable.ic_emoticon_neutral_selected);
+                return R.string.emotion_neutral;
+        }
+    }
+
+    @DrawableRes
+    private int getEmoticonDrawable(@NonNull final Emotions emotion) {
+        switch (emotion) {
+            case ANGRY:
+                return R.drawable.ic_emoticon_angry_selected;
+            case SADNESS:
+                return R.drawable.ic_emoticon_sad_selected;
+            case HAPPINESS:
+                return R.drawable.ic_emoticon_happy_selected;
+            case FANTASTIC:
+                return R.drawable.ic_emoticon_fantastic_selected;
+            case NEUTRAL:
+            default:
+                return R.drawable.ic_emoticon_neutral_selected;
         }
     }
 

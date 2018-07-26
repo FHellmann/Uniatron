@@ -76,8 +76,7 @@ public class TimeAccountCard implements CardViewHolder {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
-        return new ViewHolder(LayoutInflater.from(context)
-                .inflate(R.layout.card_time_account, viewGroup, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.card_time_account, viewGroup, false));
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {

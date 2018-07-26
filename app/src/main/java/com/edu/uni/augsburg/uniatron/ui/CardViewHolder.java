@@ -37,7 +37,9 @@ public interface CardViewHolder {
      *
      * @return {@code true} if the card should be displayed, {@code false} otherwise.
      */
-    boolean isVisible();
+    default boolean isVisible() {
+        return true;
+    }
 
     /**
      * Creates a view holder.

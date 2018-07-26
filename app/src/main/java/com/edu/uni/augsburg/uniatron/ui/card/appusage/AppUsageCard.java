@@ -79,15 +79,9 @@ public class AppUsageCard implements CardViewHolder {
     }
 
     @Override
-    public boolean isVisible() {
-        return true;
-    }
-
-    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final Context context,
                                                       @NonNull final ViewGroup viewGroup) {
-        return new ViewHolder(LayoutInflater.from(context)
-                .inflate(R.layout.card_app_usage, viewGroup, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.card_app_usage, viewGroup, false));
     }
 
     private long getTotalAppUsage() {
