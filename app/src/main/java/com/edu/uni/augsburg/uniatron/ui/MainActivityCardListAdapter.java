@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.annimon.stream.IntStream;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
@@ -75,18 +76,27 @@ public class MainActivityCardListAdapter
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder,
                                  final int position) {
         if (mCardViewHolderList.size() > position) {
-            mCardViewHolderList.get(position).onBindView(mContext, viewHolder);
+            findFirstCardMatch(position).onBindView(mContext, viewHolder);
         }
     }
 
     @Override
     public int getItemViewType(final int position) {
-        return mCardViewHolderList.size() == position ? Integer.MIN_VALUE : mCardViewHolderList.get(position).getType();
+        return mCardViewHolderList.size() == position ? Integer.MIN_VALUE : findFirstCardMatch(position).getType();
     }
 
     @Override
     public int getItemCount() {
         return (int) Stream.of(mCardViewHolderList).filter(CardViewHolder::isVisible).count() + 1;
+    }
+
+    private CardViewHolder findFirstCardMatch(final int position) {
+        return IntStream.range(0, mCardViewHolderList.size())
+                .filter(index -> index >= position)
+                .mapToObj(mCardViewHolderList::get)
+                .filter(CardViewHolder::isVisible)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 
     private Optional<CardViewHolder> getCardViewHolder(final int type) {
