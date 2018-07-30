@@ -33,5 +33,9 @@ public enum CardPriority {
     /**
      * Very low priority.
      */
-    VERY_LOW
+    VERY_LOW,
+    /**
+     * Priority only for empty view!
+     */
+    EMPTY
 }

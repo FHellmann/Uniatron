@@ -27,13 +27,8 @@ public class EmptyCard implements CardViewHolder {
     }
 
     @Override
-    public int getType() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return true;
+    public CardPriority getPriority() {
+        return CardPriority.EMPTY;
     }
 
     @Override

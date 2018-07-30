@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.annimon.stream.IntStream;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
@@ -24,6 +23,7 @@ import java.util.List;
 public class MainActivityCardListAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final CardViewHolder CARD_EMPTY = new EmptyCard();
     private final List<CardViewHolder> mCardViewHolderList = new ArrayList<>();
     private final Context mContext;
 
@@ -42,8 +42,9 @@ public class MainActivityCardListAdapter
             final Optional<CardViewHolder> cardOptional = getCardViewHolder(cardViewHolder.getType());
             if (cardOptional.isPresent()) {
                 // Update the card if it does already exists
-                cardOptional.get().update(cardViewHolder);
-                notifyItemChanged(mCardViewHolderList.indexOf(cardOptional.get()));
+                final CardViewHolder oldCardViewHolder = cardOptional.get();
+                oldCardViewHolder.update(cardViewHolder);
+                notifyItemChanged(mCardViewHolderList.indexOf(oldCardViewHolder));
             } else {
                 // Add the not existing card
                 mCardViewHolderList.add(cardViewHolder);
@@ -68,35 +69,32 @@ public class MainActivityCardListAdapter
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup viewGroup,
                                                       final int type) {
         return getCardViewHolder(type)
-                .orElse(new EmptyCard())
+                .orElse(CARD_EMPTY)
                 .onCreateViewHolder(mContext, viewGroup);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder,
                                  final int position) {
-        if (mCardViewHolderList.size() > position) {
-            findFirstCardMatch(position).onBindView(mContext, viewHolder);
-        }
+        findFirstCardMatch(position).onBindView(mContext, viewHolder);
     }
 
     @Override
     public int getItemViewType(final int position) {
-        return mCardViewHolderList.size() == position ? Integer.MIN_VALUE : findFirstCardMatch(position).getType();
+        return findFirstCardMatch(position).getType();
     }
 
     @Override
     public int getItemCount() {
-        return (int) Stream.of(mCardViewHolderList).filter(CardViewHolder::isVisible).count() + 1;
+        return (int) getVisibleCards().count() + 1;
     }
 
     private CardViewHolder findFirstCardMatch(final int position) {
-        return IntStream.range(0, mCardViewHolderList.size())
-                .filter(index -> index >= position)
-                .mapToObj(mCardViewHolderList::get)
-                .filter(CardViewHolder::isVisible)
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
+        return getVisibleCards().skip(position).findFirst().orElse(CARD_EMPTY);
+    }
+
+    private Stream<CardViewHolder> getVisibleCards() {
+        return Stream.of(mCardViewHolderList).filter(CardViewHolder::isVisible);
     }
 
     private Optional<CardViewHolder> getCardViewHolder(final int type) {

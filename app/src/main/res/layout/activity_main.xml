@@ -62,7 +62,6 @@
         android:layout_gravity="bottom"
         app:backgroundTint="@color/primaryColor"
         app:fabAlignmentMode="center"
-        app:fabAttached="true"
         app:fabCradleMargin="8dp"
         app:fabCradleRoundedCornerRadius="6dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
