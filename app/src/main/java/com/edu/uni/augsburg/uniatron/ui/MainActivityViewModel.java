@@ -12,7 +12,7 @@ import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.Function;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
 import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
@@ -46,7 +46,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         super(application);
 
         mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
-        MainApplication.getRepository(application).getMinDate().observeForever(date -> {
+        MainApplication.getDataSource(application).getMinDate().observeForever(date -> {
             if (date != null) {
                 final Calendar calendar = GregorianCalendar.getInstance();
                 calendar.setTime(date);
@@ -211,8 +211,8 @@ public class MainActivityViewModel extends AndroidViewModel {
          */
         DATE(
                 Calendar.DATE,
-                calendar -> !DateConverter.DATE_MIN_TIME.convert(new Date()).before(calendar.getTime()),
-                (calS, calE) -> calE.getTime().after(DateConverter.DATE_MAX_TIME.convert(calS.getTime()))
+                calendar -> !DateConverterImpl.DATE_MIN_TIME.convert(new Date()).before(calendar.getTime()),
+                (calS, calE) -> calE.getTime().after(DateConverterImpl.DATE_MAX_TIME.convert(calS.getTime()))
         ),
         /**
          * Group by month.

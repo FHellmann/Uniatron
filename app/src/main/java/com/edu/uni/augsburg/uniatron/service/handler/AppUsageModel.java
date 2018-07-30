@@ -17,6 +17,7 @@ import com.annimon.stream.function.Consumer;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.orhanobut.logger.Logger;
 
@@ -35,7 +36,7 @@ import java.util.Set;
 public class AppUsageModel {
 
     private final SharedPreferencesHandler mSharedPreferencesHandler;
-    private final DataRepository mRepository;
+    private final DataSource mRepository;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
     private final Map<Integer, Consumer<Integer>> mNotifyListeners = new LinkedHashMap<>();
@@ -47,7 +48,7 @@ public class AppUsageModel {
                   @NonNull final Consumer<String> blockTimeOutListener,
                   @NonNull final Consumer<String> blockLearningAidListener) {
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(context);
-        mRepository = MainApplication.getRepository(context);
+        mRepository = MainApplication.getDataSource(context);
         mBlockTimeOutListener = blockTimeOutListener;
         mBlockLearningAidListener = blockLearningAidListener;
 

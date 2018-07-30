@@ -9,7 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
 
 import org.junit.After;
 import org.junit.Before;
@@ -65,7 +65,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -85,7 +85,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -99,7 +99,7 @@ public class StepCountDaoTest {
         mDao.add(create(count, date));
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));

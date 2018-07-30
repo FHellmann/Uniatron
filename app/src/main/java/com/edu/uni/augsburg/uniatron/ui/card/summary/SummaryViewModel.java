@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
 import com.edu.uni.augsburg.uniatron.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
@@ -26,7 +27,7 @@ import java.util.List;
 public class SummaryViewModel extends AndroidViewModel implements CardViewModel {
     private final DateCache<List<Summary>> mDateCache;
     private final MediatorLiveData<SummaryCard> mObservableDaySummary;
-    private final DataRepository mRepository;
+    private final DataSource mRepository;
 
     /**
      * Ctr.
@@ -35,7 +36,7 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
      */
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
-        mRepository = MainApplication.getRepository(application);
+        mRepository = MainApplication.getDataSource(application);
         mDateCache = new DateCache<>();
         mObservableDaySummary = new MediatorLiveData<>();
     }
@@ -58,8 +59,8 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
 
     private LiveData<List<Summary>> getSummarySourceBy(@NonNull final Date date,
                                                        final int calendarType) {
-        final Date dateFrom = DateConverter.getDateConverterMin(calendarType).convert(date);
-        final Date dateTo = DateConverter.getDateConverterMax(calendarType).convert(date);
+        final Date dateFrom = DateConverter.getMin(calendarType).convert(date);
+        final Date dateTo = DateConverter.getMax(calendarType).convert(date);
         switch (calendarType) {
             case Calendar.MONTH:
                 return mRepository.getSummaryByMonth(dateFrom, dateTo);

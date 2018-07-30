@@ -10,7 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
 
 import org.junit.After;
@@ -79,7 +79,7 @@ public class AppUsageDaoTest {
         mDao.add(create(appName2, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsageTime(DateConverter.DATE_MIN_TIME.convert(date), DateConverter.DATE_MAX_TIME.convert(date));
+                .loadAppUsageTime(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -114,8 +114,8 @@ public class AppUsageDaoTest {
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
         final LiveData<Long> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
-                DateConverter.DATE_MIN_TIME.convert(date),
-                DateConverter.DATE_MAX_TIME.convert(date),
+                DateConverterImpl.DATE_MIN_TIME.convert(date),
+                DateConverterImpl.DATE_MAX_TIME.convert(date),
                 filters
         );
 

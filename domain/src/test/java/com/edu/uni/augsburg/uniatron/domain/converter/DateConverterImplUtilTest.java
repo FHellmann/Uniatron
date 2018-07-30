@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-public class DateConverterUtilTest {
+public class DateConverterImplUtilTest {
 
     @Test
     public void fromTimestamp() {

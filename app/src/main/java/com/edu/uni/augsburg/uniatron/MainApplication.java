@@ -4,8 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
+import com.edu.uni.augsburg.uniatron.domain.DatabaseSource;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
@@ -16,7 +17,7 @@ import com.orhanobut.logger.Logger;
  * @author Fabio Hellmann
  */
 public class MainApplication extends Application {
-    private DataRepository mDataRepository;
+    private DataSource mDataRepository;
     private SharedPreferencesHandler mSharedPreferencesHandler;
 
     /**
@@ -25,7 +26,7 @@ public class MainApplication extends Application {
      * @param context The current context of the callee.
      * @return The data repository.
      */
-    public static DataRepository getRepository(final Context context) {
+    public static DataSource getDataSource(final Context context) {
         return ((MainApplication) context.getApplicationContext()).mDataRepository;
     }
 
@@ -52,7 +53,7 @@ public class MainApplication extends Application {
         });
 
         // initialize app database
-        mDataRepository = new DataRepository(AppDatabase.create(this));
+        mDataRepository = new DataRepository(DatabaseSource.create(this));
         mSharedPreferencesHandler = new SharedPreferencesHandler(this);
         NotificationChannels.setupChannels(this);
     }

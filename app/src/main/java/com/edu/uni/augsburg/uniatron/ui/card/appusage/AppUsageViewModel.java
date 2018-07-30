@@ -14,8 +14,10 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Collectors;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
-import com.edu.uni.augsburg.uniatron.model.AppUsageCollection;
+import com.edu.uni.augsburg.uniatron.model.AppUsageItem;
+import com.edu.uni.augsburg.uniatron.model.DataCollection;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
@@ -28,9 +30,9 @@ import java.util.Date;
  * @author Fabio Hellmann
  */
 public class AppUsageViewModel extends AndroidViewModel implements CardViewModel {
-    private final DateCache<AppUsageCollection> mDateCache;
-    private final MediatorLiveData<AppUsageCollection> mAppUsages;
-    private final DataRepository mRepository;
+    private final DateCache<DataCollection<AppUsageItem>> mDateCache;
+    private final MediatorLiveData<DataCollection<AppUsageItem>> mAppUsages;
+    private final DataSource mRepository;
 
     /**
      * Ctr.
@@ -40,15 +42,15 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     public AppUsageViewModel(@NonNull final Application application) {
         super(application);
         mDateCache = new DateCache<>();
-        mRepository = MainApplication.getRepository(application);
+        mRepository = MainApplication.getDataSource(application);
         mAppUsages = new MediatorLiveData<>();
     }
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        final LiveData<AppUsageCollection> data = mRepository.getAppUsageTimeByDate(
-                DateConverter.getDateConverterMin(calendarType).convert(date),
-                DateConverter.getDateConverterMax(calendarType).convert(date)
+        final LiveData<DataCollection<AppUsageItem>> data = mRepository.getAppUsageTimeByDate(
+                DateConverter.getMin(calendarType).convert(date),
+                DateConverter.getMax(calendarType).convert(date)
         );
         mDateCache.clearAndRegister(mAppUsages, data);
         mAppUsages.addSource(
@@ -69,7 +71,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     }
 
     @NonNull
-    private AppUsageCard getAppUsageCard(@NonNull final Context context, @NonNull final AppUsageCollection data) {
+    private AppUsageCard getAppUsageCard(@NonNull final Context context, @NonNull final DataCollection<AppUsageItem> data) {
         final AppUsageCard card = new AppUsageCard();
         card.addAll(data.getEntries()
                 .map(entry -> new AppUsageViewItem(

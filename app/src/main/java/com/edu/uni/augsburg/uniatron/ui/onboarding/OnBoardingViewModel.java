@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class OnBoardingViewModel extends AndroidViewModel {
 
     private static final int STEP_BONUS = 500;
-    private final DataRepository mDataRepository;
+    private final DataSource mDataRepository;
     private final SharedPreferencesHandler mSharedPrefsHandler;
 
     /**
@@ -30,7 +30,7 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public OnBoardingViewModel(final @NonNull Application application) {
         super(application);
 
-        mDataRepository = MainApplication.getRepository(application);
+        mDataRepository = MainApplication.getDataSource(application);
         mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
     }
 

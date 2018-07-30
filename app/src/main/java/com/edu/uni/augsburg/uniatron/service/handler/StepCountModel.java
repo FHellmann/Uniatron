@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 
 /**
  * The model is the connection between the {@link DataRepository}
@@ -14,7 +15,7 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
  */
 public class StepCountModel {
 
-    private final DataRepository mRepository;
+    private final DataSource mRepository;
 
     /**
      * Ctr.
@@ -22,7 +23,7 @@ public class StepCountModel {
      * @param context The context.
      */
     StepCountModel(@NonNull final Context context) {
-        mRepository = MainApplication.getRepository(context);
+        mRepository = MainApplication.getDataSource(context);
     }
 
     /**

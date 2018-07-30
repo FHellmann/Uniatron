@@ -9,7 +9,8 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
+import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
@@ -24,7 +25,7 @@ import java.util.Date;
 public class CoinBagViewModel extends AndroidViewModel implements CardViewModel {
     private final MediatorLiveData<Integer> mRemainingCoins;
     private final DateCache<Integer> mDateCache;
-    private final DataRepository mRepository;
+    private final DataSource mRepository;
     private boolean mIsVisible;
 
     /**
@@ -35,15 +36,15 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
     public CoinBagViewModel(@NonNull final Application application) {
         super(application);
 
-        mRepository = MainApplication.getRepository(application);
+        mRepository = MainApplication.getDataSource(application);
         mDateCache = new DateCache<>();
         mRemainingCoins = new MediatorLiveData<>();
     }
 
     @Override
     public void setup(final Date date, final int calendarType) {
-        mIsVisible = DateConverter.DATE_MIN_TIME.convert(date)
-                .equals(DateConverter.DATE_MIN_TIME.convert(new Date()));
+        mIsVisible = DateConverterImpl.DATE_MIN_TIME.convert(date)
+                .equals(DateConverterImpl.DATE_MIN_TIME.convert(new Date()));
         final LiveData<Integer> liveData = mRepository.getRemainingStepCountsToday();
         mDateCache.clearAndRegister(mRemainingCoins, liveData);
         mRemainingCoins.addSource(

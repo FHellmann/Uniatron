@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Fabio Hellmann
  */
-public class AppUsageCollection {
+public class AppUsageCollection implements DataCollection<AppUsageItem> {
     private final List<AppUsageItem> mData;
 
     /**
@@ -30,20 +30,10 @@ public class AppUsageCollection {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Checks whether or not the collection is empty.
-     *
-     * @return {@code true} if the collection is empty, {@code false} otherwise.
-     */
     public boolean isEmpty() {
         return mData.isEmpty();
     }
 
-    /**
-     * Get the entries.
-     *
-     * @return The entries.
-     */
     public Stream<AppUsageItem> getEntries() {
         return Stream.of(mData);
     }

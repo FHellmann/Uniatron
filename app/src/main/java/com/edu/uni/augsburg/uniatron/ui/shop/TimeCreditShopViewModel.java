@@ -11,6 +11,7 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.DataSource;
 import com.edu.uni.augsburg.uniatron.model.Emotions;
 import com.edu.uni.augsburg.uniatron.model.LearningAid;
 import com.edu.uni.augsburg.uniatron.model.TimeCredits;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
-    private final DataRepository mRepository;
+    private final DataSource mRepository;
     private final List<TimeCredits> mShoppingCart;
     private final List<Emotions> mEmotionCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
@@ -46,7 +47,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
 
-        mRepository = MainApplication.getRepository(application);
+        mRepository = MainApplication.getDataSource(application);
 
         mShoppingCart = new ArrayList<>();
         mEmotionCart = new ArrayList<>();
@@ -150,7 +151,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
      * Add a listener for shop change events.
      *
      * @param timeCredits The time credit to listen on.
-     * @param listener The listener.
+     * @param listener    The listener.
      */
     public void addShopChangedListener(@NonNull final TimeCredits timeCredits,
                                        @NonNull final OnShopChangedListener listener) {
