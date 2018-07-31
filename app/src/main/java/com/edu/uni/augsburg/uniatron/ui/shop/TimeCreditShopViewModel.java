@@ -10,11 +10,11 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
-import com.edu.uni.augsburg.uniatron.model.LearningAid;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.EmotionDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.LearningAid;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,14 +22,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link TimeCreditShopActivity}.
  *
  * @author Fabio Hellmann
  */
 public class TimeCreditShopViewModel extends AndroidViewModel {
     private final SharedPreferencesHandler mPrefHandler;
-    private final DataSource mRepository;
+    private final TimeCreditDao mTimeCreditDao;
+    private final EmotionDao mEmotionDao;
     private final List<TimeCredits> mShoppingCart;
     private final List<Emotions> mEmotionCart;
     private final MediatorLiveData<Integer> mRemainingStepCount;
@@ -47,7 +48,8 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
 
-        mRepository = MainApplication.getDataSource(application);
+        mTimeCreditDao = MainApplication.getTimeCreditDao(application);
+        mEmotionDao = MainApplication.getEmotionDao(application);
 
         mShoppingCart = new ArrayList<>();
         mEmotionCart = new ArrayList<>();
@@ -55,13 +57,13 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
-                mRepository.getRemainingStepCountsToday(),
+                MainApplication.getStepCountDao(application).getRemainingStepCountsToday(),
                 mRemainingStepCount::setValue
         );
 
         mLearningAid = new MediatorLiveData<>();
         mLearningAid.addSource(
-                mRepository.getLatestLearningAid(),
+                mTimeCreditDao.getLatestLearningAid(),
                 mLearningAid::setValue
         );
     }
@@ -131,9 +133,9 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
         if (!mShoppingCart.isEmpty() && !mEmotionCart.isEmpty()) {
             Stream.of(mShoppingCart).forEach(credit -> {
                 final double stepsFactor = mPrefHandler.getStepsFactor();
-                mRepository.addTimeCredit(credit, stepsFactor);
+                mTimeCreditDao.addTimeCredit(credit, stepsFactor);
             });
-            Stream.of(mEmotionCart).forEach(mRepository::addEmotion);
+            Stream.of(mEmotionCart).forEach(mEmotionDao::addEmotion);
             clear();
         }
     }

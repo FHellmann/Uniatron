@@ -6,10 +6,9 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link PackageChangeDetector}.
  *
  * @author Fabio Hellmann

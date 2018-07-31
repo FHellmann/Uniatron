@@ -1,29 +1,34 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.TypeConverters;
+import android.arch.lifecycle.LiveData;
+import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.converter.EmotionConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
-
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotion;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
 /**
- * The dao contains all the calls depending to
- * {@link com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity}.
+ * The dao to operate on the emotion table.
  *
  * @author Fabio Hellmann
  */
-@Dao
-@TypeConverters({DateConverterUtil.class, EmotionConverterUtil.class})
 public interface EmotionDao {
+
     /**
-     * Persist an emotion.
+     * Add the emotion.
      *
-     * @param emotion The emotion to persist.
+     * @param emotions The emotion to add.
+     * @return The emotion data.
      */
-    @Insert(onConflict = REPLACE)
-    void add(EmotionEntity emotion);
+    LiveData<Emotion> addEmotion(@NonNull Emotions emotions);
+
+    /**
+     * Creates a new instance to access the emotion data.
+     *
+     * @param queryProvider The query provider.
+     * @return The emotion dao.
+     */
+    static EmotionDao create(@NonNull final QueryProvider queryProvider) {
+        return new EmotionDaoImpl(queryProvider.emotionQuery());
+    }
 }

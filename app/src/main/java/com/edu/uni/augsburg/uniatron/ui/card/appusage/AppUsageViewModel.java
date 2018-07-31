@@ -13,26 +13,25 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
-import com.edu.uni.augsburg.uniatron.model.AppUsageItem;
-import com.edu.uni.augsburg.uniatron.model.DataCollection;
+import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.AppUsage;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.DataCollection;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
 import java.util.Date;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link AppUsageCard}.
  *
  * @author Fabio Hellmann
  */
 public class AppUsageViewModel extends AndroidViewModel implements CardViewModel {
-    private final DateCache<DataCollection<AppUsageItem>> mDateCache;
-    private final MediatorLiveData<DataCollection<AppUsageItem>> mAppUsages;
-    private final DataSource mRepository;
+    private final DateCache<DataCollection<AppUsage>> mDateCache;
+    private final MediatorLiveData<DataCollection<AppUsage>> mAppUsages;
+    private final AppUsageDao mAppUsageDao;
 
     /**
      * Ctr.
@@ -42,13 +41,13 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     public AppUsageViewModel(@NonNull final Application application) {
         super(application);
         mDateCache = new DateCache<>();
-        mRepository = MainApplication.getDataSource(application);
+        mAppUsageDao = MainApplication.getAppUsageDao(application);
         mAppUsages = new MediatorLiveData<>();
     }
 
     @Override
     public void setup(@NonNull final Date date, final int calendarType) {
-        final LiveData<DataCollection<AppUsageItem>> data = mRepository.getAppUsageTimeByDate(
+        final LiveData<DataCollection<AppUsage>> data = mAppUsageDao.getAppUsageTimeByDate(
                 DateConverter.getMin(calendarType).convert(date),
                 DateConverter.getMax(calendarType).convert(date)
         );
@@ -71,14 +70,14 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     }
 
     @NonNull
-    private AppUsageCard getAppUsageCard(@NonNull final Context context, @NonNull final DataCollection<AppUsageItem> data) {
+    private AppUsageCard getAppUsageCard(@NonNull final Context context, @NonNull final DataCollection<AppUsage> data) {
         final AppUsageCard card = new AppUsageCard();
         card.addAll(data.getEntries()
                 .map(entry -> new AppUsageViewItem(
                         getApplicationLabel(context, entry.getPackageName()),
                         getApplicationIcon(context, entry.getPackageName()),
-                        entry.getApplicationUsage(),
-                        entry.getApplicationUsagePercent()))
+                        entry.getUsageTime(),
+                        entry.getUsageTimeAllPercent()))
                 .collect(Collectors.toList()));
         return card;
     }

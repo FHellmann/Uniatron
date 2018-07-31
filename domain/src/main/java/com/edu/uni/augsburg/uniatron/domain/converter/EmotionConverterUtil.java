@@ -4,10 +4,11 @@ import android.arch.persistence.room.TypeConverter;
 import android.support.annotation.Nullable;
 
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
 /**
- * A converter for the {@link com.edu.uni.augsburg.uniatron.domain.AppDatabase}
+ * A converter for the {@link AppDatabase}
  * and the model classes.
  *
  * @author Fabio Hellmann

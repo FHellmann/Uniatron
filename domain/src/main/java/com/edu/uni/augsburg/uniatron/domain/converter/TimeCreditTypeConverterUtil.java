@@ -3,10 +3,11 @@ package com.edu.uni.augsburg.uniatron.domain.converter;
 import android.arch.persistence.room.TypeConverter;
 import android.support.annotation.Nullable;
 
-import com.edu.uni.augsburg.uniatron.model.TimeCreditType;
+import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCreditType;
 
 /**
- * A converter for the {@link com.edu.uni.augsburg.uniatron.domain.AppDatabase}
+ * A converter for the {@link AppDatabase}
  * and the model classes.
  *
  * @author Fabio Hellmann

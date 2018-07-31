@@ -71,11 +71,7 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
                 usageTime / 60,
                 usageTime % 60
         ));
-        viewHolderListItem.mTextAppUsagePercent.setText(String.format(
-                Locale.getDefault(),
-                "%d %%",
-                Math.round(usageTimePercent)
-        ));
+        viewHolderListItem.mTextAppUsagePercent.setText(String.format(Locale.getDefault(), "%d %%", Math.round(usageTimePercent)));
     }
 
     @Override

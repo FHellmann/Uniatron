@@ -5,12 +5,12 @@ import android.util.Log;
 
 import com.annimon.stream.IntStream;
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.table.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.EmotionEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.StepCountEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -56,32 +56,32 @@ public final class DatabaseUtil {
     private static void createTestDataEmotion(final @NonNull AppDatabase appDatabase, final Random random) {
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getEmotion(random, index))
-                .forEach(item -> appDatabase.emotionDao().add(item));
+                .forEach(item -> appDatabase.emotionQuery().add(item));
     }
 
     private static void createTestDataTimeCredit(final @NonNull AppDatabase appDatabase) {
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(DatabaseUtil::getTimeCredit)
-                .forEach(item -> appDatabase.timeCreditDao().add(item));
+                .forEach(item -> appDatabase.timeCreditQuery().add(item));
     }
 
     private static void createTestDataSteps(final @NonNull AppDatabase appDatabase, final Random random) {
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getStepCount(random, index))
-                .forEach(item -> appDatabase.stepCountDao().add(item));
+                .forEach(item -> appDatabase.stepCountQuery().add(item));
     }
 
     private static void createTestDataAppUsage(final @NonNull AppDatabase appDatabase, final Random random) {
         IntStream.range(0, MOCK_DATA_ITEM_COUNT)
                 .mapToObj(index -> getAppUsage(random, index))
-                .forEach(item -> appDatabase.appUsageDao().add(item));
+                .forEach(item -> appDatabase.appUsageQuery().add(item));
     }
 
     private static AppUsageEntity getAppUsage(Random random, int index) {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
         appUsageEntity.setTimestamp(getRandomDate(index));
         appUsageEntity.setUsageTime(random.nextInt(100));
-        appUsageEntity.setAppName(FAVORIT_APPS[random.nextInt(FAVORIT_APPS.length)]);
+        appUsageEntity.setPackageName(FAVORIT_APPS[random.nextInt(FAVORIT_APPS.length)]);
         return appUsageEntity;
     }
 

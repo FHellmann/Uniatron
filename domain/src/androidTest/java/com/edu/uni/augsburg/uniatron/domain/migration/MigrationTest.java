@@ -12,9 +12,9 @@ import android.support.test.runner.AndroidJUnit4;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.DatabaseSource;
-import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.table.AppUsageEntity;
 import com.edu.uni.augsburg.uniatron.domain.util.TestUtils;
 
 import org.junit.After;
@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -73,18 +74,20 @@ public class MigrationTest {
 
         mMigrationHelper.runMigrationsAndValidate(mContext.getPackageName(), 2, true, Migrations.V1_TO_V2.getMigration());
 
-        final DatabaseSource migratedDb = getMigratedRoomDatabase();
+        final QueryProvider migratedDb = getMigratedRoomDatabase();
 
-        final LiveData<List<AppUsageEntity>> liveDataAppUsage = migratedDb.appUsageDao()
-                .loadAppUsageTime(DateConverterImpl.DATE_MIN_TIME.convert(new Date(time)), DateConverterImpl.DATE_MAX_TIME.convert(new Date(time)));
+        final LiveData<List<AppUsageEntity>> liveDataAppUsage = migratedDb.appUsageQuery().loadAppUsageTime(
+                DateConverter.getMin(Calendar.DATE).convert(new Date(time)),
+                DateConverter.getMax(Calendar.DATE).convert(new Date(time))
+        );
         final List<AppUsageEntity> liveDataValueAppUsage = TestUtils.getLiveDataValue(liveDataAppUsage);
         assertThat(liveDataValueAppUsage, is(notNullValue()));
         final List<Long> usageTimeValues = Stream.of(liveDataValueAppUsage).map(AppUsageEntity::getUsageTime).collect(Collectors.toList());
         assertThat(usageTimeValues, hasItems(7 * 1000L, 91 * 1000L, 435 * 1000L, 12 * 1000L, 45 * 1000L));
     }
 
-    private DatabaseSource getMigratedRoomDatabase() {
-        final DatabaseSource database = DatabaseSource.create(mContext);
+    private QueryProvider getMigratedRoomDatabase() {
+        final QueryProvider database = QueryProvider.create(mContext);
         mMigrationHelper.closeWhenFinished((RoomDatabase) database);
         return database;
     }

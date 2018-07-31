@@ -9,16 +9,16 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
+import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link TimeAccountCard}.
  *
  * @author Fabio Hellmann
@@ -26,7 +26,7 @@ import java.util.Date;
 public class TimeAccountViewModel extends AndroidViewModel implements CardViewModel {
     private final DateCache<Long> mDateCache;
     private final MediatorLiveData<Long> mRemainingAppUsageTime;
-    private final DataSource mRepository;
+    private final AppUsageDao mAppUsageDao;
     private final SharedPreferencesHandler mPrefHandler;
     private boolean mIsVisible;
 
@@ -38,7 +38,7 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
     public TimeAccountViewModel(@NonNull final Application application) {
         super(application);
 
-        mRepository = MainApplication.getDataSource(application);
+        mAppUsageDao = MainApplication.getAppUsageDao(application);
         mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
         mDateCache = new DateCache<>();
         mRemainingAppUsageTime = new MediatorLiveData<>();
@@ -46,15 +46,11 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
 
     @Override
     public void setup(final Date date, final int calendarType) {
-        mIsVisible = DateConverterImpl.DATE_MIN_TIME.convert(date)
-                .equals(DateConverterImpl.DATE_MIN_TIME.convert(new Date()));
-        final LiveData<Long> liveData = mRepository
-                .getRemainingAppUsageTimeToday(mPrefHandler.getAppsBlacklist());
+        mIsVisible = DateConverter.getMin(Calendar.DATE).convert(date)
+                .equals(DateConverter.getMin(Calendar.DATE).convert(new Date()));
+        final LiveData<Long> liveData = mAppUsageDao.getRemainingAppUsageTimeToday(mPrefHandler.getAppsBlacklist());
         mDateCache.clearAndRegister(mRemainingAppUsageTime, liveData);
-        mRemainingAppUsageTime.addSource(
-                liveData,
-                mRemainingAppUsageTime::setValue
-        );
+        mRemainingAppUsageTime.addSource(liveData, mRemainingAppUsageTime::setValue);
     }
 
     /**

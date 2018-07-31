@@ -7,15 +7,18 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.query.StepCountQuery;
+import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.StepCountEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
@@ -27,8 +30,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(AndroidJUnit4.class)
 public class StepCountDaoTest {
     private AppDatabase mDb;
-    private StepCountDao mDao;
-    private TimeCreditDao mDaoCredit;
+    private StepCountQuery mDao;
+    private TimeCreditQuery mDaoCredit;
 
     @Before
     public void setUp() {
@@ -36,8 +39,8 @@ public class StepCountDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.stepCountDao();
-        mDaoCredit = mDb.timeCreditDao();
+        mDao = mDb.stepCountQuery();
+        mDaoCredit = mDb.timeCreditQuery();
     }
 
     @After
@@ -65,7 +68,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverter.getMin(Calendar.DATE).convert(date), DateConverter.getMax(Calendar.DATE).convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -85,7 +88,7 @@ public class StepCountDaoTest {
         mDaoCredit.add(entry);
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverter.getMin(Calendar.DATE).convert(date), DateConverter.getMax(Calendar.DATE).convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
@@ -99,7 +102,7 @@ public class StepCountDaoTest {
         mDao.add(create(count, date));
 
         final LiveData<Integer> data = mDao
-                .loadRemainingStepCount(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
+                .loadRemainingStepCount(DateConverter.getMin(Calendar.DATE).convert(date), DateConverter.getMax(Calendar.DATE).convert(date));
 
         final Integer liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));

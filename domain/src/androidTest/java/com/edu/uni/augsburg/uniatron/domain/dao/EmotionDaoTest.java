@@ -7,8 +7,9 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.EmotionEntity;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.query.EmotionQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.EmotionEntity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +30,7 @@ public class EmotionDaoTest {
     public TestRule rule = new InstantTaskExecutorRule();
 
     private AppDatabase mDb;
-    private EmotionDao mDao;
+    private EmotionQuery mDao;
 
     @Before
     public void setUp() {
@@ -37,7 +38,7 @@ public class EmotionDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.emotionDao();
+        mDao = mDb.emotionQuery();
     }
 
     @After

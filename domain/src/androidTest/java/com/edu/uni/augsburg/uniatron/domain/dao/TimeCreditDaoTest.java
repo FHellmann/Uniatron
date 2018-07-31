@@ -7,8 +7,9 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(AndroidJUnit4.class)
 public class TimeCreditDaoTest {
     private AppDatabase mDb;
-    private TimeCreditDao mDao;
+    private TimeCreditQuery mDao;
 
     @Before
     public void setUp() {
@@ -35,7 +36,7 @@ public class TimeCreditDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.timeCreditDao();
+        mDao = mDb.timeCreditQuery();
     }
 
     @After

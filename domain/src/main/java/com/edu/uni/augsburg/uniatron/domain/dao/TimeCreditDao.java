@@ -1,44 +1,44 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.converter.TimeCreditTypeConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-
-import java.util.Date;
-
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.LearningAid;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredit;
+import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
 
 /**
- * The dao contains all the calls depending to time credit.
+ * The dao to operate on the time credit table.
  *
  * @author Fabio Hellmann
  */
-@Dao
-@TypeConverters({DateConverterUtil.class, TimeCreditTypeConverterUtil.class})
 public interface TimeCreditDao {
-    /**
-     * Persist a time credit.
-     *
-     * @param timeCreditEntity The time credit to persist.
-     */
-    @Insert(onConflict = REPLACE)
-    void add(TimeCreditEntity timeCreditEntity);
 
     /**
-     * Query whether the learning aid is active or not.
+     * Add a new time credit.
+     *
+     * @param timeCredit The time credit will be generated out of this.
+     * @param factor     The factor to multiply with.
+     * @return The time credit.
+     */
+    LiveData<TimeCredit> addTimeCredit(@NonNull TimeCredit timeCredit, double factor);
+
+    /**
+     * Check whether the learning aid is active or not.
      *
      * @return The difference in time to the latest learning aid.
+     * @see TimeCreditQuery#getLatestLearningAid()
      */
-    @Query("SELECT timestamp "
-            + "FROM TimeCreditEntity "
-            + "WHERE type = 'LEARNING_AID' "
-            + "ORDER BY timestamp DESC "
-            + "LIMIT 1")
-    LiveData<Date> getLatestLearningAid();
+    LiveData<LearningAid> getLatestLearningAid();
+
+    /**
+     * Creates a new instance to access the time credit data.
+     *
+     * @param queryProvider The query provider.
+     * @return The time credit dao.
+     */
+    static TimeCreditDao create(@NonNull final QueryProvider queryProvider) {
+        return new TimeCreditDaoImpl(queryProvider.timeCreditQuery());
+    }
 }

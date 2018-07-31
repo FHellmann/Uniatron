@@ -47,7 +47,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "mAppName",
+            "fieldPath": "mPackageName",
             "columnName": "app_name",
             "affinity": "TEXT",
             "notNull": false

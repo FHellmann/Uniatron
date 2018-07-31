@@ -7,10 +7,9 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverter;
-import com.edu.uni.augsburg.uniatron.model.Summary;
+import com.edu.uni.augsburg.uniatron.domain.dao.SummaryDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.DateCache;
 
@@ -19,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link SummaryCard}.
  *
  * @author Fabio Hellmann
@@ -27,7 +26,7 @@ import java.util.List;
 public class SummaryViewModel extends AndroidViewModel implements CardViewModel {
     private final DateCache<List<Summary>> mDateCache;
     private final MediatorLiveData<SummaryCard> mObservableDaySummary;
-    private final DataSource mRepository;
+    private final SummaryDao mSummaryDao;
 
     /**
      * Ctr.
@@ -36,7 +35,7 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
      */
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
-        mRepository = MainApplication.getDataSource(application);
+        mSummaryDao = MainApplication.getSummaryDao(application);
         mDateCache = new DateCache<>();
         mObservableDaySummary = new MediatorLiveData<>();
     }
@@ -57,18 +56,17 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
         );
     }
 
-    private LiveData<List<Summary>> getSummarySourceBy(@NonNull final Date date,
-                                                       final int calendarType) {
+    private LiveData<List<Summary>> getSummarySourceBy(@NonNull final Date date, final int calendarType) {
         final Date dateFrom = DateConverter.getMin(calendarType).convert(date);
         final Date dateTo = DateConverter.getMax(calendarType).convert(date);
         switch (calendarType) {
             case Calendar.MONTH:
-                return mRepository.getSummaryByMonth(dateFrom, dateTo);
+                return mSummaryDao.getSummaryByMonth(dateFrom, dateTo);
             case Calendar.YEAR:
-                return mRepository.getSummaryByYear(dateFrom, dateTo);
+                return mSummaryDao.getSummaryByYear(dateFrom, dateTo);
             case Calendar.DATE:
             default:
-                return mRepository.getSummaryByDate(dateFrom, dateTo);
+                return mSummaryDao.getSummaryByDate(dateFrom, dateTo);
         }
     }
 

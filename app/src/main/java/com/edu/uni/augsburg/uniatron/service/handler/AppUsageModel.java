@@ -12,13 +12,14 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.annimon.stream.Objects;
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
-import com.edu.uni.augsburg.uniatron.model.LearningAid;
+import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.LearningAid;
 import com.orhanobut.logger.Logger;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link AppUsageDetector}.
  *
  * @author Fabio Hellmann
@@ -36,24 +37,26 @@ import java.util.Set;
 public class AppUsageModel {
 
     private final SharedPreferencesHandler mSharedPreferencesHandler;
-    private final DataSource mRepository;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
     private final Map<Integer, Consumer<Integer>> mNotifyListeners = new LinkedHashMap<>();
     private final Consumer<String> mBlockTimeOutListener;
     private final Consumer<String> mBlockLearningAidListener;
+    private final AppUsageDao mAppUsageDao;
+    private final TimeCreditDao mTimeCreditDao;
     private SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener;
 
     AppUsageModel(@NonNull final Context context,
                   @NonNull final Consumer<String> blockTimeOutListener,
                   @NonNull final Consumer<String> blockLearningAidListener) {
         mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(context);
-        mRepository = MainApplication.getDataSource(context);
+        mAppUsageDao = MainApplication.getAppUsageDao(context);
+        mTimeCreditDao = MainApplication.getTimeCreditDao(context);
         mBlockTimeOutListener = blockTimeOutListener;
         mBlockLearningAidListener = blockLearningAidListener;
 
-        mUsageTimeHelper.addLiveData(mRepository.getRemainingAppUsageTimeToday(getAppsBlacklist()));
-        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
+        mUsageTimeHelper.addLiveData(mAppUsageDao.getRemainingAppUsageTimeToday(getAppsBlacklist()));
+        mLearningAidHelper.addLiveData(mTimeCreditDao.getLatestLearningAid());
 
         registerPreferenceListener();
     }
@@ -61,7 +64,7 @@ public class AppUsageModel {
     private void registerPreferenceListener() {
         mPrefChangeListener = (sharedPreferences, key) -> {
             final Set<String> blacklist = getAppsBlacklist();
-            mUsageTimeHelper.addLiveData(mRepository.getRemainingAppUsageTimeToday(blacklist));
+            mUsageTimeHelper.addLiveData(mAppUsageDao.getRemainingAppUsageTimeToday(blacklist));
         };
         mSharedPreferencesHandler.registerOnPreferenceChangeListener(mPrefChangeListener);
     }
@@ -82,7 +85,7 @@ public class AppUsageModel {
      * @param usageTime   The usage time.
      */
     public void onAppUsed(@NonNull final String packageName, final int usageTime) {
-        mLearningAidHelper.addLiveData(mRepository.getLatestLearningAid());
+        mLearningAidHelper.addLiveData(mTimeCreditDao.getLatestLearningAid());
         if (isAppNotInBlacklist(packageName)) {
             // Will catch all cases, when app name is not in the blacklist
             commitAppUsageTime(packageName, usageTime);
@@ -118,7 +121,7 @@ public class AppUsageModel {
 
     private void commitAppUsageTime(final String appName, final int usageTime) {
         if (!TextUtils.isEmpty(appName)) {
-            mRepository.addAppUsage(appName, usageTime);
+            mAppUsageDao.addAppUsage(appName, usageTime);
         }
     }
 
@@ -198,14 +201,14 @@ public class AppUsageModel {
         @Override
         public void onChanged(@Nullable final LearningAid learningAid) {
             if (learningAid == null) {
-                mLearningAidTmp = new LearningAid(false, 0);
+                mLearningAidTmp = Optional::empty;
             } else {
                 mLearningAidTmp = learningAid;
             }
         }
 
         private boolean isLearningAidActive() {
-            return mLearningAidTmp.isActive();
+            return mLearningAidTmp.getLeftTime().isPresent();
         }
 
         private void addLiveData(@NonNull final LiveData<LearningAid> liveData) {

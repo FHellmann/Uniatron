@@ -1,6 +1,6 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
-import com.edu.uni.augsburg.uniatron.model.TimeCreditType;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCreditType;
 
 import org.junit.Test;
 

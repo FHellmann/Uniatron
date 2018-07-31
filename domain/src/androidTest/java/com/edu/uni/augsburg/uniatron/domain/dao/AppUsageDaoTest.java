@@ -8,10 +8,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.domain.util.DateConverterImpl;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.query.AppUsageQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,6 +21,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,7 +41,7 @@ public class AppUsageDaoTest {
     public TestRule rule = new InstantTaskExecutorRule();
 
     private AppDatabase mDb;
-    private AppUsageDao mDao;
+    private AppUsageQuery mDao;
 
     @Before
     public void setUp() {
@@ -47,7 +49,7 @@ public class AppUsageDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.appUsageDao();
+        mDao = mDb.appUsageQuery();
     }
 
     @After
@@ -79,14 +81,14 @@ public class AppUsageDaoTest {
         mDao.add(create(appName2, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsageTime(DateConverterImpl.DATE_MIN_TIME.convert(date), DateConverterImpl.DATE_MAX_TIME.convert(date));
+                .loadAppUsageTime(DateConverter.getMin(Calendar.DATE).convert(date), DateConverter.getMax(Calendar.DATE).convert(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue.isEmpty(), is(false));
-        assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
-        assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName2)));
-        assertThat(liveDataValue.get(2).getAppName(), is(equalTo(appName1)));
+        assertThat(liveDataValue.get(0).getPackageName(), is(equalTo(appName0)));
+        assertThat(liveDataValue.get(1).getPackageName(), is(equalTo(appName2)));
+        assertThat(liveDataValue.get(2).getPackageName(), is(equalTo(appName1)));
         assertThat(liveDataValue.get(0).getUsageTime(), is(30L));
         assertThat(liveDataValue.get(1).getUsageTime(), is(20L));
         assertThat(liveDataValue.get(2).getUsageTime(), is(10L));
@@ -109,13 +111,13 @@ public class AppUsageDaoTest {
         timeCreditEntity.setTimeBonus(credits.getTimeBonus());
         timeCreditEntity.setStepCount(credits.getStepCount());
         timeCreditEntity.setTimestamp(date);
-        mDb.timeCreditDao().add(timeCreditEntity);
+        mDb.timeCreditQuery().add(timeCreditEntity);
 
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
         final LiveData<Long> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
-                DateConverterImpl.DATE_MIN_TIME.convert(date),
-                DateConverterImpl.DATE_MAX_TIME.convert(date),
+                DateConverter.getMin(Calendar.DATE).convert(date),
+                DateConverter.getMax(Calendar.DATE).convert(date),
                 filters
         );
 
@@ -126,7 +128,7 @@ public class AppUsageDaoTest {
 
     private AppUsageEntity create(String name, Date date) {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
-        appUsageEntity.setAppName(name);
+        appUsageEntity.setPackageName(name);
         appUsageEntity.setTimestamp(date);
         appUsageEntity.setUsageTime(10);
         return appUsageEntity;

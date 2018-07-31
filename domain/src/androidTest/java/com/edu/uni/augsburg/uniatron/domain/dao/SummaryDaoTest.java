@@ -8,7 +8,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.SummaryEntity;
+import com.edu.uni.augsburg.uniatron.domain.query.SummaryQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.SummaryEntity;
 import com.edu.uni.augsburg.uniatron.domain.util.DatabaseUtil;
 
 import org.junit.After;
@@ -34,7 +35,7 @@ public class SummaryDaoTest {
     public TestRule rule = new InstantTaskExecutorRule();
 
     private AppDatabase mDb;
-    private SummaryDao mDao;
+    private SummaryQuery mDao;
 
     @Before
     public void setUp() {
@@ -42,7 +43,7 @@ public class SummaryDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.summaryDao();
+        mDao = mDb.summaryQuery();
     }
 
     @After

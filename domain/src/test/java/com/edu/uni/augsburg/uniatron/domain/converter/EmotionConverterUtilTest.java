@@ -1,6 +1,6 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
-import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
 import org.junit.Test;
 

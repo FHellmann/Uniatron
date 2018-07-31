@@ -11,7 +11,7 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
 import com.lid.lib.LabelTextView;
 
 import java.util.List;

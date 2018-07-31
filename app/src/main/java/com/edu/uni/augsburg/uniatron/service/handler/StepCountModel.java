@@ -4,18 +4,17 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
-import com.edu.uni.augsburg.uniatron.domain.DataSource;
+import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
 
 /**
- * The model is the connection between the {@link DataRepository}
+ * The model is the connection between the data source
  * and the {@link StepCountDetector}.
  *
  * @author Fabio Hellmann
  */
 public class StepCountModel {
 
-    private final DataSource mRepository;
+    private final StepCountDao mStepCountDao;
 
     /**
      * Ctr.
@@ -23,7 +22,7 @@ public class StepCountModel {
      * @param context The context.
      */
     StepCountModel(@NonNull final Context context) {
-        mRepository = MainApplication.getDataSource(context);
+        mStepCountDao = MainApplication.getStepCountDao(context);
     }
 
     /**
@@ -32,6 +31,6 @@ public class StepCountModel {
      * @param steps The steps to add.
      */
     public void addSteps(final int steps) {
-        mRepository.addStepCount(steps);
+        mStepCountDao.addStepCount(steps);
     }
 }

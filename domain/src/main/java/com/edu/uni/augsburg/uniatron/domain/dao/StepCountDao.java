@@ -1,44 +1,40 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.model.StepCountEntity;
-
-import java.util.Date;
-
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.StepCount;
 
 /**
- * The dao contains all the calls depending to step count.
+ * The dao to operate on the step count table.
  *
  * @author Fabio Hellmann
  */
-@Dao
-@TypeConverters({DateConverterUtil.class})
 public interface StepCountDao {
-    /**
-     * Persist a step count.
-     *
-     * @param stepCount The step count to persist.
-     */
-    @Insert(onConflict = REPLACE)
-    void add(StepCountEntity stepCount);
 
     /**
-     * Load the remaining step count for a specified date range.
+     * Add an amount of steps.
      *
-     * @param dateFrom The date to start searching.
-     * @param dateTo   The date to end searching.
+     * @param stepCount The amount of steps.
      * @return The step count.
      */
-    @Query("SELECT TOTAL(step_count) - (SELECT TOTAL(steps) FROM TimeCreditEntity "
-            + "WHERE TimeCreditEntity.timestamp BETWEEN :dateFrom AND :dateTo) "
-            + "FROM StepCountEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
-    LiveData<Integer> loadRemainingStepCount(Date dateFrom, Date dateTo);
+    LiveData<StepCount> addStepCount(int stepCount);
+
+    /**
+     * Get the remaining step count for today.
+     *
+     * @return The amount of steps.
+     */
+    LiveData<Integer> getRemainingStepCountsToday();
+
+    /**
+     * Creates a new instance to access the step count data.
+     *
+     * @param queryProvider The query provider.
+     * @return The step count dao.
+     */
+    static StepCountDao create(@NonNull final QueryProvider queryProvider) {
+        return new StepCountDaoImpl(queryProvider.stepCountQuery());
+    }
 }

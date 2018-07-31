@@ -1,75 +1,62 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.AppUsage;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.DataCollection;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
-
 /**
- * The dao contains all the calls depending to app usage.
+ * The dao to operate on the app usage table.
  *
  * @author Fabio Hellmann
  */
-@Dao
-@TypeConverters({DateConverterUtil.class})
 public interface AppUsageDao {
-    /**
-     * Persist an app usage.
-     *
-     * @param appUsageEntity The app usage to persist.
-     */
-    @Insert(onConflict = REPLACE)
-    void add(AppUsageEntity appUsageEntity);
 
     /**
-     * Load the app usage time of each app summed by the app name.
+     * Add the usage time of an app.
+     *
+     * @param packageName   The package name of the app which was used.
+     * @param usageTime The time of usage.
+     * @return The app usage data.
+     */
+    LiveData<AppUsage> addAppUsage(@NonNull String packageName, long usageTime);
+
+    /**
+     * Get the total amount of days since the app was installed.
+     *
+     * @return The amount of days.
+     */
+    LiveData<Date> getMinDate();
+
+    /**
+     * Get the app usage time from date.
      *
      * @param dateFrom The date to start searching.
      * @param dateTo   The date to end searching.
-     * @return The app usage time by app.
+     * @return The app usage time.
      */
-    @Query("SELECT 0 id, app_name, date('now') timestamp, "
-            + "TOTAL(usage_time) usage_time "
-            + "FROM AppUsageEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "GROUP BY app_name "
-            + "ORDER BY TOTAL(usage_time) DESC")
-    LiveData<List<AppUsageEntity>> loadAppUsageTime(Date dateFrom, Date dateTo);
+    LiveData<DataCollection<AppUsage>> getAppUsageTimeByDate(@NonNull Date dateFrom, @NonNull Date dateTo);
 
     /**
-     * Load the remaining app usage time.
+     * Get the remaining usage time for today.
      *
-     * @param dateFrom The date to start searching.
-     * @param dateTo   The date to end searching.
-     * @param filter   The filter for observed apps.
-     * @return The remaining app usage time.
+     * @param filter The apps to filter.
+     * @return The remaining usage time.
      */
-    @Query("SELECT (SELECT TOTAL(time_bonus) FROM TimeCreditEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo) - TOTAL(usage_time) "
-            + "FROM AppUsageEntity WHERE (timestamp BETWEEN :dateFrom AND :dateTo) "
-            + "AND app_name IN (:filter)")
-    LiveData<Long> loadRemainingAppUsageTimeByBlacklist(Date dateFrom,
-                                                        Date dateTo,
-                                                        Set<String> filter);
+    LiveData<Long> getRemainingAppUsageTimeToday(@NonNull Set<String> filter);
 
     /**
-     * Get the total days for the specified date range.
+     * Creates a new instance to access the app usage data.
      *
-     * @param dateFrom The date to start counting.
-     * @param dateTo   The date to end counting.
-     * @return The total days.
+     * @param queryProvider The query provider.
+     * @return The app usage dao.
      */
-    @Query("SELECT timestamp FROM AppUsageEntity WHERE timestamp BETWEEN :dateFrom AND :dateTo "
-            + "ORDER BY timestamp ASC LIMIT 1")
-    LiveData<Date> getMinDate(Date dateFrom, Date dateTo);
+    static AppUsageDao create(@NonNull final QueryProvider queryProvider) {
+        return new AppUsageDaoImpl(queryProvider.appUsageQuery());
+    }
 }
