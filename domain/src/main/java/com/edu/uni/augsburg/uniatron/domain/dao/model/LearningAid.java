@@ -18,7 +18,8 @@ public interface LearningAid {
     }
 
     /**
-     * Get the left time for the current learning aid or empty if the learning aid is inactive.
+     * Get the left time for the current learning aid or empty if the
+     * learning aid is inactive.
      *
      * @return the learning aid left time.
      */

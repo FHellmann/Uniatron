@@ -24,6 +24,7 @@ Severity: HARD
         <exclude name="OnlyOneReturn" />
         <exclude name="CommentDefaultAccessModifier" />
         <exclude name="DefaultPackage" />
+        <exclude name="ClassNamingConventions" />
     </rule>
     <rule ref="category/java/codestyle.xml/LongVariable" >
         <properties>
@@ -35,6 +36,7 @@ Severity: HARD
         <exclude name="ExcessiveImports" />
         <exclude name="LoosePackageCoupling" />
         <exclude name="LawOfDemeter" />
+        <exclude name="AbstractClassWithoutAnyMethod" />
     </rule>
     <rule ref="category/java/design.xml/NcssCount" >
         <properties>
