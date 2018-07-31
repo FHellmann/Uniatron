@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotion;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
 import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
@@ -46,7 +45,7 @@ public class SummaryCard implements CardViewHolder {
         CardUtil.setFullSpan(viewHolder);
         final ViewHolder itemViewHolder = (ViewHolder) viewHolder;
 
-        final Emotion emotion = mSummary.getEmotion();
+        final Emotions emotion = mSummary.getEmotion();
         final Drawable drawable = context.getResources().getDrawable(getEmoticonDrawable(emotion));
 
         itemViewHolder.mImageViewEmoticon.setImageDrawable(drawable);
@@ -68,8 +67,8 @@ public class SummaryCard implements CardViewHolder {
     }
 
     @StringRes
-    private int getEmotionText(@NonNull final Emotion emotion) {
-        switch ((Emotions) emotion) {
+    private int getEmotionText(@NonNull final Emotions emotion) {
+        switch (emotion) {
             case ANGRY:
                 return R.string.emotion_angry;
             case SADNESS:
@@ -84,8 +83,8 @@ public class SummaryCard implements CardViewHolder {
     }
 
     @DrawableRes
-    private int getEmoticonDrawable(@NonNull final Emotion emotion) {
-        switch ((Emotions) emotion) {
+    private int getEmoticonDrawable(@NonNull final Emotions emotion) {
+        switch (emotion) {
             case ANGRY:
                 return R.drawable.ic_emoticon_angry_selected;
             case SADNESS:
