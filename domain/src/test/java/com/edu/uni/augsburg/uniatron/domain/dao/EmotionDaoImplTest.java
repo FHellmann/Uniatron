@@ -37,6 +37,6 @@ public class EmotionDaoImplTest {
 
         final Emotion liveDataValue = TestUtils.getLiveDataValue(emotion);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(value));
+        assertThat(liveDataValue.getValue(), is(value));
     }
 }

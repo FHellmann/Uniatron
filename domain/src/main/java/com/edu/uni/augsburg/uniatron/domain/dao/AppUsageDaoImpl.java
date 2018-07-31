@@ -39,8 +39,7 @@ class AppUsageDaoImpl implements AppUsageDao {
         mAppUsageQuery = appUsageQuery;
     }
 
-    public LiveData<AppUsage> addAppUsage(@NonNull final String packageName,
-                                          final long usageTime) {
+    public LiveData<AppUsage> addAppUsage(@NonNull final String packageName, final long usageTime) {
         return LiveDataAsyncTask.execute(() -> {
             final AppUsageEntity appUsageEntity = new AppUsageEntity();
             appUsageEntity.setPackageName(packageName);
@@ -59,8 +58,7 @@ class AppUsageDaoImpl implements AppUsageDao {
         return mAppUsageQuery.getMinDate(dateFrom, dateTo);
     }
 
-    public LiveData<DataCollection<AppUsage>> getAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                                    @NonNull final Date dateTo) {
+    public LiveData<DataCollection<AppUsage>> getAppUsageTimeByDate(@NonNull final Date dateFrom, @NonNull final Date dateTo) {
         return Transformations.map(mAppUsageQuery.loadAppUsageTime(dateFrom, dateTo),
                 appUsageList -> new StreamCollection<>(Stream.ofNullable(appUsageList)
                         .peek(item -> item.setUsageTimeAllPercent(item.getUsageTime() * 100.0 / Stream.ofNullable(appUsageList)
@@ -72,12 +70,6 @@ class AppUsageDaoImpl implements AppUsageDao {
     public LiveData<Long> getRemainingAppUsageTimeToday(@NonNull final Set<String> filter) {
         final Date dateFrom = DateConverter.getMin(Calendar.DATE).now();
         final Date dateTo = DateConverter.getMax(Calendar.DATE).now();
-        return getRemainingAppUsageTimeByDate(dateFrom, dateTo, filter);
-    }
-
-    private LiveData<Long> getRemainingAppUsageTimeByDate(@NonNull final Date dateFrom,
-                                                          @NonNull final Date dateTo,
-                                                          @NonNull final Set<String> filter) {
         return mAppUsageQuery.loadRemainingAppUsageTimeByBlacklist(dateFrom, dateTo, filter);
     }
 }

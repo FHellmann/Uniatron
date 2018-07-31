@@ -1,5 +1,7 @@
 package com.edu.uni.augsburg.uniatron.domain.table;
 
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
+
 import org.junit.Test;
 
 import java.util.Date;
@@ -71,5 +73,21 @@ public class SummaryEntityTest {
         final double expected = 3.5;
         entity.setEmotionAvg(expected);
         assertThat(entity.getEmotionAvg(), is(expected));
+    }
+
+    @Test
+    public void getDefaultEmotion() {
+        final SummaryEntity entity = new SummaryEntity();
+        final Emotions expected = Emotions.NEUTRAL;
+        entity.setEmotionAvg(-1d);
+        assertThat(entity.getEmotion(), is(expected));
+    }
+
+    @Test
+    public void setAndGetEmotion() {
+        final SummaryEntity entity = new SummaryEntity();
+        final double expected = 3.5;
+        entity.setEmotionAvg(expected);
+        assertThat(entity.getEmotion(), is(Emotions.FANTASTIC));
     }
 }

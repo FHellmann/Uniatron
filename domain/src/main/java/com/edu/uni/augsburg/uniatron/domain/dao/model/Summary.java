@@ -28,5 +28,5 @@ public interface Summary {
      *
      * @return the average emotion as double.
      */
-    Emotion getEmotion();
+    Emotions getEmotion();
 }

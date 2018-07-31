@@ -72,4 +72,18 @@ public class AppUsageEntityTest {
         entity.setUsageTime(expected);
         assertThat(entity.getUsageTime(), is(equalTo(expected)));
     }
+
+    @Test
+    public void getDefaultUsageTimeAllPercent() {
+        final AppUsageEntity entity = new AppUsageEntity();
+        assertThat(entity.getUsageTimeAllPercent(), is(0D));
+    }
+
+    @Test
+    public void setAndGetUsageTimeAllPercent() {
+        final AppUsageEntity entity = new AppUsageEntity();
+        final double expected = 0.73;
+        entity.setUsageTimeAllPercent(expected);
+        assertThat(entity.getUsageTimeAllPercent(), is(equalTo(expected)));
+    }
 }

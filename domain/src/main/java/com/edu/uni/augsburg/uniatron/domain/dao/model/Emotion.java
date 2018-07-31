@@ -9,4 +9,10 @@ import com.edu.uni.augsburg.uniatron.domain.table.EmotionEntity;
  * @author Fabio Hellmann
  */
 public interface Emotion {
+    /**
+     * Get the emotion value.
+     *
+     * @return The emotion.
+     */
+    Emotions getValue();
 }

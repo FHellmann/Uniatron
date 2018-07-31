@@ -1,6 +1,5 @@
 package com.edu.uni.augsburg.uniatron.domain.table;
 
-import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotion;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
 
@@ -38,7 +37,7 @@ public class SummaryEntity implements Summary {
     }
 
     @Override
-    public Emotion getEmotion() {
+    public Emotions getEmotion() {
         if (mEmotionAvg >= 0) {
             final int emotionIndex = (int) Math.round(mEmotionAvg);
             return Emotions.values()[emotionIndex];

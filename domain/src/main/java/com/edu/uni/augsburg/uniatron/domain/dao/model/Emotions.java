@@ -5,7 +5,7 @@ package com.edu.uni.augsburg.uniatron.domain.dao.model;
  *
  * @author Fabio Hellmann
  */
-public enum Emotions implements Emotion {
+public enum Emotions {
     /**
      * The emotion state ANGRY.
      **/
