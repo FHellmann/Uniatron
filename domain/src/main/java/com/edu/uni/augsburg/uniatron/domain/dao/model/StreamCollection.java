@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * The collected app usage for a specified time range.
  *
+ * @param <T> The generic type of the data.
  * @author Fabio Hellmann
  */
 public class StreamCollection<T> implements DataCollection<T> {
