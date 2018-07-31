@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">UNIAtron</string>
-    <string name="app_icon_description">应用程序图标</string>
     <string name="settings">设置</string>
     <string name="time_credit_shop_title">时间信用商店</string>
     <string name="minutes_short">%1$d 分</string>
@@ -18,13 +17,13 @@
     <string name="channel_blacklist">黑名单</string>
     <string name="channel_time_up">时间差不多了</string>
     <string name="notify_package_added">安装了新应用</string>
-    <string name="notify_package_added_summary">按将％1$s添加到黑名单。</string>
-    <string name="time_notification">少于％1$d分钟％2$s剩下！ 点按即可获得更多时间。</string>
+    <string name="notify_package_added_summary">按将%1$s添加到黑名单。</string>
+    <string name="time_notification">还剩不到%1$d分钟！ 点按即可获得更多时间。</string>
     <string name="time_credits_header">选择你的时间信用！</string>
-    <string name="learning_aid_active">学习辅助是活跃的，你还需要等待％d分钟。</string>
+    <string name="learning_aid_active">学习辅助是活跃的，你还需要等待%d分钟。</string>
     <string name="card_summary_title">概要</string>
     <string name="app_usage">应用程序用法</string>
-    <string name="app_usage_time">使用时间：％1$d％2$02d分钟</string>
+    <string name="app_usage_time">使用时间：%1$d:%2$02d 分钟</string>
     <string name="onboarding_btn_whitelist">白名单</string>
     <string name="onboarding_btn_grant">格兰特</string>
     <string name="onboarding_btn_blacklist">选择应用</string>
@@ -42,8 +41,8 @@
     <string name="onboarding_btn_shop">真棒</string>
     <string name="show_all">显示所有</string>
     <string name="show_only_top_five">仅显示前5名</string>
-    <string name="time_in_minutes">％1$d％2$02d分钟</string>
-    <string name="card_summary_steps">在此期间，你走了 %1$d 步，感觉 ％2$s。</string>
+    <string name="time_in_minutes">%1$d:%2$02d 分钟</string>
+    <string name="card_summary_steps">在此期间，你走了%1$d步，感觉%2$s。</string>
     <string name="total">总</string>
     <string name="emotion_angry">愤怒</string>
     <string name="emotion_sad">伤心</string>
