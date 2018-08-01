@@ -12,13 +12,15 @@ import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Notification is shown when the time is running out soon.
  */
 public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     private final Context mContext;
-    private final Integer remainingTime;
-    private final int requestId;
+    private final long mRemainingTime;
+    private final int mRequestId;
 
     /**
      * Build Notification to inform user that times running out.
@@ -26,23 +28,23 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
      * @param context       the context
      * @param remainingTime remaining Time for apps in blacklist
      */
-    public TimeUpNotificationBuilder(@NonNull final Context context, final Integer remainingTime) {
+    public TimeUpNotificationBuilder(@NonNull final Context context, final long remainingTime) {
         this.mContext = context;
-        this.remainingTime = remainingTime;
-        this.requestId = (int) System.currentTimeMillis();
+        this.mRemainingTime = remainingTime;
+        this.mRequestId = (int) System.currentTimeMillis();
     }
 
     @Override
     public Notification build() {
-        final int remainingTimeRounded = Math.round(remainingTime / 60.0f);
+        final long remainingMinutes = TimeUnit.MINUTES.convert(mRemainingTime, TimeUnit.MILLISECONDS);
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText(mContext.getString(R.string.time_notification, remainingTimeRounded))
+                .setContentText(mContext.getString(R.string.time_notification, remainingMinutes))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
-                        requestId,
+                        mRequestId,
                         new Intent(mContext, TimeCreditShopActivity.class),
                         PendingIntent.FLAG_CANCEL_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -54,6 +56,6 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public int getId() {
-        return requestId;
+        return mRequestId;
     }
 }

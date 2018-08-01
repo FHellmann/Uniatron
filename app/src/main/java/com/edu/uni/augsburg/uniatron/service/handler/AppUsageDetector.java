@@ -46,9 +46,9 @@ public final class AppUsageDetector extends BroadcastReceiver {
         );
         mModel.addNotifyOnTimeUpSoonListeners(
                 remainingTime -> showNotificationIfTimeAlmostUp(context, remainingTime),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_ONE_MINUTE, TimeUnit.MINUTES),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_FIVE_MINUTES, TimeUnit.MINUTES),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_TEN_MINUTES, TimeUnit.MINUTES)
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_ONE_MINUTE, TimeUnit.MINUTES),
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_FIVE_MINUTES, TimeUnit.MINUTES),
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_TEN_MINUTES, TimeUnit.MINUTES)
         );
         startAppChecker(context);
     }
@@ -83,7 +83,7 @@ public final class AppUsageDetector extends BroadcastReceiver {
     }
 
     private void showNotificationIfTimeAlmostUp(@NonNull final Context context,
-                                                final int remainingTime) {
+                                                final long remainingTime) {
         final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(
                 context,
                 remainingTime

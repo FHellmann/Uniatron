@@ -39,7 +39,7 @@ public class AppUsageModel {
     private final SharedPreferencesHandler mSharedPreferencesHandler;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
-    private final Map<Integer, Consumer<Integer>> mNotifyListeners = new LinkedHashMap<>();
+    private final Map<Long, Consumer<Long>> mNotifyListeners = new LinkedHashMap<>();
     private final Consumer<String> mBlockTimeOutListener;
     private final Consumer<String> mBlockLearningAidListener;
     private final AppUsageDao mAppUsageDao;
@@ -112,8 +112,8 @@ public class AppUsageModel {
      * @param listener   The listener.
      * @param timeToEnds The times.
      */
-    public void addNotifyOnTimeUpSoonListeners(@NonNull final Consumer<Integer> listener,
-                                               @NonNull final Integer... timeToEnds) {
+    public void addNotifyOnTimeUpSoonListeners(@NonNull final Consumer<Long> listener,
+                                               @NonNull final Long... timeToEnds) {
         Stream.ofNullable(timeToEnds)
                 .filter(Objects::nonNull)
                 .forEach(value -> mNotifyListeners.put(value, listener));
