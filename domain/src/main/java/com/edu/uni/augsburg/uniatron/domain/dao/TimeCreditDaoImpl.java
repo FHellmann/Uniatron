@@ -12,7 +12,6 @@ import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
 import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The dao implementation for {@link TimeCreditDao}.
@@ -48,25 +47,17 @@ class TimeCreditDaoImpl implements TimeCreditDao {
     public LiveData<LearningAid> getLatestLearningAid() {
         return Transformations.map(
                 mTimeCreditQuery.getLatestLearningAid(),
-                data -> {
-                    final long timePassed = data == null
-                            ? 0 : System.currentTimeMillis() - data.getTime();
-                    final long timeLeft = TimeCredits.CREDIT_LEARNING.getBlockedTime()
-                            - TimeUnit.MINUTES.convert(timePassed, TimeUnit.MILLISECONDS);
-                    if (timeLeft > 0
-                            && timeLeft <= TimeCredits.CREDIT_LEARNING.getBlockedTime()) {
-                        return new LearningAidImpl(timePassed > 0, timeLeft);
-                    }
-                    return new LearningAidImpl(false, 0);
-                });
+                data -> new LearningAidImpl(data == null
+                        ? 0
+                        : TimeCredits.CREDIT_LEARNING.getBlockedTime() - (System.currentTimeMillis() - data.getTime())));
     }
 
     private static final class LearningAidImpl implements LearningAid {
-        private final boolean mActive;
         private final long mTimeLeft;
+        private final boolean mActive;
 
-        LearningAidImpl(final boolean active, final long timeLeft) {
-            mActive = active;
+        LearningAidImpl(final long timeLeft) {
+            mActive = timeLeft > 0;
             mTimeLeft = timeLeft;
         }
 
