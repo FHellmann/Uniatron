@@ -23,6 +23,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
                 app:backgroundTint="@android:color/transparent"
                 app:icon="@drawable/ic_chevron_left_gray_24dp" />
@@ -41,6 +43,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
                 app:backgroundTint="@android:color/transparent"
                 app:icon="@drawable/ic_chevron_right_gray_24dp" />
@@ -62,7 +66,6 @@
         android:layout_gravity="bottom"
         app:backgroundTint="@color/primaryColor"
         app:fabAlignmentMode="center"
-        app:fabAttached="true"
         app:fabCradleMargin="8dp"
         app:fabCradleRoundedCornerRadius="6dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"

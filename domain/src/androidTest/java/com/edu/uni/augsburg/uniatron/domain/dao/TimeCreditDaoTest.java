@@ -4,19 +4,20 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Date;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,9 +25,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+@RunWith(AndroidJUnit4.class)
 public class TimeCreditDaoTest {
     private AppDatabase mDb;
-    private TimeCreditDao mDao;
+    private TimeCreditQuery mDao;
 
     @Before
     public void setUp() {
@@ -34,7 +36,7 @@ public class TimeCreditDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.timeCreditDao();
+        mDao = mDb.timeCreditQuery();
     }
 
     @After
@@ -51,31 +53,16 @@ public class TimeCreditDaoTest {
     }
 
     @Test
-    public void loadTimeCredits() throws Exception {
-        mDao.add(createTestData(1));
-        mDao.add(createTestData(1));
-        mDao.add(createTestData(2));
-        mDao.add(createTestData(3));
-        mDao.add(createTestData(2));
-
-        final Date date = getDate(1, 1, 2018);
-        final LiveData<Integer> data = mDao
-                .loadTimeCredits(getMinTimeOfDate(date), getMaxTimeOfDate(date));
-
-        assertThat(getLiveDataValue(data), is(10));
-    }
-
-    @Test
     public void getLatestLearningAidActive() throws Exception {
         final TimeCreditEntity testData = new TimeCreditEntity();
         testData.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData.setTimeBonus(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData.setTimestamp(new Date());
         mDao.add(testData);
         final TimeCreditEntity testData2 = new TimeCreditEntity();
         testData2.setType(TimeCredits.CREDIT_LEARNING.getType());
-        testData2.setTime(TimeCredits.CREDIT_LEARNING.getTime());
+        testData2.setTimeBonus(TimeCredits.CREDIT_LEARNING.getTimeBonus());
         testData2.setStepCount(TimeCredits.CREDIT_LEARNING.getStepCount());
         testData2.setTimestamp(new Date());
         mDao.add(testData2);
@@ -88,7 +75,7 @@ public class TimeCreditDaoTest {
 
     private TimeCreditEntity createTestData(int month) {
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(5);
+        timeCreditEntity.setTimeBonus(5);
         timeCreditEntity.setTimestamp(getDate(1, month, 2018));
         return timeCreditEntity;
     }

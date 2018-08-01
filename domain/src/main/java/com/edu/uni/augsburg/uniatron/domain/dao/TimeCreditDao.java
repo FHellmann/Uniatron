@@ -1,55 +1,44 @@
 package com.edu.uni.augsburg.uniatron.domain.dao;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.domain.converter.DateConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.converter.TimeCreditTypeConverterUtil;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-
-import java.util.Date;
-
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.LearningAid;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredit;
+import com.edu.uni.augsburg.uniatron.domain.query.TimeCreditQuery;
 
 /**
- * The dao contains all the calls depending to time credit.
+ * The dao to operate on the time credit table.
  *
  * @author Fabio Hellmann
  */
-@Dao
-@TypeConverters({DateConverterUtil.class, TimeCreditTypeConverterUtil.class})
 public interface TimeCreditDao {
-    /**
-     * Persist a time credit.
-     *
-     * @param timeCreditEntity The time credit to persist.
-     */
-    @Insert(onConflict = REPLACE)
-    void add(TimeCreditEntity timeCreditEntity);
 
     /**
-     * Query the sum of remaining time credits for the current date.
+     * Add a new time credit.
      *
-     * @param dateFrom The date to start searching.
-     * @param dateTo   The date to end searching.
-     * @return the remaining time credits.
+     * @param timeCredit The time credit will be generated out of this.
+     * @param factor     The factor to multiply with.
+     * @return The time credit.
      */
-    @Query("SELECT TOTAL(time_in_minutes) FROM TimeCreditEntity "
-            + "WHERE timestamp BETWEEN :dateFrom AND :dateTo")
-    LiveData<Integer> loadTimeCredits(Date dateFrom, Date dateTo);
+    LiveData<TimeCredit> addTimeCredit(@NonNull TimeCredit timeCredit, double factor);
 
     /**
-     * Query whether the learning aid is active or not.
+     * Check whether the learning aid is active or not.
      *
      * @return The difference in time to the latest learning aid.
+     * @see TimeCreditQuery#getLatestLearningAid()
      */
-    @Query("SELECT timestamp "
-            + "FROM TimeCreditEntity "
-            + "WHERE type = 'LEARNING_AID' "
-            + "ORDER BY timestamp DESC "
-            + "LIMIT 1")
-    LiveData<Date> getLatestLearningAid();
+    LiveData<LearningAid> getLatestLearningAid();
+
+    /**
+     * Creates a new instance to access the time credit data.
+     *
+     * @param queryProvider The query provider.
+     * @return The time credit dao.
+     */
+    static TimeCreditDao create(@NonNull final QueryProvider queryProvider) {
+        return new TimeCreditDaoImpl(queryProvider.timeCreditQuery());
+    }
 }

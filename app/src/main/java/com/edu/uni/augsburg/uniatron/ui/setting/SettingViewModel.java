@@ -49,10 +49,10 @@ public class SettingViewModel extends AndroidViewModel {
         MainApplication.getSharedPreferencesHandler(application)
                 .registerOnPreferenceChangeListener((sharedPreferences, key) -> {
                     Log.d(getClass().toString(), "shared prefs changed");
-                    mObservable.setValue(getAllInstalledApps());
+                    mObservable.setValue(getInstalledAppsDataSorted(getApplication()));
                 });
 
-        mObservable.setValue(getAllInstalledApps());
+        mObservable.setValue(getInstalledAppsDataSorted(application));
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
@@ -69,45 +69,56 @@ public class SettingViewModel extends AndroidViewModel {
                 data -> data == null ? Collections.emptyMap() : data);
     }
 
-    private Map<String, String> getAllInstalledApps() {
-        final Map<String, String> linkedElements = getInstalledAppsData();
-        return Stream.concat(
-                // Selected apps
-                getFilteredItems(linkedElements, mHandler.getAppsBlacklist()::contains),
-                // Unselected apps
-                getFilteredItems(linkedElements, app -> !mHandler.getAppsBlacklist().contains(app))
-        ).collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (value1, value2) -> value1,
-                LinkedHashMap::new
-        ));
-    }
-
-    private Stream<Map.Entry<String, String>> getFilteredItems(@NonNull final Map<String, String> linkedElements,
-                                                               @NonNull final Function<String, Boolean> filter) {
-        return Stream
-                .of(linkedElements.entrySet())
-                .filter(item -> filter.apply(item.getKey()))
-                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-    }
-
-    private Map<String, String> getInstalledAppsData() {
-        final PackageManager packageManager = getApplication().getPackageManager();
+    private Map<String, String> getInstalledAppsDataSorted(@NonNull final Context context) {
+        final PackageManager packageManager = context.getPackageManager();
         final List<ApplicationInfo> installedApplications = packageManager
                 .getInstalledApplications(PackageManager.GET_META_DATA);
-        return Stream.ofNullable(installedApplications)
+
+        if (installedApplications == null) {
+            return Collections.emptyMap();
+        } else {
+            final Map<String, String> linkedElements = getInstalledAppsData(context, packageManager, installedApplications);
+            return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (value1, value2) -> value1,
+                            LinkedHashMap::new
+                    ));
+        }
+    }
+
+    @NonNull
+    private Map<String, String> getInstalledAppsData(@NonNull final Context context,
+                                                     @NonNull final PackageManager packageManager,
+                                                     @NonNull final List<ApplicationInfo> installedApplications) {
+        return Stream.of(installedApplications)
                 // Is this app?
                 .filter(item -> !item.packageName.equals(getApplication().getPackageName()))
                 // Is system app?
-                .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
-                        | ApplicationInfo.FLAG_SYSTEM)) == 0)
+                .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP | ApplicationInfo.FLAG_SYSTEM)) == 0)
                 // Is launcher app?
                 .filter(item -> isNotLauncherPackage(item.packageName))
                 .collect(Collectors.toMap(
                         key -> key.packageName,
                         value -> packageManager.getApplicationLabel(value).toString()
                 ));
+    }
+
+    @NonNull
+    private Stream<Map.Entry<String, String>> getSelectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
+    }
+
+    @NonNull
+    private Stream<Map.Entry<String, String>> getUnselectedItems(@NonNull final Map<String, String> linkedElements) {
+        return Stream
+                .of(linkedElements.entrySet())
+                .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
+                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
     }
 
     private boolean isNotLauncherPackage(@NonNull final String packageName) {

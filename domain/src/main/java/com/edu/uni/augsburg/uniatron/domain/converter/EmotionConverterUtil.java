@@ -1,11 +1,14 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.support.annotation.Nullable;
 
-import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.annimon.stream.Stream;
+import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
 /**
- * A converter for the {@link com.edu.uni.augsburg.uniatron.domain.AppDatabase}
+ * A converter for the {@link AppDatabase}
  * and the model classes.
  *
  * @author Fabio Hellmann
@@ -21,8 +24,11 @@ public final class EmotionConverterUtil {
      * @return The emotion.
      */
     @TypeConverter
-    public static Emotions fromRawValue(final Integer value) {
-        return value == null ? null : Emotions.values()[value];
+    public static Emotions fromRawValue(@Nullable final Integer value) {
+        return value == null ? null : Stream.of(Emotions.values())
+                .filter(emotion -> emotion.getIndex() == value)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 
     /**
@@ -32,7 +38,7 @@ public final class EmotionConverterUtil {
      * @return The int.
      */
     @TypeConverter
-    public static Integer fromRealValue(final Emotions emotions) {
-        return emotions == null ? null : emotions.ordinal();
+    public static Integer fromRealValue(@Nullable final Emotions emotions) {
+        return emotions == null ? null : emotions.getIndex();
     }
 }

@@ -1,11 +1,14 @@
 package com.edu.uni.augsburg.uniatron.domain.converter;
 
 import android.arch.persistence.room.TypeConverter;
+import android.support.annotation.Nullable;
+
+import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
 
 import java.util.Date;
 
 /**
- * A converter for the {@link com.edu.uni.augsburg.uniatron.domain.AppDatabase}
+ * A converter for the {@link AppDatabase}
  * and the model classes.
  *
  * @author Fabio Hellmann
@@ -21,7 +24,7 @@ public final class DateConverterUtil {
      * @return The date.
      */
     @TypeConverter
-    public static Date fromTimestamp(final Long value) {
+    public static Date fromTimestamp(@Nullable final Long value) {
         return value == null ? null : new Date(value);
     }
 
@@ -32,7 +35,7 @@ public final class DateConverterUtil {
      * @return The long.
      */
     @TypeConverter
-    public static Long dateToTimestamp(final Date date) {
+    public static Long dateToTimestamp(@Nullable final Date date) {
         return date == null ? null : date.getTime();
     }
 }
