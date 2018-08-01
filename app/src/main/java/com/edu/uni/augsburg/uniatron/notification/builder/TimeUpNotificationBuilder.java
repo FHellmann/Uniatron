@@ -38,8 +38,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
         return new NotificationCompat.Builder(mContext, NotificationChannels.TIME_UP.name())
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setContentTitle(mContext.getString(R.string.channel_time_up))
-                .setContentText(mContext.getString(R.string.time_notification,
-                        remainingTimeRounded, remainingTimeRounded == 1 ? "" : "s"))
+                .setContentText(mContext.getString(R.string.time_notification, remainingTimeRounded))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
