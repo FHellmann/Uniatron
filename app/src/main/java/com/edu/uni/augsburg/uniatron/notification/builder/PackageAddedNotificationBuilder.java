@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.service.AddBlacklistEntryService;
+import com.edu.uni.augsburg.uniatron.service.NotificationReceiverService;
 
 /**
  * This notification will be displayed to the user when a new app is installed.
@@ -52,7 +52,7 @@ public class PackageAddedNotificationBuilder implements AppNotificationBuilder {
                 .setContentIntent(PendingIntent.getService(
                         mContext,
                         requestId,
-                        new Intent(mContext, AddBlacklistEntryService.class)
+                        new Intent(mContext, NotificationReceiverService.class)
                                 .putExtra(Intent.EXTRA_RETURN_RESULT, packageName),
                         0))
                 .setAutoCancel(true)

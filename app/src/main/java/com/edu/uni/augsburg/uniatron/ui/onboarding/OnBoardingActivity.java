@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
-import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
+import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 
@@ -61,11 +61,11 @@ public class OnBoardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground2Dark)
                 .scrollable(true);
 
-        if (PermissionUtil.needUsageAccessPermission(this)) {
+        if (Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(this)) {
             userAccessSlideBuilder
                     .description(R.string.onboarding_app_usage_description)
                     .buttonCtaLabel(R.string.onboarding_btn_grant)
-                    .buttonCtaClickListener(vew -> PermissionUtil.requestUsageAccess(this));
+                    .buttonCtaClickListener(vew -> Permissions.USAGE_ACCESS_SETTINGS.request(this));
         }
         addSlide(userAccessSlideBuilder.build());
     }
@@ -81,12 +81,12 @@ public class OnBoardingActivity extends IntroActivity {
                 .backgroundDark(R.color.onboardingBackground6Dark)
                 .scrollable(true);
 
-        if (PermissionUtil.needBatteryWhitelistPermission(this)) {
+        if (Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(this)) {
             coinbagSlideBuilder
                     .description(R.string.onboarding_coinbag_description)
                     .buttonCtaLabel(R.string.onboarding_btn_whitelist)
-                    .buttonCtaClickListener(view -> PermissionUtil
-                            .requestIgnoreBatterOptimization(this));
+                    .buttonCtaClickListener(view ->
+                            Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.request(this));
         }
         addSlide(coinbagSlideBuilder.build());
     }

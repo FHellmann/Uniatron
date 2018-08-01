@@ -65,7 +65,7 @@
             android:theme="@style/Theme.Intro"/>
 
         <receiver
-            android:name="com.edu.uni.augsburg.uniatron.service.handler.BootCompletedHandler"
+            android:name="com.edu.uni.augsburg.uniatron.service.handler.BootCompletedDetector"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -73,9 +73,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.StepCountService" />
-        <service android:name=".service.BroadcastService" />
-        <service android:name=".service.AddBlacklistEntryService" />
-        <service android:name=".service.AppTrackingService" />
+        <service android:name=".service.NotificationReceiverService" />
+        <service android:name=".service.StickyAppService" />
     </application>
 </manifest>

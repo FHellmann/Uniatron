@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.ui.CardViewHolder;
 
 /**
  * An empty card.
@@ -28,13 +27,8 @@ public class EmptyCard implements CardViewHolder {
     }
 
     @Override
-    public int getType() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return true;
+    public CardPriority getPriority() {
+        return CardPriority.EMPTY;
     }
 
     @Override

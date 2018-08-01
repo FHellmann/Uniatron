@@ -8,9 +8,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.edu.uni.augsburg.uniatron.domain.AppDatabase;
-import com.edu.uni.augsburg.uniatron.domain.model.AppUsageEntity;
-import com.edu.uni.augsburg.uniatron.domain.model.TimeCreditEntity;
-import com.edu.uni.augsburg.uniatron.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.TimeCredits;
+import com.edu.uni.augsburg.uniatron.domain.query.AppUsageQuery;
+import com.edu.uni.augsburg.uniatron.domain.table.AppUsageEntity;
+import com.edu.uni.augsburg.uniatron.domain.table.TimeCreditEntity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,14 +21,13 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMaxTimeOfDate;
-import static com.edu.uni.augsburg.uniatron.domain.util.DateUtil.getMinTimeOfDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getDate;
 import static com.edu.uni.augsburg.uniatron.domain.util.TestUtils.getLiveDataValue;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -40,7 +41,7 @@ public class AppUsageDaoTest {
     public TestRule rule = new InstantTaskExecutorRule();
 
     private AppDatabase mDb;
-    private AppUsageDao mDao;
+    private AppUsageQuery mDao;
 
     @Before
     public void setUp() {
@@ -48,7 +49,7 @@ public class AppUsageDaoTest {
         mDb = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-        mDao = mDb.appUsageDao();
+        mDao = mDb.appUsageQuery();
     }
 
     @After
@@ -80,40 +81,17 @@ public class AppUsageDaoTest {
         mDao.add(create(appName2, date));
 
         final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsageTime(getMinTimeOfDate(date), getMaxTimeOfDate(date));
+                .loadAppUsageTime(DateConverter.getMin(Calendar.DATE).convert(date), DateConverter.getMax(Calendar.DATE).convert(date));
 
         final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
         assertThat(liveDataValue, is(notNullValue()));
         assertThat(liveDataValue.isEmpty(), is(false));
-        assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
-        assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName2)));
-        assertThat(liveDataValue.get(2).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getTime(), is(30));
-        assertThat(liveDataValue.get(1).getTime(), is(20));
-        assertThat(liveDataValue.get(2).getTime(), is(10));
-    }
-
-    @Test
-    public void loadAppUsagePercent() throws Exception {
-        final String appName0 = "Test";
-        final Date date = getDate(1, 1, 2018);
-        mDao.add(create(appName0, date));
-        mDao.add(create(appName0, date));
-        mDao.add(create(appName0, date));
-
-        final String appName1 = "Test1";
-        mDao.add(create(appName1, date));
-
-        final LiveData<List<AppUsageEntity>> data = mDao
-                .loadAppUsagePercent(getMinTimeOfDate(date), getMaxTimeOfDate(date));
-
-        final List<AppUsageEntity> liveDataValue = getLiveDataValue(data);
-        assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue.isEmpty(), is(false));
-        assertThat(liveDataValue.get(0).getAppName(), is(equalTo(appName0)));
-        assertThat(liveDataValue.get(1).getAppName(), is(equalTo(appName1)));
-        assertThat(liveDataValue.get(0).getTime(), is(75));
-        assertThat(liveDataValue.get(1).getTime(), is(25));
+        assertThat(liveDataValue.get(0).getPackageName(), is(equalTo(appName0)));
+        assertThat(liveDataValue.get(1).getPackageName(), is(equalTo(appName2)));
+        assertThat(liveDataValue.get(2).getPackageName(), is(equalTo(appName1)));
+        assertThat(liveDataValue.get(0).getUsageTime(), is(30L));
+        assertThat(liveDataValue.get(1).getUsageTime(), is(20L));
+        assertThat(liveDataValue.get(2).getUsageTime(), is(10L));
     }
 
     @Test
@@ -130,29 +108,29 @@ public class AppUsageDaoTest {
 
         final TimeCredits credits = TimeCredits.CREDIT_1000;
         final TimeCreditEntity timeCreditEntity = new TimeCreditEntity();
-        timeCreditEntity.setTime(credits.getTime());
+        timeCreditEntity.setTimeBonus(credits.getTimeBonus());
         timeCreditEntity.setStepCount(credits.getStepCount());
         timeCreditEntity.setTimestamp(date);
-        mDb.timeCreditDao().add(timeCreditEntity);
+        mDb.timeCreditQuery().add(timeCreditEntity);
 
         final Set<String> filters = new HashSet<>(Collections.singletonList("app1"));
 
-        final LiveData<Integer> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
-                getMinTimeOfDate(date),
-                getMaxTimeOfDate(date),
+        final LiveData<Long> liveData = mDao.loadRemainingAppUsageTimeByBlacklist(
+                DateConverter.getMin(Calendar.DATE).convert(date),
+                DateConverter.getMax(Calendar.DATE).convert(date),
                 filters
         );
 
-        final Integer liveDataValue = getLiveDataValue(liveData);
+        final Long liveDataValue = getLiveDataValue(liveData);
         assertThat(liveDataValue, is(notNullValue()));
-        assertThat(liveDataValue, is(credits.getTime() * 60 - test.getTime()));
+        assertThat(liveDataValue, is(credits.getTimeBonus() - test.getUsageTime()));
     }
 
     private AppUsageEntity create(String name, Date date) {
         final AppUsageEntity appUsageEntity = new AppUsageEntity();
-        appUsageEntity.setAppName(name);
+        appUsageEntity.setPackageName(name);
         appUsageEntity.setTimestamp(date);
-        appUsageEntity.setTime(10);
+        appUsageEntity.setUsageTime(10);
         return appUsageEntity;
     }
 }
