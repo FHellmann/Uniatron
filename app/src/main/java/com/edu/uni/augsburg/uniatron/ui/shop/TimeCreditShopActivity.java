@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
+import java.util.concurrent.TimeUnit;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -84,7 +86,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
                 mLayoutLearningAid.setVisibility(View.VISIBLE);
                 mTextLearningAidInfo.setText(getString(
                         R.string.learning_aid_active,
-                        learningAid.getLeftTime().get()
+                        TimeUnit.MINUTES.convert(learningAid.getLeftTime().get(), TimeUnit.MILLISECONDS)
                 ));
             } else {
                 mScrollView.setVisibility(View.VISIBLE);
