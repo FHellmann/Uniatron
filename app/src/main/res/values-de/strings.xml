@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">UNIAtron</string>
     <string name="settings">Einstellungen</string>
     <string name="time_credit_shop_title">Zeitguthaben Shop</string>
     <string name="minutes_short">%1$d min</string>
