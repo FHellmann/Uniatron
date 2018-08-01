@@ -16,7 +16,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
-import com.edu.uni.augsburg.uniatron.model.Emotions;
+import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,12 +79,12 @@ public class TimeCreditShopActivity extends AppCompatActivity {
             mModel.setEmotion(Emotions.values()[checkedIndex]);
         });
         mModel.getLatestLearningAidTimePassed().observe(this, learningAid -> {
-            if (learningAid.isActive()) {
+            if (learningAid != null && learningAid.isActive()) {
                 mScrollView.setVisibility(View.GONE);
                 mLayoutLearningAid.setVisibility(View.VISIBLE);
                 mTextLearningAidInfo.setText(getString(
                         R.string.learning_aid_active,
-                        learningAid.getLeftTime()
+                        learningAid.getLeftTime().get()
                 ));
             } else {
                 mScrollView.setVisibility(View.VISIBLE);
@@ -97,8 +97,10 @@ public class TimeCreditShopActivity extends AppCompatActivity {
     private void setupActionBar() {
         setSupportActionBar(mToolbar);
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getString(R.string.time_credit_shop_title));
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(getString(R.string.time_credit_shop_title));
+        }
     }
 
     @Override

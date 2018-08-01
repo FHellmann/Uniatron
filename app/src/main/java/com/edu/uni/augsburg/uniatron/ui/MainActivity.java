@@ -20,14 +20,12 @@ import android.view.View;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.notification.NotificationChannels;
-import com.edu.uni.augsburg.uniatron.service.AppTrackingService;
-import com.edu.uni.augsburg.uniatron.service.BroadcastService;
-import com.edu.uni.augsburg.uniatron.service.StepCountService;
+import com.edu.uni.augsburg.uniatron.service.StickyAppService;
 import com.edu.uni.augsburg.uniatron.ui.about.AboutActivity;
-import com.edu.uni.augsburg.uniatron.ui.card.AppUsageViewModel;
-import com.edu.uni.augsburg.uniatron.ui.card.CoinBagViewModel;
-import com.edu.uni.augsburg.uniatron.ui.card.SummaryViewModel;
-import com.edu.uni.augsburg.uniatron.ui.card.TimeAccountViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.appusage.AppUsageViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.coinbag.CoinBagViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.summary.SummaryViewModel;
+import com.edu.uni.augsburg.uniatron.ui.card.timeaccount.TimeAccountViewModel;
 import com.edu.uni.augsburg.uniatron.ui.onboarding.OnBoardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
@@ -81,9 +79,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         startOnBoarding();
 
         NotificationChannels.setupChannels(this);
-        startService(new Intent(this, BroadcastService.class));
-        startService(new Intent(this, StepCountService.class));
-        startService(new Intent(this, AppTrackingService.class));
+        startService(new Intent(this, StickyAppService.class));
     }
 
     private void setupCardModels() {
@@ -145,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 (datePicker, year, month, date) -> {
                     final Calendar calendar = GregorianCalendar.getInstance();
                     calendar.set(year, month, date);
-                    mAdapter.clear();
                     mModelNavigation.setDate(calendar.getTime());
                 },
                 mModelNavigation.getCurrentDateValue(Calendar.YEAR),

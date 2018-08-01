@@ -12,8 +12,10 @@ import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.Function;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.util.DateUtil;
-import com.edu.uni.augsburg.uniatron.ui.util.PermissionUtil;
+import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
+import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
+import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
+import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +46,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         super(application);
 
         mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
-        MainApplication.getRepository(application).getMinDate().observeForever(date -> {
+        MainApplication.getAppUsageDao(application).getMinDate().observeForever(date -> {
             if (date != null) {
                 final Calendar calendar = GregorianCalendar.getInstance();
                 calendar.setTime(date);
@@ -76,8 +78,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     private void notifyDataSetChanged() {
         Stream.of(mCardViewModelList)
-                .forEach(cardViewModel ->
-                        cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType));
+                .forEach(cardViewModel -> cardViewModel.setup(mCalendar.getTime(), mGroupByStrategy.mCalendarType));
         mDateLoaded.setValue(mCalendar);
     }
 
@@ -133,12 +134,12 @@ public class MainActivityViewModel extends AndroidViewModel {
     public String getDateFormatByGroupStrategy(@NonNull final Date date) {
         switch (mGroupByStrategy) {
             case MONTH:
-                return DateUtil.formatForMonth(date);
+                return DateFormatter.MM_YYYY.format(date);
             case YEAR:
-                return DateUtil.formatForYear(date);
+                return DateFormatter.YYYY.format(date);
             case DATE:
             default:
-                return DateUtil.formatForDate(date);
+                return DateFormatter.DD_MM_YYYY.format(date);
         }
     }
 
@@ -188,8 +189,8 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public boolean isIntroNeeded(@NonNull final Context context) {
         return mSharedPrefsHandler.isFirstStart()
-                || PermissionUtil.needBatteryWhitelistPermission(context)
-                || PermissionUtil.needUsageAccessPermission(context);
+                || Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(context)
+                || Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(context);
     }
 
     /**
@@ -210,8 +211,8 @@ public class MainActivityViewModel extends AndroidViewModel {
          */
         DATE(
                 Calendar.DATE,
-                calendar -> !DateUtil.getMinTimeOfDate(new Date()).before(calendar.getTime()),
-                (calS, calE) -> calE.getTime().after(DateUtil.getMaxTimeOfDate(calS.getTime()))
+                calendar -> !DateConverter.getMin(Calendar.DATE).convert(new Date()).before(calendar.getTime()),
+                (calS, calE) -> calE.getTime().after(DateConverter.getMax(Calendar.DATE).convert(calS.getTime()))
         ),
         /**
          * Group by month.

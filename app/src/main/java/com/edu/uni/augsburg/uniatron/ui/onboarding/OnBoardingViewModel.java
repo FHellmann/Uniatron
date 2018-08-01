@@ -6,7 +6,10 @@ import android.support.annotation.NonNull;
 
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.edu.uni.augsburg.uniatron.domain.DataRepository;
+import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
+import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * The {@link OnBoardingViewModel} provides the data for
@@ -17,7 +20,8 @@ import com.edu.uni.augsburg.uniatron.domain.DataRepository;
 public class OnBoardingViewModel extends AndroidViewModel {
 
     private static final int STEP_BONUS = 500;
-    private final DataRepository mDataRepository;
+    private final AppUsageDao mAppUsageDao;
+    private final StepCountDao mStepCountDao;
     private final SharedPreferencesHandler mSharedPrefsHandler;
 
     /**
@@ -28,7 +32,8 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public OnBoardingViewModel(final @NonNull Application application) {
         super(application);
 
-        mDataRepository = MainApplication.getRepository(application);
+        mAppUsageDao = MainApplication.getAppUsageDao(application);
+        mStepCountDao = MainApplication.getStepCountDao(application);
         mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
     }
 
@@ -40,8 +45,8 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public void addIntroBonusIfAvailable(@NonNull final String packageName) {
         if (mSharedPrefsHandler.isIntroBonusEligible()) {
             mSharedPrefsHandler.setIntroBonusGranted();
-            mDataRepository.addAppUsage(packageName, 60);
-            mDataRepository.addStepCount(STEP_BONUS);
+            mAppUsageDao.addAppUsage(packageName, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
+            mStepCountDao.addStepCount(STEP_BONUS);
         }
     }
 }
