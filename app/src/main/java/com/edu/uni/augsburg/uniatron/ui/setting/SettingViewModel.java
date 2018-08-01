@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -15,7 +16,6 @@ import android.util.Log;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 
@@ -77,7 +77,7 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyMap();
         } else {
-            final Map<String, String> linkedElements = getInstalledAppsData(context, packageManager, installedApplications);
+            final Map<String, String> linkedElements = getInstalledAppsData(packageManager, installedApplications);
             return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
@@ -89,14 +89,11 @@ public class SettingViewModel extends AndroidViewModel {
     }
 
     @NonNull
-    private Map<String, String> getInstalledAppsData(@NonNull final Context context,
-                                                     @NonNull final PackageManager packageManager,
+    private Map<String, String> getInstalledAppsData(@NonNull final PackageManager packageManager,
                                                      @NonNull final List<ApplicationInfo> installedApplications) {
         return Stream.of(installedApplications)
                 // Is this app?
                 .filter(item -> !item.packageName.equals(getApplication().getPackageName()))
-                // Is system app?
-                .filter(item -> (item.flags & (ApplicationInfo.FLAG_UPDATED_SYSTEM_APP | ApplicationInfo.FLAG_SYSTEM)) == 0)
                 // Is launcher app?
                 .filter(item -> isNotLauncherPackage(item.packageName))
                 .collect(Collectors.toMap(
