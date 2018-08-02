@@ -10,10 +10,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 @RunWith(AndroidJUnit4.class)
 public class SharedPreferencesHandlerTest {
@@ -53,6 +59,33 @@ public class SharedPreferencesHandlerTest {
         preferences.edit().putString("pref_fitness_level", "2").commit();
 
         assertThat(mHandler.getStepsFactor(), is(2.0));
+    }
+
+    @Test
+    public void testRegisterListener() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        final String expected = "test";
+
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> assertThat(s, is(equalTo(expected))));
+        mHandler.registerOnPreferenceChangeListener(listener);
+
+        preferences.edit().putString(expected, expected).commit();
+
+        verify(listener, atLeastOnce()).onSharedPreferenceChanged(any(), any());
+    }
+
+    @Test
+    public void testUnregisterListener() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        final String expected = "test";
+
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> assertThat(s, is(equalTo(expected))));
+        mHandler.registerOnPreferenceChangeListener(listener);
+        mHandler.unregisterOnPreferenceChangeListener(listener);
+
+        preferences.edit().putString(expected, expected).commit();
+
+        verify(listener, never()).onSharedPreferenceChanged(any(), any());
     }
 
     @Test
