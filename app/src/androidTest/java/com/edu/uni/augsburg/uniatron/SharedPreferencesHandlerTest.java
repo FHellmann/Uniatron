@@ -65,8 +65,11 @@ public class SharedPreferencesHandlerTest {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         final String expected = "test";
 
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> {
-            // ignore
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String s) {
+                // ignore
+            }
         });
         mHandler.registerOnPreferenceChangeListener(listener);
 
@@ -80,8 +83,11 @@ public class SharedPreferencesHandlerTest {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         final String expected = "test";
 
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> {
-            // ignore
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String s) {
+                // ignore
+            }
         });
         mHandler.registerOnPreferenceChangeListener(listener);
         mHandler.unregisterOnPreferenceChangeListener(listener);
