@@ -11,19 +11,20 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.orhanobut.logger.Logger;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * The {@link SettingViewModel} provides the data for the {@link SettingActivity}.
@@ -31,9 +32,8 @@ import java.util.Map;
  * @author Fabio Hellmann
  */
 public class SettingViewModel extends AndroidViewModel {
-    private final MediatorLiveData<Map<String, String>> mInstalledApps;
-    private final MutableLiveData<Map<String, String>> mObservable = new MutableLiveData<>();
-    private final SharedPreferencesHandler mHandler;
+    private final MediatorLiveData<List<InstalledApp>> mInstalledApps;
+    private final MutableLiveData<List<InstalledApp>> mObservable = new MutableLiveData<>();
 
     /**
      * Ctr.
@@ -43,19 +43,21 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = MainApplication.getSharedPreferencesHandler(application);
-
-        // the blacklist will be instantly updated upon saving the selection the user made
-        MainApplication.getSharedPreferencesHandler(application)
-                .registerOnPreferenceChangeListener((sharedPreferences, key) -> {
-                    Log.d(getClass().toString(), "shared prefs changed");
-                    mObservable.setValue(getInstalledAppsDataSorted(getApplication()));
-                });
-
-        mObservable.setValue(getInstalledAppsDataSorted(application));
+        final SharedPreferencesHandler mHandler = MainApplication.getSharedPreferencesHandler(application);
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
+
+        // the blacklist will be instantly updated upon saving the selection the user made
+        mHandler.registerOnPreferenceChangeListener((sharedPreferences, key) -> {
+            Logger.d("shared prefs changed");
+            queryInstalledAppsAsync(application, mHandler.getAppsBlacklist());
+        });
+        queryInstalledAppsAsync(application, mHandler.getAppsBlacklist());
+    }
+
+    private void queryInstalledAppsAsync(@NonNull final Context context, @NonNull final Set<String> blacklist) {
+        new AsyncInstalledAppLoader(blacklist, mObservable::setValue).execute(context);
     }
 
     /**
@@ -64,66 +66,75 @@ public class SettingViewModel extends AndroidViewModel {
      * @return The app name/package name pairs.
      */
     @NonNull
-    public LiveData<Map<String, String>> getInstalledApps() {
-        return Transformations.map(mInstalledApps,
-                data -> data == null ? Collections.emptyMap() : data);
+    public LiveData<List<InstalledApp>> getInstalledApps() {
+        return Transformations.map(mInstalledApps, data -> data == null ? Collections.emptyList() : data);
     }
 
-    private Map<String, String> getInstalledAppsDataSorted(@NonNull final Context context) {
-        final PackageManager packageManager = context.getPackageManager();
-        final List<ApplicationInfo> installedApplications = packageManager
-                .getInstalledApplications(PackageManager.GET_META_DATA);
+    private static final class AsyncInstalledAppLoader extends AsyncTask<Context, Void, List<InstalledApp>> {
+        @NonNull
+        private final Set<String> mBlacklist;
+        @NonNull
+        private final Consumer<List<InstalledApp>> mConsumer;
 
-        if (installedApplications == null) {
-            return Collections.emptyMap();
-        } else {
-            final Map<String, String> linkedElements = getInstalledAppsData(packageManager, installedApplications);
-            return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (value1, value2) -> value1,
-                            LinkedHashMap::new
-                    ));
+        AsyncInstalledAppLoader(@NonNull final Set<String> blacklist, @NonNull final Consumer<List<InstalledApp>> consumer) {
+            super();
+            mBlacklist = blacklist;
+            mConsumer = consumer;
         }
-    }
 
-    @NonNull
-    private Map<String, String> getInstalledAppsData(@NonNull final PackageManager packageManager,
-                                                     @NonNull final List<ApplicationInfo> installedApplications) {
-        return Stream.of(installedApplications)
-                // Is this app?
-                .filter(item -> !item.packageName.equals(getApplication().getPackageName()))
-                // Is launcher app?
-                .filter(item -> isNotLauncherPackage(item.packageName))
-                .collect(Collectors.toMap(
-                        key -> key.packageName,
-                        value -> packageManager.getApplicationLabel(value).toString()
-                ));
-    }
+        @Override
+        protected List<InstalledApp> doInBackground(final Context... contexts) {
+            final Context context = contexts[0];
+            final PackageManager packageManager = context.getPackageManager();
+            final List<ApplicationInfo> installedApplications = packageManager
+                    .getInstalledApplications(PackageManager.GET_META_DATA);
 
-    @NonNull
-    private Stream<Map.Entry<String, String>> getSelectedItems(@NonNull final Map<String, String> linkedElements) {
-        return Stream
-                .of(linkedElements.entrySet())
-                .filter(item -> mHandler.getAppsBlacklist().contains(item.getKey()))
-                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-    }
+            if (installedApplications == null) {
+                return Collections.emptyList();
+            } else {
+                final List<InstalledApp> linkedElements = getInstalledAppsData(context, installedApplications);
+                return Stream.concat(getSelectedItems(linkedElements), getUnselectedItems(linkedElements)).collect(Collectors.toList());
+            }
+        }
 
-    @NonNull
-    private Stream<Map.Entry<String, String>> getUnselectedItems(@NonNull final Map<String, String> linkedElements) {
-        return Stream
-                .of(linkedElements.entrySet())
-                .filter(item -> !mHandler.getAppsBlacklist().contains(item.getKey()))
-                .sortBy(item -> item.getValue().toLowerCase(Locale.getDefault()));
-    }
+        @Override
+        protected void onPostExecute(final List<InstalledApp> installedApps) {
+            mConsumer.accept(installedApps);
+        }
 
-    private boolean isNotLauncherPackage(@NonNull final String packageName) {
-        final Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        final List<ResolveInfo> resolveInfoList = getApplication().getPackageManager().queryIntentActivities(intent, 0);
-        return Stream.ofNullable(resolveInfoList)
-                .map(item -> item.activityInfo.packageName)
-                .noneMatch(item -> item.equals(packageName));
+        @NonNull
+        private List<InstalledApp> getInstalledAppsData(@NonNull final Context context,
+                                                        @NonNull final List<ApplicationInfo> installedApplications) {
+            return Stream.of(installedApplications)
+                    .map(item -> new InstalledApp(item.packageName, context.getPackageManager().getApplicationLabel(item).toString()))
+                    // Is this app?
+                    .filter(item -> !item.getPackageName().equals(context.getPackageName()))
+                    // Is launcher app?
+                    .filter(item -> isNotLauncherPackage(context, item))
+                    .collect(Collectors.toList());
+        }
+
+        @NonNull
+        private Stream<InstalledApp> getSelectedItems(@NonNull final List<InstalledApp> linkedElements) {
+            return Stream.of(linkedElements)
+                    .filter(item -> mBlacklist.contains(item.getPackageName()))
+                    .sortBy(item -> item.getLabel().toLowerCase(Locale.getDefault()));
+        }
+
+        @NonNull
+        private Stream<InstalledApp> getUnselectedItems(@NonNull final List<InstalledApp> linkedElements) {
+            return Stream.of(linkedElements)
+                    .filter(item -> !mBlacklist.contains(item.getPackageName()))
+                    .sortBy(item -> item.getLabel().toLowerCase(Locale.getDefault()));
+        }
+
+        private boolean isNotLauncherPackage(@NonNull final Context context, @NonNull final InstalledApp installedApp) {
+            final Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            final List<ResolveInfo> resolveInfoList = context.getPackageManager().queryIntentActivities(intent, 0);
+            return Stream.ofNullable(resolveInfoList)
+                    .map(item -> item.activityInfo.packageName)
+                    .noneMatch(item -> item.equals(installedApp.getPackageName()));
+        }
     }
 }
