@@ -2,14 +2,17 @@ package com.edu.uni.augsburg.uniatron;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 import com.orhanobut.logger.Logger;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -25,19 +28,20 @@ public final class SharedPreferencesHandler {
     /**
      * Preference for the steps per minute.
      */
-    private static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
+    public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
     /**
      * Preference for the intro bonus.
      */
-    private static final String PREF_INTRO_BONUS = "pref_intro_bonus";
+    public static final String PREF_INTRO_BONUS = "pref_intro_bonus";
     /**
      * Preference for the first start.
      */
-    private static final String PREF_FIRST_START = "pref_first_start";
+    public static final String PREF_FIRST_START = "pref_first_start";
 
     private static final float STEP_FACTOR_EASY = 1.0f;
 
     private final SharedPreferences mPrefs;
+    private final Map<String, Consumer<SharedPreferences>> mListeners = new HashMap<>();
 
     /**
      * Ctr.
@@ -46,6 +50,13 @@ public final class SharedPreferencesHandler {
      */
     public SharedPreferencesHandler(@NonNull final Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> notifyDatasetChanged(key, sharedPreferences));
+    }
+
+    private void notifyDatasetChanged(@NonNull final String key, @NonNull final SharedPreferences sharedPreferences) {
+        Stream.ofNullable(mListeners.entrySet())
+                .filter(entry -> entry.getKey().equals(key))
+                .forEach(entry -> entry.getValue().accept(sharedPreferences));
     }
 
     /**
@@ -71,6 +82,8 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
+
+        notifyDatasetChanged(PREF_APP_BLACKLIST, mPrefs);
     }
 
     /**
@@ -87,6 +100,8 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(PREF_APP_BLACKLIST, newAppBlacklist);
         editor.apply();
+
+        notifyDatasetChanged(PREF_APP_BLACKLIST, mPrefs);
     }
 
     /**
@@ -110,19 +125,22 @@ public final class SharedPreferencesHandler {
     /**
      * Register a listener for the SharedPreferences.
      *
-     * @param listener the listener to register
+     * @param key      The key of the preference.
+     * @param listener The listener to register
      */
-    public void registerOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
-        mPrefs.registerOnSharedPreferenceChangeListener(listener);
+    public void registerListener(@NonNull final String key, @NonNull final Consumer<SharedPreferences> listener) {
+        mListeners.put(key, listener);
     }
 
     /**
      * Register a listener for the SharedPreferences.
      *
-     * @param listener the listener to register
+     * @param key The key of the preference.
      */
-    public void unregisterOnPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
-        mPrefs.unregisterOnSharedPreferenceChangeListener(listener);
+    public void removeListener(@NonNull final String key) {
+        if (mListeners.containsKey(key)) {
+            mListeners.remove(key);
+        }
     }
 
     /**
@@ -142,6 +160,8 @@ public final class SharedPreferencesHandler {
         //  Edit preference to make it false because we don't want this to run again
         editor.putBoolean(PREF_FIRST_START, false);
         editor.apply();
+
+        notifyDatasetChanged(PREF_FIRST_START, mPrefs);
     }
 
     /**
@@ -160,5 +180,7 @@ public final class SharedPreferencesHandler {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putBoolean(PREF_INTRO_BONUS, false);
         editor.apply();
+
+        notifyDatasetChanged(PREF_INTRO_BONUS, mPrefs);
     }
 }

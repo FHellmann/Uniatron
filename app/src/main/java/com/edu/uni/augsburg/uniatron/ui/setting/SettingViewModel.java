@@ -8,7 +8,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -32,7 +31,6 @@ import java.util.Set;
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<InstalledApp>> mInstalledApps;
     private final MutableLiveData<List<InstalledApp>> mObservable = new MutableLiveData<>();
-    private final SharedPreferences.OnSharedPreferenceChangeListener mChangeListener;
     private final SharedPreferencesHandler mHandler;
 
     /**
@@ -49,14 +47,13 @@ public class SettingViewModel extends AndroidViewModel {
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
 
         // the blacklist will be instantly updated upon saving the selection the user made
-        mChangeListener = (sharedPreferences, key) -> mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist()));
-        mHandler.registerOnPreferenceChangeListener(mChangeListener);
+        mHandler.registerListener(SharedPreferencesHandler.PREF_APP_BLACKLIST, pref -> mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist())));
         mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist()));
     }
 
     @Override
     protected void onCleared() {
-        mHandler.unregisterOnPreferenceChangeListener(mChangeListener);
+        mHandler.removeListener(SharedPreferencesHandler.PREF_APP_BLACKLIST);
         super.onCleared();
     }
 
@@ -89,7 +86,7 @@ public class SettingViewModel extends AndroidViewModel {
 
     @NonNull
     private static List<InstalledApp> getInstalledAppsData(@NonNull final Context context,
-                                                    @NonNull final List<ApplicationInfo> installedApplications) {
+                                                           @NonNull final List<ApplicationInfo> installedApplications) {
         return Stream.of(installedApplications)
                 // Is this app?
                 .filter(item -> !item.packageName.equals(context.getPackageName()))

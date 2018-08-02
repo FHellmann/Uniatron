@@ -6,6 +6,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.preference.PreferenceManager;
 
+import com.annimon.stream.function.Consumer;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +32,7 @@ public class SharedPreferencesHandlerTest {
     public void setUp() {
         mContext = InstrumentationRegistry.getContext();
         mHandler = new SharedPreferencesHandler(mContext);
+        PreferenceManager.getDefaultSharedPreferences(mContext).edit().clear().apply();
     }
 
     @Test
@@ -56,45 +59,24 @@ public class SharedPreferencesHandlerTest {
     public void testStepFactor() {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         preferences.edit().putString("pref_fitness_level", "2").commit();
-
         assertThat(mHandler.getStepsFactor(), is(2.0));
     }
 
     @Test
     public void testRegisterListener() {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        final String expected = "test";
-
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String s) {
-                // ignore
-            }
-        });
-        mHandler.registerOnPreferenceChangeListener(listener);
-
-        preferences.edit().putString(expected, expected).commit();
-
-        verify(listener, atLeastOnce()).onSharedPreferenceChanged(any(), any());
+        final Consumer<SharedPreferences> listener = spy(new PrefListener());
+        mHandler.registerListener(SharedPreferencesHandler.PREF_APP_BLACKLIST, listener);
+        mHandler.addAppToBlacklist("com.test");
+        verify(listener, atLeastOnce()).accept(any());
     }
 
     @Test
     public void testUnregisterListener() {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        final String expected = "test";
-
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String s) {
-                // ignore
-            }
-        });
-        mHandler.registerOnPreferenceChangeListener(listener);
-        mHandler.unregisterOnPreferenceChangeListener(listener);
-
-        preferences.edit().putString(expected, expected).commit();
-
-        verify(listener, never()).onSharedPreferenceChanged(any(), any());
+        final Consumer<SharedPreferences> listener = spy(new PrefListener());
+        mHandler.registerListener(SharedPreferencesHandler.PREF_APP_BLACKLIST, listener);
+        mHandler.removeListener(SharedPreferencesHandler.PREF_APP_BLACKLIST);
+        mHandler.addAppToBlacklist("com.test");
+        verify(listener, never()).accept(any());
     }
 
     @Test
@@ -117,5 +99,12 @@ public class SharedPreferencesHandlerTest {
     public void testIntroBonusFalse() {
         mHandler.setIntroBonusGranted();
         assertThat(mHandler.isIntroBonusEligible(), is(false));
+    }
+
+    private class PrefListener implements Consumer<SharedPreferences> {
+        @Override
+        public void accept(final SharedPreferences sharedPreferences) {
+            // ignore
+        }
     }
 }
