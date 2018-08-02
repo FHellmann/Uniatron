@@ -45,8 +45,9 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull final Application application) {
         super(application);
 
-        mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
-        MainApplication.getAppUsageDao(application).getMinDate().observeForever(date -> {
+        final MainApplication instance = MainApplication.getInstance(application);
+        mSharedPrefsHandler = instance.getSharedPreferencesHandler();
+        instance.getAppUsageDao().getMinDate().observeForever(date -> {
             if (date != null) {
                 final Calendar calendar = GregorianCalendar.getInstance();
                 calendar.setTime(date);

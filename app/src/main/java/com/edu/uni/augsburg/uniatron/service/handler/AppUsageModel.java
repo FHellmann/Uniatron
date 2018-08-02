@@ -49,9 +49,10 @@ public class AppUsageModel {
     AppUsageModel(@NonNull final Context context,
                   @NonNull final Consumer<String> blockTimeOutListener,
                   @NonNull final Consumer<String> blockLearningAidListener) {
-        mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(context);
-        mAppUsageDao = MainApplication.getAppUsageDao(context);
-        mTimeCreditDao = MainApplication.getTimeCreditDao(context);
+        final MainApplication application = MainApplication.getInstance(context);
+        mSharedPreferencesHandler = application.getSharedPreferencesHandler();
+        mAppUsageDao = application.getAppUsageDao();
+        mTimeCreditDao = application.getTimeCreditDao();
         mBlockTimeOutListener = blockTimeOutListener;
         mBlockLearningAidListener = blockLearningAidListener;
 

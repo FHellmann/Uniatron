@@ -2,6 +2,7 @@ package com.edu.uni.augsburg.uniatron;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
@@ -23,64 +24,62 @@ public class MainApplication extends Application {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private QueryProvider mQueryProvider;
 
+    public static MainApplication getInstance(@NonNull final Context context) {
+        return (MainApplication) context.getApplicationContext();
+    }
+
     /**
      * Get the SharedPreferencesHandler.
      *
-     * @param context The current context of the callee.
      * @return The SharedPreferencesHandler.
      */
-    public static SharedPreferencesHandler getSharedPreferencesHandler(final Context context) {
-        return ((MainApplication) context.getApplicationContext()).mSharedPreferencesHandler;
+    public SharedPreferencesHandler getSharedPreferencesHandler() {
+        return mSharedPreferencesHandler;
     }
 
     /**
      * Get the app usage dao.
      *
-     * @param context The context.
      * @return The app usage dao.
      */
-    public static AppUsageDao getAppUsageDao(final Context context) {
-        return AppUsageDao.create(((MainApplication) context.getApplicationContext()).mQueryProvider);
+    public AppUsageDao getAppUsageDao() {
+        return AppUsageDao.create(mQueryProvider);
     }
 
     /**
      * Get the emotion dao.
      *
-     * @param context The context.
      * @return The emotion dao.
      */
-    public static EmotionDao getEmotionDao(final Context context) {
-        return EmotionDao.create(((MainApplication) context.getApplicationContext()).mQueryProvider);
+    public EmotionDao getEmotionDao() {
+        return EmotionDao.create(mQueryProvider);
     }
 
     /**
      * Get the step count dao.
      *
-     * @param context The context.
      * @return The step count dao.
      */
-    public static StepCountDao getStepCountDao(final Context context) {
-        return StepCountDao.create(((MainApplication) context.getApplicationContext()).mQueryProvider);
+    public StepCountDao getStepCountDao() {
+        return StepCountDao.create(mQueryProvider);
     }
 
     /**
      * Get the summary dao.
      *
-     * @param context The context.
      * @return The summary dao.
      */
-    public static SummaryDao getSummaryDao(final Context context) {
-        return SummaryDao.create(((MainApplication) context.getApplicationContext()).mQueryProvider);
+    public SummaryDao getSummaryDao() {
+        return SummaryDao.create(mQueryProvider);
     }
 
     /**
      * Get the time credit dao.
      *
-     * @param context The context.
      * @return The time credit dao.
      */
-    public static TimeCreditDao getTimeCreditDao(final Context context) {
-        return TimeCreditDao.create(((MainApplication) context.getApplicationContext()).mQueryProvider);
+    public TimeCreditDao getTimeCreditDao() {
+        return TimeCreditDao.create(mQueryProvider);
     }
 
     @Override

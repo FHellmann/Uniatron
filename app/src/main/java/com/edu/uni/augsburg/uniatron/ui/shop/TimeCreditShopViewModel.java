@@ -46,10 +46,10 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     public TimeCreditShopViewModel(@NonNull final Application application) {
         super(application);
 
-        mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
-
-        mTimeCreditDao = MainApplication.getTimeCreditDao(application);
-        mEmotionDao = MainApplication.getEmotionDao(application);
+        final MainApplication instance = MainApplication.getInstance(application);
+        mPrefHandler = instance.getSharedPreferencesHandler();
+        mTimeCreditDao = instance.getTimeCreditDao();
+        mEmotionDao = instance.getEmotionDao();
 
         mShoppingCart = new ArrayList<>();
         mEmotionCart = new ArrayList<>();
@@ -57,7 +57,7 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
 
         mRemainingStepCount = new MediatorLiveData<>();
         mRemainingStepCount.addSource(
-                MainApplication.getStepCountDao(application).getRemainingStepCountsToday(),
+                instance.getStepCountDao().getRemainingStepCountsToday(),
                 mRemainingStepCount::setValue
         );
 

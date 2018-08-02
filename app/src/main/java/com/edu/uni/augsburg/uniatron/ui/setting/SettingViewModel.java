@@ -43,7 +43,7 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        final SharedPreferencesHandler mHandler = MainApplication.getSharedPreferencesHandler(application);
+        final SharedPreferencesHandler mHandler = MainApplication.getInstance(application).getSharedPreferencesHandler();
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);

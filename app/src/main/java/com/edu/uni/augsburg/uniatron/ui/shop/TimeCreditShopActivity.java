@@ -59,8 +59,7 @@ public class TimeCreditShopActivity extends AppCompatActivity {
         final GridLayoutManager layout = new GridLayoutManager(this, 2);
         layout.setOrientation(GridLayoutManager.VERTICAL);
 
-        mModel = ViewModelProviders.of(this)
-                .get(TimeCreditShopViewModel.class);
+        mModel = ViewModelProviders.of(this).get(TimeCreditShopViewModel.class);
         mModel.setShopValidListener(visible -> mMenuTrade.setVisible(visible));
 
         mAdapter = new TimeCreditShopListAdapter(this, mModel);

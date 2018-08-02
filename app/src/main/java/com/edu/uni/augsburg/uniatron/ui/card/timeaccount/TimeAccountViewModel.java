@@ -38,8 +38,9 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
     public TimeAccountViewModel(@NonNull final Application application) {
         super(application);
 
-        mAppUsageDao = MainApplication.getAppUsageDao(application);
-        mPrefHandler = MainApplication.getSharedPreferencesHandler(application);
+        final MainApplication instance = MainApplication.getInstance(application);
+        mAppUsageDao = instance.getAppUsageDao();
+        mPrefHandler = instance.getSharedPreferencesHandler();
         mDateCache = new DateCache<>();
         mRemainingAppUsageTime = new MediatorLiveData<>();
     }

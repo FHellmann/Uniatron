@@ -32,9 +32,10 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public OnBoardingViewModel(final @NonNull Application application) {
         super(application);
 
-        mAppUsageDao = MainApplication.getAppUsageDao(application);
-        mStepCountDao = MainApplication.getStepCountDao(application);
-        mSharedPrefsHandler = MainApplication.getSharedPreferencesHandler(application);
+        final MainApplication instance = MainApplication.getInstance(application);
+        mAppUsageDao = instance.getAppUsageDao();
+        mStepCountDao = instance.getStepCountDao();
+        mSharedPrefsHandler = instance.getSharedPreferencesHandler();
     }
 
     /**
