@@ -26,10 +26,7 @@ public class NotificationReceiverService extends Service {
         // Then we can not add the app automatically.
         if (intent != null && intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             final String packageName = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
-
-            final SharedPreferencesHandler preferencesHandler = MainApplication.
-                    getSharedPreferencesHandler(getBaseContext());
-
+            final SharedPreferencesHandler preferencesHandler = MainApplication.getInstance(getBaseContext()).getSharedPreferencesHandler();
             preferencesHandler.addAppToBlacklist(packageName);
         }
         return super.onStartCommand(intent, flags, startId);
