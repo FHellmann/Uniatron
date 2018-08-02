@@ -24,6 +24,12 @@ public class MainApplication extends Application {
     private SharedPreferencesHandler mSharedPreferencesHandler;
     private QueryProvider mQueryProvider;
 
+    /**
+     * Get an instance of the main application.
+     *
+     * @param context The context.
+     * @return The main application.
+     */
     public static MainApplication getInstance(@NonNull final Context context) {
         return (MainApplication) context.getApplicationContext();
     }
