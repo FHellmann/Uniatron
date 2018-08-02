@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -66,7 +65,9 @@ public class SharedPreferencesHandlerTest {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         final String expected = "test";
 
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> assertThat(s, is(equalTo(expected))));
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> {
+            // ignore
+        });
         mHandler.registerOnPreferenceChangeListener(listener);
 
         preferences.edit().putString(expected, expected).commit();
@@ -79,7 +80,9 @@ public class SharedPreferencesHandlerTest {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         final String expected = "test";
 
-        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> assertThat(s, is(equalTo(expected))));
+        final SharedPreferences.OnSharedPreferenceChangeListener listener = spy((sharedPreferences, s) -> {
+            // ignore
+        });
         mHandler.registerOnPreferenceChangeListener(listener);
         mHandler.unregisterOnPreferenceChangeListener(listener);
 
