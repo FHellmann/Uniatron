@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.IntStream;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
+import com.edu.uni.augsburg.uniatron.service.Detector;
 import com.orhanobut.logger.Logger;
 
 import static android.content.Context.SENSOR_SERVICE;
@@ -19,7 +20,7 @@ import static android.content.Context.SENSOR_SERVICE;
  *
  * @author Fabio Hellmann
  */
-public final class StepCountDetector {
+public final class StepCountDetector implements Detector {
     private final SensorManager mSensorManager;
     private final StepDetector mStepDetector;
 
@@ -34,7 +35,10 @@ public final class StepCountDetector {
 
         // grab step detector and register the listener
         mSensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+    }
 
+    @Override
+    public void start(@NonNull final Context context) {
         if (mSensorManager == null) {
             Logger.w("The sensor manager is not available!");
         } else {
@@ -52,20 +56,18 @@ public final class StepCountDetector {
         }
     }
 
-    /**
-     * Destroys the handler.
-     */
-    public void destroy() {
+    @Override
+    public void destroy(@NonNull final Context context) {
         mSensorManager.unregisterListener(mStepDetector);
     }
 
     /**
-     * Starts the handler.
+     * Creates the detector.
      *
      * @param context The context.
-     * @return The handler.
+     * @return The detector.
      */
-    public static StepCountDetector start(@NonNull final Context context) {
+    public static Detector create(@NonNull final Context context) {
         return new StepCountDetector(context);
     }
 

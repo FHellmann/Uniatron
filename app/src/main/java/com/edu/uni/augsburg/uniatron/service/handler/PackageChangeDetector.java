@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.edu.uni.augsburg.uniatron.notification.AppNotificationBuilder;
 import com.edu.uni.augsburg.uniatron.notification.builder.PackageAddedNotificationBuilder;
+import com.edu.uni.augsburg.uniatron.service.Detector;
 import com.orhanobut.logger.Logger;
 
 /**
@@ -18,7 +19,7 @@ import com.orhanobut.logger.Logger;
  *
  * @author Fabio Hellmann
  */
-public final class PackageChangeDetector extends BroadcastReceiver {
+public final class PackageChangeDetector extends BroadcastReceiver implements Detector {
     private final PackageChangeModel mModel;
 
     private PackageChangeDetector(@NonNull final Context context) {
@@ -64,28 +65,27 @@ public final class PackageChangeDetector extends BroadcastReceiver {
         }
     }
 
-    /**
-     * Destroys the handler.
-     *
-     * @param context The context.
-     */
+    @Override
+    public void start(@NonNull final Context context) {
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        context.registerReceiver(this, filter);
+    }
+
+    @Override
     public void destroy(@NonNull final Context context) {
         context.unregisterReceiver(this);
     }
 
     /**
-     * Starts the handler.
+     * Creates the detector.
      *
      * @param context The context.
-     * @return The handler.
+     * @return The detector.
      */
-    public static PackageChangeDetector start(@NonNull final Context context) {
-        final PackageChangeDetector handler = new PackageChangeDetector(context);
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addDataScheme("package");
-        context.registerReceiver(handler, filter);
-        return handler;
+    public static Detector create(@NonNull final Context context) {
+        return new PackageChangeDetector(context);
     }
 }
