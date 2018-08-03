@@ -46,6 +46,10 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
         return mShowSmallVisibleAmount;
     }
 
+    int getSmallVisibleAmount() {
+        return SMALL_VISIBLE_AMOUNT;
+    }
+
     @NonNull
     @Override
     public ViewHolderListItem onCreateViewHolder(@NonNull final ViewGroup viewGroup,

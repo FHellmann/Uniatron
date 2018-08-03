@@ -6,10 +6,14 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.service.handler.AppUsageDetector;
 import com.edu.uni.augsburg.uniatron.service.handler.PackageChangeDetector;
 import com.edu.uni.augsburg.uniatron.service.handler.StepCountDetector;
 import com.orhanobut.logger.Logger;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A sticky service for all the background tasks.
@@ -18,9 +22,7 @@ import com.orhanobut.logger.Logger;
  */
 public class StickyAppService extends Service {
 
-    private AppUsageDetector mAppUsageDetector;
-    private PackageChangeDetector mPackageAddedReceiver;
-    private StepCountDetector mStepHandler;
+    private List<Detector> mDetectorList;
 
     @Nullable
     @Override
@@ -31,23 +33,25 @@ public class StickyAppService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logger.d("Start main service");
-        mPackageAddedReceiver = PackageChangeDetector.start(this);
-        mAppUsageDetector = AppUsageDetector.start(this);
-        mStepHandler = StepCountDetector.start(this);
+        Logger.d("Create detectors...");
+        mDetectorList = Arrays.asList(
+                PackageChangeDetector.create(this),
+                AppUsageDetector.create(this),
+                StepCountDetector.create(this)
+        );
     }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        Stream.of(mDetectorList).forEach(detector -> detector.start(this));
+        Logger.d("Detectors started!");
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        Logger.d("Destroy main service");
-        mAppUsageDetector.destroy(this);
-        mPackageAddedReceiver.destroy(this);
-        mStepHandler.destroy();
+        Stream.of(mDetectorList).forEach(detector -> detector.destroy(this));
+        Logger.d("Detectors destroyed!");
         super.onDestroy();
     }
 }

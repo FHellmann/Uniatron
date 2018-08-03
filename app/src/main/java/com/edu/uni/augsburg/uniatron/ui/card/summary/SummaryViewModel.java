@@ -35,7 +35,7 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
      */
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
-        mSummaryDao = MainApplication.getSummaryDao(application);
+        mSummaryDao = MainApplication.getInstance(application).getSummaryDao();
         mDateCache = new DateCache<>();
         mObservableDaySummary = new MediatorLiveData<>();
     }

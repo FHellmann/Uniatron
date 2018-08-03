@@ -64,34 +64,12 @@ This will guide him through the setup process and request all necessary permissi
 Upon completion the user will be granted a bonus of 500 steps, so he can try the announced shop for himself.
 Additionally, one sample entry for the current day will be added, to provide immediate feedback of the just now introduced UI.
 
-## Schedule
-### Milestone 1: First prototype (Due date May 31, 2018)
-We will create a first prototype with the basic functionality.
-
-- Locking apps
-- Collecting time of doing sportive activity
-- Tracking emotions
-- Configure the app
-
-### Milestone 2: Final app - BETA (Due date July 11, 2018)
-We will further refine the prototype. Thus, additional features might be implemented.
-
-- Learning aid
-- Group history view by day/month/year
-- Detail history day/month/year view
-- On-Boarding
-
-### Milestone 3: Final app - RELEASE
-- App Icon
-- Lifestyle Assistant
-- Wearables connection
-
 ## Design
 Considering the fact that the user can reach every content of the app with three clicks, we opted for a flat navigation hierarchy. With a navigation bar at the bottom with three options (timeline, home, settings) every screen can be reached with just one click. Accordingly, a navigation depth of no more than two clicks can be claimed on each of these pages.
 
 The design of our app complies with the design guidelines of [Google Material Design](https://material.io/guidelines/material-design/introduction.html).
 
-### Final App - BETA
+### Final App
 Screenshot | Description
 :---------:|:----------:
 <img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Today.png" width="800"/> | **Start screen/Today**<br/>Several cards are displayed in the today screen. These cards contain different information, e. g. app usage, summary. At the top, two cards are represented colored to get the users focus on the important cards. In this case it would be the remaining time of app usage and the amount of coins to trade more time.
@@ -108,32 +86,25 @@ Screenshot | Description
 
 ### Work Process
 1. Create Issue
-2. Create Branch (Naming: {first letter of first name + last name}-{issue nr})
-3. Work your task
-4. Create Pullrequest
-5. Review
+2. Create Branch with the following naming: {first letter of first name + last name}-{issue nr}-{issue description}
+3. Implement the solution for the related issue in the branch
+4. Create a pull-request
+5. Review by at least 1 reviewer
+6. Update code to solve review comments
+7. Merge pull-request if everything is fine
+
+### Multiple feature testing
+To test multiple features merge every feature to test in a new branch. This branch can then be merged into the master branch, if the tests were
+successful.
 
 ### Coding Style
-[Google Android](https://source.android.com/setup/contribute/code-style)
+As for the coding style guide we use [Google's Android](https://source.android.com/setup/contribute/code-style) style.
 
+In addition:
 - Use [Optional](http://www.baeldung.com/java-optional) instead of return null
 
 ## Collaborators
 - [Fabio Hellmann](https://github.com/FHellmann)
 - [Leon Wöhrl](https://github.com/leonpoint)
-- [Anja Hager](https://github.com/anja-h)
 - [Danilo Hoss](https://github.com/speedyhoopster3)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [Anja Hager](https://github.com/anja-h)

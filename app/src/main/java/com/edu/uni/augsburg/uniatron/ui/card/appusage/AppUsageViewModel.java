@@ -41,7 +41,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     public AppUsageViewModel(@NonNull final Application application) {
         super(application);
         mDateCache = new DateCache<>();
-        mAppUsageDao = MainApplication.getAppUsageDao(application);
+        mAppUsageDao = MainApplication.getInstance(application).getAppUsageDao();
         mAppUsages = new MediatorLiveData<>();
     }
 

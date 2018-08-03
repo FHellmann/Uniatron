@@ -60,10 +60,16 @@ public class AppUsageCard implements CardViewHolder {
         layout.setOrientation(LinearLayoutManager.VERTICAL);
         holder.mRecyclerView.setLayoutManager(layout);
         holder.mRecyclerView.setLayoutFrozen(true);
-        holder.mRecyclerView.setAdapter(new AppUsageAdapter(context, mAppUsageList));
+        final AppUsageAdapter adapter = new AppUsageAdapter(context, mAppUsageList);
+        holder.mRecyclerView.setAdapter(adapter);
         final long totalAppUsage = TimeUnit.SECONDS.convert(getTotalAppUsage(), TimeUnit.MILLISECONDS);
         holder.mTextAppUsageTotal.setText(context.getString(R.string.time_in_minutes, totalAppUsage / 60, totalAppUsage % 60));
-        holder.mButtonShowAll.setText(R.string.show_all);
+        if (mAppUsageList.size() > adapter.getSmallVisibleAmount()) {
+            holder.mButtonShowAll.setText(R.string.show_all);
+            holder.mButtonShowAll.setVisibility(View.VISIBLE);
+        } else {
+            holder.mButtonShowAll.setVisibility(View.GONE);
+        }
     }
 
     @Override

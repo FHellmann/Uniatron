@@ -22,7 +22,7 @@ public class StepCountModel {
      * @param context The context.
      */
     StepCountModel(@NonNull final Context context) {
-        mStepCountDao = MainApplication.getStepCountDao(context);
+        mStepCountDao = MainApplication.getInstance(context).getStepCountDao();
     }
 
     /**

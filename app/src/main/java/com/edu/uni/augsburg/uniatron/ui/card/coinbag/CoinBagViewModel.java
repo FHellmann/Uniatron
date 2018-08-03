@@ -36,7 +36,7 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
     public CoinBagViewModel(@NonNull final Application application) {
         super(application);
 
-        mStepCountDao = MainApplication.getStepCountDao(application);
+        mStepCountDao = MainApplication.getInstance(application).getStepCountDao();
         mDateCache = new DateCache<>();
         mRemainingCoins = new MediatorLiveData<>();
     }

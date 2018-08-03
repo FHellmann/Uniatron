@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.notification.builder.TimeUpNotificationBuilder;
+import com.edu.uni.augsburg.uniatron.service.Detector;
 import com.edu.uni.augsburg.uniatron.service.StickyAppService;
 import com.edu.uni.augsburg.uniatron.ui.MainActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Fabio Hellmann
  */
-public final class AppUsageDetector extends BroadcastReceiver {
+public final class AppUsageDetector extends BroadcastReceiver implements Detector {
 
     private static final int NOTIFICATION_ONE_MINUTE = 1;
     private static final int NOTIFICATION_FIVE_MINUTES = 5;
@@ -46,11 +47,10 @@ public final class AppUsageDetector extends BroadcastReceiver {
         );
         mModel.addNotifyOnTimeUpSoonListeners(
                 remainingTime -> showNotificationIfTimeAlmostUp(context, remainingTime),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_ONE_MINUTE, TimeUnit.MINUTES),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_FIVE_MINUTES, TimeUnit.MINUTES),
-                (int) TimeUnit.MILLISECONDS.convert(NOTIFICATION_TEN_MINUTES, TimeUnit.MINUTES)
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_ONE_MINUTE, TimeUnit.MINUTES),
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_FIVE_MINUTES, TimeUnit.MINUTES),
+                TimeUnit.MILLISECONDS.convert(NOTIFICATION_TEN_MINUTES, TimeUnit.MINUTES)
         );
-        startAppChecker(context);
     }
 
     @Override
@@ -58,11 +58,10 @@ public final class AppUsageDetector extends BroadcastReceiver {
         final String action = intent.getAction();
         if (Intent.ACTION_SCREEN_OFF.equals(action)) {
             stopAppChecker();
-            context.startService(new Intent(context, StickyAppService.class));
         } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
             startAppChecker(context);
-            context.startService(new Intent(context, StickyAppService.class));
         }
+        context.startService(new Intent(context, StickyAppService.class));
     }
 
     private void startAppChecker(@NonNull final Context context) {
@@ -83,7 +82,7 @@ public final class AppUsageDetector extends BroadcastReceiver {
     }
 
     private void showNotificationIfTimeAlmostUp(@NonNull final Context context,
-                                                final int remainingTime) {
+                                                final long remainingTime) {
         final TimeUpNotificationBuilder builder = new TimeUpNotificationBuilder(
                 context,
                 remainingTime
@@ -105,28 +104,28 @@ public final class AppUsageDetector extends BroadcastReceiver {
         context.startActivity(blockIntent);
     }
 
-    /**
-     * Destroys the handler.
-     *
-     * @param context The context.
-     */
+    @Override
+    public void start(@NonNull final Context context) {
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.SCREEN_ON");
+        filter.addAction("android.intent.action.SCREEN_OFF");
+        context.registerReceiver(this, filter);
+        startAppChecker(context);
+    }
+
+    @Override
     public void destroy(@NonNull final Context context) {
         mModel.destroy();
         context.unregisterReceiver(this);
     }
 
     /**
-     * Starts the handler.
+     * Creates the detector.
      *
      * @param context The context.
-     * @return The handler.
+     * @return The detector.
      */
-    public static AppUsageDetector start(@NonNull final Context context) {
-        final AppUsageDetector handler = new AppUsageDetector(context);
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction("android.intent.action.SCREEN_ON");
-        filter.addAction("android.intent.action.SCREEN_OFF");
-        context.registerReceiver(handler, filter);
-        return handler;
+    public static Detector create(@NonNull final Context context) {
+        return new AppUsageDetector(context);
     }
 }

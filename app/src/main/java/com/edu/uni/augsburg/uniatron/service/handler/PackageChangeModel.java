@@ -18,7 +18,7 @@ public class PackageChangeModel {
     private final SharedPreferencesHandler mSharedPreferences;
 
     PackageChangeModel(@NonNull final Context context) {
-        mSharedPreferences = MainApplication.getSharedPreferencesHandler(context);
+        mSharedPreferences = MainApplication.getInstance(context).getSharedPreferencesHandler();
     }
 
     /**

@@ -5,7 +5,6 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,19 +38,19 @@ public class AppUsageModel {
     private final SharedPreferencesHandler mSharedPreferencesHandler;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
-    private final Map<Integer, Consumer<Integer>> mNotifyListeners = new LinkedHashMap<>();
+    private final Map<Long, Consumer<Long>> mNotifyListeners = new LinkedHashMap<>();
     private final Consumer<String> mBlockTimeOutListener;
     private final Consumer<String> mBlockLearningAidListener;
     private final AppUsageDao mAppUsageDao;
     private final TimeCreditDao mTimeCreditDao;
-    private SharedPreferences.OnSharedPreferenceChangeListener mPrefChangeListener;
 
     AppUsageModel(@NonNull final Context context,
                   @NonNull final Consumer<String> blockTimeOutListener,
                   @NonNull final Consumer<String> blockLearningAidListener) {
-        mSharedPreferencesHandler = MainApplication.getSharedPreferencesHandler(context);
-        mAppUsageDao = MainApplication.getAppUsageDao(context);
-        mTimeCreditDao = MainApplication.getTimeCreditDao(context);
+        final MainApplication application = MainApplication.getInstance(context);
+        mSharedPreferencesHandler = application.getSharedPreferencesHandler();
+        mAppUsageDao = application.getAppUsageDao();
+        mTimeCreditDao = application.getTimeCreditDao();
         mBlockTimeOutListener = blockTimeOutListener;
         mBlockLearningAidListener = blockLearningAidListener;
 
@@ -62,18 +61,17 @@ public class AppUsageModel {
     }
 
     private void registerPreferenceListener() {
-        mPrefChangeListener = (sharedPreferences, key) -> {
-            final Set<String> blacklist = getAppsBlacklist();
-            mUsageTimeHelper.addLiveData(mAppUsageDao.getRemainingAppUsageTimeToday(blacklist));
-        };
-        mSharedPreferencesHandler.registerOnPreferenceChangeListener(mPrefChangeListener);
+        mSharedPreferencesHandler.registerListener(
+                SharedPreferencesHandler.PREF_APP_BLACKLIST,
+                pref -> mUsageTimeHelper.addLiveData(mAppUsageDao.getRemainingAppUsageTimeToday(getAppsBlacklist()))
+        );
     }
 
     /**
      * Destroys the model.
      */
     public void destroy() {
-        mSharedPreferencesHandler.unregisterOnPreferenceChangeListener(mPrefChangeListener);
+        mSharedPreferencesHandler.removeListener(SharedPreferencesHandler.PREF_APP_BLACKLIST);
         mUsageTimeHelper.removeLiveData();
         mLearningAidHelper.removeLiveData();
     }
@@ -112,8 +110,8 @@ public class AppUsageModel {
      * @param listener   The listener.
      * @param timeToEnds The times.
      */
-    public void addNotifyOnTimeUpSoonListeners(@NonNull final Consumer<Integer> listener,
-                                               @NonNull final Integer... timeToEnds) {
+    public void addNotifyOnTimeUpSoonListeners(@NonNull final Consumer<Long> listener,
+                                               @NonNull final Long... timeToEnds) {
         Stream.ofNullable(timeToEnds)
                 .filter(Objects::nonNull)
                 .forEach(value -> mNotifyListeners.put(value, listener));
