@@ -47,7 +47,10 @@ public class SettingViewModel extends AndroidViewModel {
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
 
         // the blacklist will be instantly updated upon saving the selection the user made
-        mHandler.registerListener(SharedPreferencesHandler.PREF_APP_BLACKLIST, pref -> mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist())));
+        mHandler.registerListener(
+                SharedPreferencesHandler.PREF_APP_BLACKLIST,
+                pref -> mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist()))
+        );
         mObservable.setValue(getInstalledApps(application, mHandler.getAppsBlacklist()));
     }
 
