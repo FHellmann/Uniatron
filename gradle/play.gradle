@@ -1,0 +1,9 @@
+apply plugin: 'com.github.triplet.play'
+
+play {
+    track = 'beta'
+    untrackOld = true
+    errorOnSizeLimit = true
+    uploadImages = true
+    jsonFile = file('your-key.json')
+}

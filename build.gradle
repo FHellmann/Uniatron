@@ -10,6 +10,7 @@ buildscript {
         classpath 'com.novoda:gradle-static-analysis-plugin:0.5.2'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
         classpath 'org.jacoco:org.jacoco.core:0.8.0'
+        classpath 'com.github.triplet.gradle:play-publisher:1.2.2'
     }
 }
 
