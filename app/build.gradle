@@ -4,8 +4,8 @@ apply from: rootProject.file('gradle/play.gradle')
 android {
     playAccountConfigs {
         defaultAccountConfig {
-            serviceAccountEmail = "service_account_email_here"
-            jsonFile = file("someDirectory/my_json_key.json")
+            serviceAccountEmail = play.serviceAccountEmail
+            pk12File = play.pk12File
         }
     }
     compileSdkVersion 28
@@ -16,7 +16,7 @@ android {
         targetSdkVersion 28
         versionCode 5
         versionName project.version
-        playAccountConfigs = playAccountConfigs.defaultAccountConfig
+        playAccountConfig = playAccountConfigs.defaultAccountConfig
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId 'com.edu.uni.augsburg.uniatron.test'
     }
