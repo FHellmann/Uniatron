@@ -67,6 +67,7 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - ./gradlew publishRelease
 
 after_failure:
   - "cat $TRAVIS_BUILD_DIR/app/build/reports/checkstyle/main.xml"
