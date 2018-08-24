@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Notification is shown when the time is running out soon.
  */
 public class TimeUpNotificationBuilder implements AppNotificationBuilder {
-    private static final int REQUEST_ID = (int) System.currentTimeMillis();
+    private static final int REQUEST_ID = 238487;
     private final Context mContext;
     private final long mRemainingTime;
 
