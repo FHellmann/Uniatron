@@ -28,21 +28,15 @@ public enum Permissions {
             context.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
     }, context -> {
-        final AppOpsManager appOpsManager =
-                (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        final AppOpsManager appOpsManager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
         if (appOpsManager == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // no way to find out. assume we need permission
             return true;
         }
         try {
             final PackageManager packageManager = context.getPackageManager();
-            final ApplicationInfo applicationInfo = packageManager
-                    .getApplicationInfo(context.getPackageName(), 0);
-            final int mode = appOpsManager.checkOpNoThrow(
-                    AppOpsManager.OPSTR_GET_USAGE_STATS,
-                    applicationInfo.uid,
-                    applicationInfo.packageName
-            );
+            final ApplicationInfo applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);
+            final int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
             return mode != AppOpsManager.MODE_ALLOWED;
         } catch (PackageManager.NameNotFoundException e) {
             return true;
@@ -59,10 +53,8 @@ public enum Permissions {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
-        final PowerManager powerManager =
-                (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        return powerManager == null
-                || !powerManager.isIgnoringBatteryOptimizations(context.getPackageName());
+        final PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        return powerManager == null || !powerManager.isIgnoringBatteryOptimizations(context.getPackageName());
     });
 
     @NonNull
