@@ -76,9 +76,8 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyList();
         } else {
-            // Fetch launchable apps (Performance: ~1200ms)
+            // Fetch apps (Performance: ~1200ms) + concat and sort (Performance: ~100ms)
             final List<InstalledApp> linkedElements = getInstalledAppsData(context, installedApplications);
-            // Concat with sortBy (Performance: ~100ms)
             return Stream.concat(getSelectedItems(linkedElements, appsBlacklist), getUnselectedItems(linkedElements, appsBlacklist))
                     .collect(Collectors.toList());
         }
