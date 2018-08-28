@@ -13,8 +13,8 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class BlacklistViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<LaunchableAppDetails>> mInstalledApps;
-    private final SharedPreferencesHandler mHandler;
+    private final AppPreferences mHandler;
 
     /**
      * Ctr.
@@ -37,7 +37,7 @@ public class BlacklistViewModel extends AndroidViewModel {
     public BlacklistViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = MainApplication.getInstance(application).getSharedPreferencesHandler();
+        mHandler = AppContext.getInstance(application).getPreferences();
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.setValue(getInstalledApps(application));

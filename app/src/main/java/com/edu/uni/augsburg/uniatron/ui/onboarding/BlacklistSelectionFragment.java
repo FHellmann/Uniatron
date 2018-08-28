@@ -45,12 +45,7 @@ public class BlacklistSelectionFragment extends SlideFragment {
                 model::isAppBlacklisted
         );
         mListSelection.setAdapter(adapter);
-        mListSelection.setLayoutManager(new GridLayoutManager(
-                getContext(),
-                4,
-                LinearLayoutManager.VERTICAL,
-                false
-        ));
+        mListSelection.setLayoutManager(new GridLayoutManager(getContext(), 4, LinearLayoutManager.VERTICAL, false));
 
         model.getInstalledApps().observe(this, adapter::setData);
     }

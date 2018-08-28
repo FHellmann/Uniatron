@@ -26,7 +26,7 @@ public enum NotificationChannels {
             NotificationManagerCompat.IMPORTANCE_DEFAULT
     ),
     /**
-     *  The notification channel for app usage time's running out.
+     * The notification channel for app usage time's running out.
      */
     TIME_UP(
             R.string.channel_time_up,

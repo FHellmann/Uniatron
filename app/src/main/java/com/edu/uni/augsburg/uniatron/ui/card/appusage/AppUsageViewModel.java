@@ -12,7 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.AppUsage;
@@ -41,7 +41,7 @@ public class AppUsageViewModel extends AndroidViewModel implements CardViewModel
     public AppUsageViewModel(@NonNull final Application application) {
         super(application);
         mDateCache = new DateCache<>();
-        mAppUsageDao = MainApplication.getInstance(application).getAppUsageDao();
+        mAppUsageDao = AppContext.getInstance(application).getAppUsageDao();
         mAppUsages = new MediatorLiveData<>();
     }
 

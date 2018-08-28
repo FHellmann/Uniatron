@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.Function;
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
@@ -32,7 +32,7 @@ import java.util.List;
 public class MainActivityViewModel extends AndroidViewModel {
     private final List<CardViewModel> mCardViewModelList;
     private final MediatorLiveData<Calendar> mDateLoaded;
-    private final SharedPreferencesHandler mSharedPrefsHandler;
+    private final AppPreferences mSharedPrefsHandler;
     private Calendar mMinCalendar;
     private Calendar mCalendar;
     private GroupBy mGroupByStrategy;
@@ -45,8 +45,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull final Application application) {
         super(application);
 
-        final MainApplication instance = MainApplication.getInstance(application);
-        mSharedPrefsHandler = instance.getSharedPreferencesHandler();
+        final AppContext instance = AppContext.getInstance(application);
+        mSharedPrefsHandler = instance.getPreferences();
         instance.getAppUsageDao().getMinDate().observeForever(date -> {
             if (date != null) {
                 final Calendar calendar = GregorianCalendar.getInstance();

@@ -11,6 +11,7 @@ import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import agency.tango.materialintroscreen.SlideFragment;
 
@@ -63,18 +64,8 @@ public class PermissionFragment extends SlideFragment {
     @Override
     public void askForPermissions() {
         final ArrayList<String> notGrantedPermissions = new ArrayList<>();
-
-        Stream.ofNullable(mNeededPermissions)
-                .withoutNulls()
-                .filter(permission -> permission.length() > 0)
-                .filter(this::isPermissionNotGranted)
-                .collect(Collectors.toCollection(() -> notGrantedPermissions));
-
-        Stream.ofNullable(mPossiblePermissions)
-                .withoutNulls()
-                .filter(permission -> permission.length() > 0)
-                .filter(this::isPermissionNotGranted)
-                .collect(Collectors.toCollection(() -> notGrantedPermissions));
+        notGrantedPermissions.addAll(getPermissionsToGrant(mNeededPermissions));
+        notGrantedPermissions.addAll(getPermissionsToGrant(mPossiblePermissions));
 
         if (notGrantedPermissions.contains(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)) {
             Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.request(getContext());
@@ -92,19 +83,20 @@ public class PermissionFragment extends SlideFragment {
 
     @Override
     public boolean hasAnyPermissionsToGrant() {
-        return hasPermissionsToGrant(mNeededPermissions) || hasPermissionsToGrant(mPossiblePermissions);
+        return !getPermissionsToGrant(mNeededPermissions).isEmpty() || !getPermissionsToGrant(mPossiblePermissions).isEmpty();
     }
 
     @Override
     public boolean hasNeededPermissionsToGrant() {
-        return hasPermissionsToGrant(mNeededPermissions);
+        return !getPermissionsToGrant(mNeededPermissions).isEmpty();
     }
 
-    private boolean hasPermissionsToGrant(@NonNull final String... permissions) {
+    private List<String> getPermissionsToGrant(@NonNull final String... permissions) {
         return Stream.ofNullable(permissions)
                 .withoutNulls()
                 .filter(permission -> permission.length() > 0)
-                .anyMatch(this::isPermissionNotGranted);
+                .filter(this::isPermissionNotGranted)
+                .collect(Collectors.toList());
     }
 
     private boolean isPermissionNotGranted(final String permission) {

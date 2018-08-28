@@ -14,7 +14,8 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.orhanobut.logger.Logger;
 
@@ -31,7 +32,7 @@ import java.util.Set;
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<InstalledApp>> mInstalledApps;
     private final MutableLiveData<List<InstalledApp>> mObservable = new MutableLiveData<>();
-    private final SharedPreferencesHandler mHandler;
+    private final AppPreferences mHandler;
 
     /**
      * Ctr.
@@ -41,7 +42,7 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = MainApplication.getInstance(application).getSharedPreferencesHandler();
+        mHandler = AppContext.getInstance(application).getPreferences();
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);

@@ -25,7 +25,7 @@ public class DateCache<T> {
      * @param source   The source live data.
      */
     public void clearAndRegister(@NonNull final MediatorLiveData<?> liveData,
-                          @NonNull final LiveData<T> source) {
+                                 @NonNull final LiveData<T> source) {
         Stream.of(mCache.entrySet()).forEach(entry -> entry.getKey().removeSource(entry.getValue()));
         mCache.clear();
         mCache.put(liveData, source);
