@@ -16,7 +16,6 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.MainApplication;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.orhanobut.logger.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -76,11 +75,8 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyList();
         } else {
-            final long start = System.currentTimeMillis();
             // Fetch launchable apps (Performance: ~1200ms)
             final List<InstalledApp> linkedElements = getInstalledAppsData(context, installedApplications);
-            Logger.d("Fetch installed apps (count=" + installedApplications.size() + ") needs "
-                    + (System.currentTimeMillis() - start) + "ms to filter launchable apps (count=" + linkedElements.size() + ")");
             // Concat with sortBy (Performance: ~100ms)
             return Stream.concat(getSelectedItems(linkedElements, appsBlacklist), getUnselectedItems(linkedElements, appsBlacklist))
                     .collect(Collectors.toList());
