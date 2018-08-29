@@ -62,4 +62,6 @@
     <string name="month">月</string>
     <string name="year">年</string>
     <string name="time_account_desc">%1$d:%2$02d 分</string>
+    <string name="onboarding_body_sensor">步进跟踪准确性</string>
+    <string name="onboarding_body_sensor_description">为了更好的准确性，我们需要访问您手机的身体传感器</string>
 </resources>

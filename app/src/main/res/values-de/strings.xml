@@ -62,4 +62,6 @@
     <string name="day">Tag</string>
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
+    <string name="onboarding_body_sensor">Schritt-Tracking-Genauigkeit</string>
+    <string name="onboarding_body_sensor_description">Für eine bessere Genauigkeit müssen wir auf die Körpersensoren Ihres Mobiltelefons zugreifen</string>
 </resources>

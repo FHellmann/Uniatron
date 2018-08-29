@@ -62,4 +62,6 @@
     <string name="day">Journée</string>
     <string name="month">Mois</string>
     <string name="year">An</string>
+    <string name="onboarding_body_sensor">Précision du suivi des étapes</string>
+    <string name="onboarding_body_sensor_description">Pour une meilleure précision, nous devons accéder aux capteurs du corps de votre téléphone portable</string>
 </resources>

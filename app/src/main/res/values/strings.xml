@@ -64,6 +64,6 @@
     <string name="day">Day</string>
     <string name="month">Month</string>
     <string name="year">Year</string>
-    <string name="onboarding_body_sensor">When are you moving?</string>
-    <string name="onboarding_body_sensor_description">I need the permission to track your movements to give you an accurate tracking result</string>
+    <string name="onboarding_body_sensor">Step tracking accuracy</string>
+    <string name="onboarding_body_sensor_description">For a better accuracy we need to access the body sensors of your mobile phone</string>
 </resources>
