@@ -50,7 +50,7 @@ public class OnBoardingActivity extends MaterialIntroActivity {
                 .title(getString(R.string.onboarding_body_sensor))
                 .description(getString(R.string.onboarding_body_sensor_description))
                 .image(R.drawable.ic_directions_walk_black_24dp)
-                .neededPermissions("android.permission.BODY_SENSORS")
+                .possiblePermissions("android.permission.BODY_SENSORS")
                 .backgroundColor(R.color.onboardingBackground3)
                 .buttonsColor(R.color.onboardingBackground3Dark)
                 .build();

@@ -2,8 +2,6 @@ package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
 import com.annimon.stream.Stream;
 
-import java.util.Arrays;
-
 /**
  * The permission model contains all the relevant data
  * for a {@link PermissionFragment}.
@@ -61,7 +59,7 @@ class PermissionModel {
      * @return The needed permissions.
      */
     public String[] getNeededPermissions() {
-        return Arrays.copyOf(mNeededPermissions, mNeededPermissions.length);
+        return Stream.ofNullable(mNeededPermissions).toArray(String[]::new);
     }
 
     /**
@@ -70,7 +68,7 @@ class PermissionModel {
      * @return The possible permissions.
      */
     public String[] getPossiblePermissions() {
-        return Arrays.copyOf(mPossiblePermissions, mPossiblePermissions.length);
+        return Stream.ofNullable(mPossiblePermissions).toArray(String[]::new);
     }
 
     /**
