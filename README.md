@@ -69,19 +69,6 @@ Considering the fact that the user can reach every content of the app with three
 
 The design of our app complies with the design guidelines of [Google Material Design](https://material.io/guidelines/material-design/introduction.html).
 
-### Final App
-Screenshot | Description
-:---------:|:----------:
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Today.png" width="800"/> | **Start screen/Today**<br/>Several cards are displayed in the today screen. These cards contain different information, e. g. app usage, summary. At the top, two cards are represented colored to get the users focus on the important cards. In this case it would be the remaining time of app usage and the amount of coins to trade more time.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_History.png" width="800"/> | **History**<br/>The history is layouted the same like the today view. The only difference is by not displaying the two upper cards about time account and coin bag.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Shop.png" width="800"/> | **Shop**<br/>If the user has enough coins collected, then he is able to trade these coins into more app usage time. Another option would be the "Learning Aid", if there are not enough coins available. The user also states his current mood here.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_Settings.png" width="800"/> | **Settings**<br/>By now, there are two settings available. The first one is to set the fitness level of the user. Therefore three levels can be chosen - easy, normal, hard. Of course, the second setting is to select all the apps - saved in a blacklist - which should be blocked.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Onboarding/banner.png" width="800"/> | **On-Boarding (Introduction)**<br/>The On-Boarding is an introduction for the user to get first information about the app and how to use it. The user will also be asked to grant the required permissions to run the app.
-<img src="https://github.com/FHellmann/Uniatron/blob/master/doc/Screenshots/Screenshot_About.png" width="800"/> | **About**<br/>The "About" view depicts the credit to the contributors.
-
-### Prototype
-![alt text](https://github.com/FHellmann/Uniatron/blob/master/doc/Concepts/Prototype.JPG)
-
 ## Coding Guidelines
 
 ### Work Process
