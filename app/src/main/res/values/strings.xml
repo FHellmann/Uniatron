@@ -66,4 +66,8 @@
     <string name="year">Year</string>
     <string name="onboarding_body_sensor">Step tracking accuracy</string>
     <string name="onboarding_body_sensor_description">For a better accuracy we need to access the body sensors of your mobile phone</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

@@ -26,7 +26,6 @@ import com.edu.uni.augsburg.uniatron.ui.card.appusage.AppUsageViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.coinbag.CoinBagViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.summary.SummaryViewModel;
 import com.edu.uni.augsburg.uniatron.ui.card.timeaccount.TimeAccountViewModel;
-import com.edu.uni.augsburg.uniatron.ui.onboarding.OnBoardingActivity;
 import com.edu.uni.augsburg.uniatron.ui.setting.SettingActivity;
 import com.edu.uni.augsburg.uniatron.ui.shop.TimeCreditShopActivity;
 
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         mRecyclerView.setAdapter(mAdapter);
 
         setupCardModels();
-        startOnBoarding();
 
         NotificationChannels.setupChannels(this);
         startService(new Intent(this, StickyAppService.class));
@@ -113,13 +111,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     private int getButtonVisibility(final boolean isAvailable) {
         return isAvailable ? View.VISIBLE : View.INVISIBLE;
-    }
-
-    private void startOnBoarding() {
-        if (mModelNavigation.isIntroNeeded(this)) {
-            startActivity(new Intent(this, OnBoardingActivity.class));
-            mModelNavigation.setIntroDone();
-        }
     }
 
     /**
