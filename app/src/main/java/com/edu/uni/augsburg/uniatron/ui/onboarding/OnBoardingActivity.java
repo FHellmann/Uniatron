@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.edu.uni.augsburg.uniatron.R;
 
-import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.SlideFragment;
 import agency.tango.materialintroscreen.SlideFragmentBuilder;
 
@@ -14,13 +13,11 @@ import agency.tango.materialintroscreen.SlideFragmentBuilder;
  *
  * @author Leon Wöhrl
  */
-public class OnBoardingActivity extends MaterialIntroActivity {
+public class OnBoardingActivity extends ExtendedMaterialIntroActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        enableLastSlideAlphaExitTransition(true);
 
         addSlide(createIntroSlide());
         addSlide(createAppUsageSlide());
