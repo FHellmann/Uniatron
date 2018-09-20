@@ -78,6 +78,7 @@ dependencies {
     implementation 'com.github.medyo:android-about-page:1.2.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'agency.tango.android:material-intro-screen:0.0.5'
+    implementation 'com.jaredrummler:animated-svg-view:1.0.5'
 
     // Testing
     testImplementation 'junit:junit:4.12'

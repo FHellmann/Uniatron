@@ -86,7 +86,7 @@ public class SharedPreferencesHandlerTest {
 
     @Test
     public void testFirstStartFalse() {
-        mHandler.setFirstStartDone();
+        mHandler.setFirstStart(false);
         assertThat(mHandler.isFirstStart(), is(false));
     }
 

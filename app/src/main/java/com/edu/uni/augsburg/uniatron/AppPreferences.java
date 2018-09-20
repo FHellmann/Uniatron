@@ -83,8 +83,9 @@ public interface AppPreferences {
 
     /**
      * Marks the app as not first start for future launches.
+     * @param firstStart Sets if it is the first start or not.
      */
-    void setFirstStartDone();
+    void setFirstStart(boolean firstStart);
 
     /**
      * Checks if the user is eligible for the intro bonus.

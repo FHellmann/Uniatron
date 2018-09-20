@@ -43,11 +43,12 @@ public class OnBoardingViewModel extends AndroidViewModel {
      *
      * @param packageName The package name of this app.
      */
-    public void addIntroBonusIfAvailable(@NonNull final String packageName) {
+    public void setIntroFinished(@NonNull final String packageName) {
         if (mSharedPrefsHandler.isIntroBonusEligible()) {
             mSharedPrefsHandler.setIntroBonusGranted();
             mAppUsageDao.addAppUsage(packageName, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
             mStepCountDao.addStepCount(STEP_BONUS);
         }
+        mSharedPrefsHandler.setFirstStart(false);
     }
 }

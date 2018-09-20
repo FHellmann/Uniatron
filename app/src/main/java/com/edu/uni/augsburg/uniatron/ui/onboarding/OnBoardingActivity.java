@@ -28,11 +28,13 @@ public class OnBoardingActivity extends ExtendedMaterialIntroActivity {
         }
         addSlide(createShoppingSlide());
         addSlide(new BlacklistSelectionFragment());
+    }
 
+    @Override
+    protected void onFinished() {
         // the user gets a sample entry on first on-boarding so it's not empty
-        final OnBoardingViewModel mViewModel = ViewModelProviders.of(this)
-                .get(OnBoardingViewModel.class);
-        mViewModel.addIntroBonusIfAvailable(getPackageName());
+        final OnBoardingViewModel mViewModel = ViewModelProviders.of(this).get(OnBoardingViewModel.class);
+        mViewModel.setIntroFinished(getPackageName());
     }
 
     private SlideFragment createShoppingSlide() {
@@ -82,7 +84,7 @@ public class OnBoardingActivity extends ExtendedMaterialIntroActivity {
         return new SlideFragmentBuilder()
                 .title(getString(R.string.app_name))
                 .description(getString(R.string.onboarding_intro_description))
-                .image(R.mipmap.ic_launcher_foreground)
+                .image(R.drawable.ic_emoticon_happy_selected)
                 .backgroundColor(R.color.primaryColor)
                 .buttonsColor(android.R.color.transparent)
                 .build();

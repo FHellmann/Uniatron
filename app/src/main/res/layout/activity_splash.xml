@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,14 +7,22 @@
     android:orientation="vertical"
     tools:context="com.edu.uni.augsburg.uniatron.ui.splash.SplashActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="168dp"
-        android:layout_height="168dp"
+    <com.jaredrummler.android.widget.AnimatedSvgView
+        android:id="@+id/animated_svg_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginBottom="25dp"
         android:layout_weight="1"
-        android:contentDescription="@null"
-        android:src="@mipmap/ic_launcher_foreground" />
+        app:animatedSvgFillColors="@array/app_icon_color"
+        app:animatedSvgFillStart="1200"
+        app:animatedSvgFillTime="1000"
+        app:animatedSvgGlyphStrings="@array/app_icon_svg"
+        app:animatedSvgImageSizeX="400"
+        app:animatedSvgImageSizeY="400"
+        app:animatedSvgTraceMarkerLength="50"
+        app:animatedSvgTraceTime="2000"
+        app:animatedSvgTraceTimePerGlyph="1000" />
 
     <TextView
         android:id="@+id/fullscreen_content"

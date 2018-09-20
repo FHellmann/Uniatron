@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
@@ -38,7 +39,6 @@ public class SplashViewModel extends AndroidViewModel {
      */
     public boolean isIntroNeeded(@NonNull final Context context) {
         return mSharedPrefsHandler.isFirstStart()
-                || Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(context)
-                || Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(context);
+                || Stream.of(Permissions.values()).anyMatch(permission -> permission.isNotGranted(context));
     }
 }

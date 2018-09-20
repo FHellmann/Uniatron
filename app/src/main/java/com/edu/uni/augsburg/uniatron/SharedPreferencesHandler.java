@@ -107,10 +107,10 @@ public final class SharedPreferencesHandler implements AppPreferences {
     }
 
     @Override
-    public void setFirstStartDone() {
+    public void setFirstStart(final boolean firstStart) {
         final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference to make it false because we don't want this to run again
-        editor.putBoolean(PREF_FIRST_START, false);
+        editor.putBoolean(PREF_FIRST_START, firstStart);
         editor.apply();
 
         notifyDatasetChanged(PREF_FIRST_START, mPrefs);
