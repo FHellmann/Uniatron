@@ -1,5 +1,6 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
+import android.os.Build;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -54,38 +55,44 @@ public class OnBoardingActivityTest {
 
         // App usage permission
         onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
-        onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
-                .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
-        onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
-        device.findObject(new UiSelector().text(getTargetContext().getString(R.string.app_name))).click();
-        device.findObject(new UiSelector().checkable(true).checked(false)).click();
-        device.pressBack();
-        device.pressBack();
-        onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
+                    .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
+            onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
+            device.findObject(new UiSelector().text(getTargetContext().getString(R.string.app_name))).click();
+            device.findObject(new UiSelector().checkable(true).checked(false)).click();
+            device.pressBack();
+            device.pressBack();
+            onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        }
 
         // Battery optimization permission
         onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
-        onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
-                .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
-        onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
-        device.findObject(new UiSelector().className(Spinner.class)).click();
-        device.findObjects(By.res("android:id/text1")).get(1).click();
-        final UiScrollable uiScrollable = new UiScrollable(new UiSelector().className(ListView.class));
-        uiScrollable.setMaxSearchSwipes(100);
-        uiScrollable.scrollIntoView(new UiSelector().text(getTargetContext().getString(R.string.app_name)));
-        device.findObject(new UiSelector().text(getTargetContext().getString(R.string.app_name))).click();
-        device.findObject(new UiSelector().checkable(true).checked(false)).click();
-        device.findObject(new UiSelector().className(Button.class).index(1)).click();
-        device.pressBack();
-        onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
+                    .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
+            onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
+            device.findObject(new UiSelector().className(Spinner.class)).click();
+            device.findObjects(By.res("android:id/text1")).get(1).click();
+            final UiScrollable uiScrollable = new UiScrollable(new UiSelector().className(ListView.class));
+            uiScrollable.setMaxSearchSwipes(100);
+            uiScrollable.scrollIntoView(new UiSelector().text(getTargetContext().getString(R.string.app_name)));
+            device.findObject(new UiSelector().text(getTargetContext().getString(R.string.app_name))).click();
+            device.findObject(new UiSelector().checkable(true).checked(false)).click();
+            device.findObject(new UiSelector().className(Button.class).index(1)).click();
+            device.pressBack();
+            onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        }
 
         // Body sensor permission
         onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
-        onView(withText(agency.tango.materialintroscreen.R.string.impassable_slide))
-                .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
-        onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
-        device.findObject(new UiSelector().className(Button.class).index(1)).click();
-        onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            onView(withText(agency.tango.materialintroscreen.R.string.impassable_slide))
+                    .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
+            onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
+            device.findObject(new UiSelector().className(Button.class).index(1)).click();
+            onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        }
 
         // Shopping cart
         onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());

@@ -199,15 +199,11 @@ public class AppUsageModel {
 
         @Override
         public void onChanged(@Nullable final LearningAid learningAid) {
-            if (learningAid == null) {
-                mLearningAidTmp = Optional::empty;
-            } else {
-                mLearningAidTmp = learningAid;
-            }
+            mLearningAidTmp = learningAid;
         }
 
         private boolean isLearningAidActive() {
-            return mLearningAidTmp.getLeftTime().isPresent();
+            return Optional.ofNullable(mLearningAidTmp).map(tmp -> tmp.getLeftTime().isPresent()).orElse(false);
         }
 
         private void addLiveData(@NonNull final LiveData<LearningAid> liveData) {

@@ -14,7 +14,7 @@ import com.edu.uni.augsburg.uniatron.R;
  *
  * @author Fabio Hellmann
  */
-public class EmptyCard implements CardViewHolder {
+public class EmptyCard extends BaseCardViewHolder {
     @Override
     public void update(@NonNull final CardViewHolder cardViewHolder) {
         // Empty

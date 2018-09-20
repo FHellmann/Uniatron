@@ -1,6 +1,7 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.edu.uni.augsburg.uniatron.R;
@@ -22,7 +23,9 @@ public class OnBoardingActivity extends ExtendedMaterialIntroActivity {
         addSlide(createIntroSlide());
         addSlide(createAppUsageSlide());
         addSlide(createBatteryOptimizationSlide());
-        addSlide(createBodySensorSlide());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            addSlide(createBodySensorSlide());
+        }
         addSlide(createShoppingSlide());
         addSlide(new BlacklistSelectionFragment());
 

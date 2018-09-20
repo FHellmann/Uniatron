@@ -1,12 +1,12 @@
 package com.edu.uni.augsburg.uniatron.ui.onboarding;
 
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
@@ -67,10 +67,11 @@ public class PermissionFragment extends SlideFragment {
         notGrantedPermissions.addAll(getPermissionsToGrant(mNeededPermissions));
         notGrantedPermissions.addAll(getPermissionsToGrant(mPossiblePermissions));
 
-        if (notGrantedPermissions.contains(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)) {
-            Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.request(getContext());
-        } else if (notGrantedPermissions.contains(Manifest.permission.PACKAGE_USAGE_STATS)) {
-            Permissions.USAGE_ACCESS_SETTINGS.request(getContext());
+        final Optional<Permissions> permissionHandler = Stream.of(Permissions.values())
+                .filter(permission -> notGrantedPermissions.contains(permission.getPermissionName()))
+                .findFirst();
+        if (permissionHandler.isPresent()) {
+            permissionHandler.get().request(getContext());
         } else {
             super.askForPermissions();
         }
@@ -100,13 +101,10 @@ public class PermissionFragment extends SlideFragment {
     }
 
     private boolean isPermissionNotGranted(final String permission) {
-        switch (permission) {
-            case Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS:
-                return Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(getContext());
-            case Manifest.permission.PACKAGE_USAGE_STATS:
-                return Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(getContext());
-            default:
-                return ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED;
-        }
+        return Stream.of(Permissions.values())
+                .filter(permissionHandler -> permissionHandler.getPermissionName().equalsIgnoreCase(permission))
+                .findFirst()
+                .map(permissionHandler -> permissionHandler.isNotGranted(getContext()))
+                .orElse(ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED);
     }
 }
