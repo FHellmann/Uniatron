@@ -37,7 +37,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 public class OnBoardingActivityTest {
 
     @Rule
-    public ActivityTestRule<OnBoardingActivity> mActivityRule = new ActivityTestRule<>(OnBoardingActivity.class);
+    public ActivityTestRule<OnBoardingActivity> mActivityRule = new ActivityTestRule<>(OnBoardingActivity.class, true, true);
     private UiDevice device;
 
     @Before
@@ -64,6 +64,9 @@ public class OnBoardingActivityTest {
             device.pressBack();
             device.pressBack();
             onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        } else {
+            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
+                    .check((view, noViewFoundException) -> assertThat(view, is(nullValue())));
         }
 
         // Battery optimization permission
@@ -82,6 +85,9 @@ public class OnBoardingActivityTest {
             device.findObject(new UiSelector().className(Button.class).index(1)).click();
             device.pressBack();
             onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        } else {
+            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
+                    .check((view, noViewFoundException) -> assertThat(view, is(nullValue())));
         }
 
         // Body sensor permission
@@ -92,6 +98,9 @@ public class OnBoardingActivityTest {
             onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
             device.findObject(new UiSelector().className(Button.class).index(1)).click();
             onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
+        } else {
+            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
+                    .check((view, noViewFoundException) -> assertThat(view, is(nullValue())));
         }
 
         // Shopping cart
