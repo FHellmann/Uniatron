@@ -20,8 +20,7 @@ import java.util.List;
  *
  * @author Fabio Hellmann
  */
-public class MainActivityCardListAdapter
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MainActivityCardListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final CardViewHolder CARD_EMPTY = new EmptyCard();
     private final List<CardViewHolder> mCardViewHolderList = new ArrayList<>();

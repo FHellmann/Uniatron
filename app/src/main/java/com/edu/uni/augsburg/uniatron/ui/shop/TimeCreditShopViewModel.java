@@ -8,8 +8,8 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.domain.dao.EmotionDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
@@ -28,7 +28,7 @@ import java.util.Map;
  * @author Fabio Hellmann
  */
 public class TimeCreditShopViewModel extends AndroidViewModel {
-    private final SharedPreferencesHandler mPrefHandler;
+    private final AppPreferences mPrefHandler;
     private final TimeCreditDao mTimeCreditDao;
     private final EmotionDao mEmotionDao;
     private final List<TimeCredits> mShoppingCart;
@@ -46,8 +46,8 @@ public class TimeCreditShopViewModel extends AndroidViewModel {
     public TimeCreditShopViewModel(@NonNull final Application application) {
         super(application);
 
-        final MainApplication instance = MainApplication.getInstance(application);
-        mPrefHandler = instance.getSharedPreferencesHandler();
+        final AppContext instance = AppContext.getInstance(application);
+        mPrefHandler = instance.getPreferences();
         mTimeCreditDao = instance.getTimeCreditDao();
         mEmotionDao = instance.getEmotionDao();
 

@@ -12,7 +12,7 @@ public interface CardViewModel {
     /**
      * Setup the initial state of the card.
      *
-     * @param date The date.
+     * @param date         The date.
      * @param calendarType The calendar type (date/month/year).
      */
     void setup(Date date, int calendarType);

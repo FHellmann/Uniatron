@@ -6,7 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.domain.dao.SummaryDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
@@ -35,7 +35,7 @@ public class SummaryViewModel extends AndroidViewModel implements CardViewModel 
      */
     public SummaryViewModel(@NonNull final Application application) {
         super(application);
-        mSummaryDao = MainApplication.getInstance(application).getSummaryDao();
+        mSummaryDao = AppContext.getInstance(application).getSummaryDao();
         mDateCache = new DateCache<>();
         mObservableDaySummary = new MediatorLiveData<>();
     }

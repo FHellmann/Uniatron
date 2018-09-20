@@ -8,7 +8,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
 
-import static com.edu.uni.augsburg.uniatron.SharedPreferencesHandler.PREF_APP_BLACKLIST;
+import static com.edu.uni.augsburg.uniatron.AppPreferences.PREF_APP_BLACKLIST;
 
 /**
  * The preference fragment for the general part.
