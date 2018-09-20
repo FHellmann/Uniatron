@@ -37,7 +37,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 public class OnBoardingActivityTest {
 
     @Rule
-    public ActivityTestRule<OnBoardingActivity> mActivityRule = new ActivityTestRule<>(OnBoardingActivity.class, true, true);
+    public ActivityTestRule<OnBoardingActivity> mActivityRule = new ActivityTestRule<>(OnBoardingActivity.class);
     private UiDevice device;
 
     @Before
@@ -91,16 +91,13 @@ public class OnBoardingActivityTest {
         }
 
         // Body sensor permission
-        onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
             onView(withText(agency.tango.materialintroscreen.R.string.impassable_slide))
                     .check((view, noViewFoundException) -> assertThat(view.getVisibility(), is(View.VISIBLE)));
             onView(withId(agency.tango.materialintroscreen.R.id.button_message)).perform(click());
             device.findObject(new UiSelector().className(Button.class).index(1)).click();
             onView(withId(agency.tango.materialintroscreen.R.id.button_next)).perform(click());
-        } else {
-            onView(withText(agency.tango.materialintroscreen.R.string.please_grant_permissions))
-                    .check((view, noViewFoundException) -> assertThat(view, is(nullValue())));
         }
 
         // Shopping cart
