@@ -14,7 +14,8 @@ import com.annimon.stream.Objects;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.TimeCreditDao;
@@ -35,7 +36,7 @@ import java.util.Set;
  */
 public class AppUsageModel {
 
-    private final SharedPreferencesHandler mSharedPreferencesHandler;
+    private final AppPreferences mSharedPreferencesHandler;
     private final UsageTimeHelper mUsageTimeHelper = new UsageTimeHelper();
     private final LearningAidHelper mLearningAidHelper = new LearningAidHelper();
     private final Map<Long, Consumer<Long>> mNotifyListeners = new LinkedHashMap<>();
@@ -47,8 +48,8 @@ public class AppUsageModel {
     AppUsageModel(@NonNull final Context context,
                   @NonNull final Consumer<String> blockTimeOutListener,
                   @NonNull final Consumer<String> blockLearningAidListener) {
-        final MainApplication application = MainApplication.getInstance(context);
-        mSharedPreferencesHandler = application.getSharedPreferencesHandler();
+        final AppContext application = AppContext.getInstance(context);
+        mSharedPreferencesHandler = application.getPreferences();
         mAppUsageDao = application.getAppUsageDao();
         mTimeCreditDao = application.getTimeCreditDao();
         mBlockTimeOutListener = blockTimeOutListener;
@@ -198,15 +199,11 @@ public class AppUsageModel {
 
         @Override
         public void onChanged(@Nullable final LearningAid learningAid) {
-            if (learningAid == null) {
-                mLearningAidTmp = Optional::empty;
-            } else {
-                mLearningAidTmp = learningAid;
-            }
+            mLearningAidTmp = learningAid;
         }
 
         private boolean isLearningAidActive() {
-            return mLearningAidTmp.getLeftTime().isPresent();
+            return Optional.ofNullable(mLearningAidTmp).map(tmp -> tmp.getLeftTime().isPresent()).orElse(false);
         }
 
         private void addLiveData(@NonNull final LiveData<LearningAid> liveData) {

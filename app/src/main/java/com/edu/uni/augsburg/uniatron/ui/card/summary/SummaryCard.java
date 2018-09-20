@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
+import com.edu.uni.augsburg.uniatron.ui.card.BaseCardViewHolder;
 import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
 import com.edu.uni.augsburg.uniatron.ui.card.CardUtil;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
@@ -27,10 +28,11 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class SummaryCard implements CardViewHolder {
+public class SummaryCard extends BaseCardViewHolder {
     private Summary mSummary;
 
     SummaryCard(@NonNull final Summary summary) {
+        super();
         mSummary = summary;
     }
 

@@ -20,26 +20,9 @@ import java.util.Set;
  *
  * @author Fabio Hellmann
  */
-public final class SharedPreferencesHandler {
-    /**
-     * Preference for the app blacklist.
-     */
-    public static final String PREF_APP_BLACKLIST = "pref_app_blacklist";
-    /**
-     * Preference for the steps per minute.
-     */
-    public static final String PREF_STEPS_PER_MINUTE = "pref_fitness_level";
-    /**
-     * Preference for the intro bonus.
-     */
-    public static final String PREF_INTRO_BONUS = "pref_intro_bonus";
-    /**
-     * Preference for the first start.
-     */
-    public static final String PREF_FIRST_START = "pref_first_start";
+public final class SharedPreferencesHandler implements AppPreferences {
 
     private static final float STEP_FACTOR_EASY = 1.0f;
-
     private final SharedPreferences mPrefs;
     private final Map<String, Consumer<SharedPreferences>> mListeners = new HashMap<>();
 
@@ -59,21 +42,13 @@ public final class SharedPreferencesHandler {
                 .forEach(entry -> entry.getValue().accept(sharedPreferences));
     }
 
-    /**
-     * Get all the apps which have been selected to block.
-     *
-     * @return The list of apps.
-     */
+    @Override
     public Set<String> getAppsBlacklist() {
         return mPrefs.getStringSet(PREF_APP_BLACKLIST, Collections.emptySet());
     }
 
-    /**
-     * Add an app to the blacklist.
-     *
-     * @param packageName The package name of the app.
-     */
-    public void addAppToBlacklist(final String packageName) {
+    @Override
+    public void addAppToBlacklist(@NonNull final String packageName) {
         Logger.d("Add '" + packageName + "' to blacklist");
 
         final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
@@ -86,12 +61,8 @@ public final class SharedPreferencesHandler {
         notifyDatasetChanged(PREF_APP_BLACKLIST, mPrefs);
     }
 
-    /**
-     * Remove an app from the blacklist.
-     *
-     * @param packageName The package name of the app.
-     */
-    public void removeAppFromBlacklist(final String packageName) {
+    @Override
+    public void removeAppFromBlacklist(@NonNull final String packageName) {
         Logger.d("Remove '" + packageName + "' from blacklist");
 
         final Set<String> newAppBlacklist = new LinkedHashSet<>(getAppsBlacklist());
@@ -104,11 +75,7 @@ public final class SharedPreferencesHandler {
         notifyDatasetChanged(PREF_APP_BLACKLIST, mPrefs);
     }
 
-    /**
-     * Get the steps amount per minute.
-     *
-     * @return The steps amount.
-     */
+    @Override
     public double getStepsFactor() {
         if (mPrefs.contains(PREF_STEPS_PER_MINUTE)) {
             return Float.valueOf(
@@ -122,60 +89,39 @@ public final class SharedPreferencesHandler {
         }
     }
 
-    /**
-     * Register a listener for the SharedPreferences.
-     *
-     * @param key      The key of the preference.
-     * @param listener The listener to register
-     */
+    @Override
     public void registerListener(@NonNull final String key, @NonNull final Consumer<SharedPreferences> listener) {
         mListeners.put(key, listener);
     }
 
-    /**
-     * Register a listener for the SharedPreferences.
-     *
-     * @param key The key of the preference.
-     */
+    @Override
     public void removeListener(@NonNull final String key) {
         if (mListeners.containsKey(key)) {
             mListeners.remove(key);
         }
     }
 
-    /**
-     * Checks if this is the first app launch.
-     *
-     * @return The value of the lookup
-     */
+    @Override
     public boolean isFirstStart() {
         return mPrefs.getBoolean(PREF_FIRST_START, true);
     }
 
-    /**
-     * Marks the app as not first start for future launches.
-     */
-    public void setFirstStartDone() {
+    @Override
+    public void setFirstStart(final boolean firstStart) {
         final SharedPreferences.Editor editor = mPrefs.edit();
         //  Edit preference to make it false because we don't want this to run again
-        editor.putBoolean(PREF_FIRST_START, false);
+        editor.putBoolean(PREF_FIRST_START, firstStart);
         editor.apply();
 
         notifyDatasetChanged(PREF_FIRST_START, mPrefs);
     }
 
-    /**
-     * Checks if the user is eligible for the intro bonus.
-     *
-     * @return true if the user is eligible to earn the intro bonus.
-     */
+    @Override
     public boolean isIntroBonusEligible() {
         return mPrefs.getBoolean(PREF_INTRO_BONUS, true);
     }
 
-    /**
-     * Marks the intro bonus as granted.
-     */
+    @Override
     public void setIntroBonusGranted() {
         final SharedPreferences.Editor editor = mPrefs.edit();
         editor.putBoolean(PREF_INTRO_BONUS, false);

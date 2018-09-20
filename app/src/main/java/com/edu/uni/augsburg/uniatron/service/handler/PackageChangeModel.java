@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 
 /**
  * The model is the connection between the data source
@@ -15,10 +15,10 @@ import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
  */
 public class PackageChangeModel {
 
-    private final SharedPreferencesHandler mSharedPreferences;
+    private final AppPreferences mSharedPreferences;
 
     PackageChangeModel(@NonNull final Context context) {
-        mSharedPreferences = MainApplication.getInstance(context).getSharedPreferencesHandler();
+        mSharedPreferences = AppContext.getInstance(context).getPreferences();
     }
 
     /**

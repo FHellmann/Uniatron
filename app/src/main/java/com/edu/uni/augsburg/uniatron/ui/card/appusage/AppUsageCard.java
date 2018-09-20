@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.ui.card.BaseCardViewHolder;
 import com.edu.uni.augsburg.uniatron.ui.card.CardUtil;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
@@ -29,7 +30,7 @@ import butterknife.OnClick;
  *
  * @author Fabio Hellmann
  */
-public class AppUsageCard implements CardViewHolder {
+public class AppUsageCard extends BaseCardViewHolder {
 
     private final List<AppUsageViewItem> mAppUsageList = new ArrayList<>();
 

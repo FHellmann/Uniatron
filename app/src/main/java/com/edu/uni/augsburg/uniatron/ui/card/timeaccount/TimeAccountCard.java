@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.edu.uni.augsburg.uniatron.R;
+import com.edu.uni.augsburg.uniatron.ui.card.BaseCardViewHolder;
 import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
 
@@ -22,7 +23,7 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class TimeAccountCard implements CardViewHolder {
+public class TimeAccountCard extends BaseCardViewHolder {
 
     private long mTimeLeft;
     private boolean mVisible;

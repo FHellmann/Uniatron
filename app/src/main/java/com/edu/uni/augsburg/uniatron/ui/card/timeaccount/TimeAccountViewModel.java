@@ -7,8 +7,8 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
@@ -27,7 +27,7 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
     private final DateCache<Long> mDateCache;
     private final MediatorLiveData<Long> mRemainingAppUsageTime;
     private final AppUsageDao mAppUsageDao;
-    private final SharedPreferencesHandler mPrefHandler;
+    private final AppPreferences mPrefHandler;
     private boolean mIsVisible;
 
     /**
@@ -38,9 +38,9 @@ public class TimeAccountViewModel extends AndroidViewModel implements CardViewMo
     public TimeAccountViewModel(@NonNull final Application application) {
         super(application);
 
-        final MainApplication instance = MainApplication.getInstance(application);
+        final AppContext instance = AppContext.getInstance(application);
         mAppUsageDao = instance.getAppUsageDao();
-        mPrefHandler = instance.getSharedPreferencesHandler();
+        mPrefHandler = instance.getPreferences();
         mDateCache = new DateCache<>();
         mRemainingAppUsageTime = new MediatorLiveData<>();
     }

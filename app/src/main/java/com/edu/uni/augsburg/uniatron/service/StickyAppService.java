@@ -23,6 +23,7 @@ import java.util.List;
 public class StickyAppService extends Service {
 
     private List<Detector> mDetectorList;
+    private boolean mStarted;
 
     @Nullable
     @Override
@@ -45,13 +46,17 @@ public class StickyAppService extends Service {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         Stream.of(mDetectorList).forEach(detector -> detector.start(this));
         Logger.d("Detectors started!");
+        mStarted = true;
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        Stream.of(mDetectorList).forEach(detector -> detector.destroy(this));
-        Logger.d("Detectors destroyed!");
+        if (mStarted) {
+            Stream.of(mDetectorList).forEach(detector -> detector.destroy(this));
+            Logger.d("Detectors destroyed!");
+            mStarted = false;
+        }
         super.onDestroy();
     }
 }

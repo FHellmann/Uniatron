@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
 
@@ -68,7 +69,12 @@ public final class AppUsageDetector extends BroadcastReceiver implements Detecto
         stopAppChecker(); // In case the checker is already running
 
         final AppChecker checker = mAppChecker
-                .whenOther(packageName -> mModel.onAppUsed(packageName, DELAY_IN_MILLISECONDS))
+                .whenOther(packageName -> {
+                    // Only track launchable apps (filters system-ui)
+                    if (isLaunchableApp(context.getPackageManager(), packageName)) {
+                        mModel.onAppUsed(packageName, DELAY_IN_MILLISECONDS);
+                    }
+                })
                 .timeout(DELAY_IN_MILLISECONDS);
         Stream.of(mModel.getPackageFilters(context))
                 .forEach(packageName -> checker.when(packageName, process -> {
@@ -117,6 +123,12 @@ public final class AppUsageDetector extends BroadcastReceiver implements Detecto
     public void destroy(@NonNull final Context context) {
         mModel.destroy();
         context.unregisterReceiver(this);
+    }
+
+    private static boolean isLaunchableApp(@NonNull final PackageManager packageManager, @NonNull final String packageName) {
+        // Performance: 1-4 ms
+        final Intent intent = packageManager.getLaunchIntentForPackage(packageName);
+        return intent != null && intent.resolveActivity(packageManager) != null;
     }
 
     /**

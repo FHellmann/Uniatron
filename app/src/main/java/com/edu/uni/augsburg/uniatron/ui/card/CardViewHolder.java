@@ -39,25 +39,19 @@ public interface CardViewHolder {
      *
      * @return The type.
      */
-    default int getType() {
-        return getClass().getName().hashCode();
-    }
+    int getType();
 
     /**
      * Check if the card should be displayed.
      *
      * @return {@code true} if the card should be displayed, {@code false} otherwise.
      */
-    default boolean isVisible() {
-        return true;
-    }
+    boolean isVisible();
 
     /**
      * Get the priority.
      *
      * @return The priority.
      */
-    default CardPriority getPriority() {
-        return CardPriority.NORMAL;
-    }
+    CardPriority getPriority();
 }

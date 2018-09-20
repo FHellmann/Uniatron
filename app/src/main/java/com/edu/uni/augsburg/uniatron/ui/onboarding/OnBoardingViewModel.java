@@ -4,8 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.domain.dao.AppUsageDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
 
@@ -22,7 +22,7 @@ public class OnBoardingViewModel extends AndroidViewModel {
     private static final int STEP_BONUS = 500;
     private final AppUsageDao mAppUsageDao;
     private final StepCountDao mStepCountDao;
-    private final SharedPreferencesHandler mSharedPrefsHandler;
+    private final AppPreferences mSharedPrefsHandler;
 
     /**
      * Ctr.
@@ -32,10 +32,10 @@ public class OnBoardingViewModel extends AndroidViewModel {
     public OnBoardingViewModel(final @NonNull Application application) {
         super(application);
 
-        final MainApplication instance = MainApplication.getInstance(application);
+        final AppContext instance = AppContext.getInstance(application);
         mAppUsageDao = instance.getAppUsageDao();
         mStepCountDao = instance.getStepCountDao();
-        mSharedPrefsHandler = instance.getSharedPreferencesHandler();
+        mSharedPrefsHandler = instance.getPreferences();
     }
 
     /**
@@ -43,11 +43,12 @@ public class OnBoardingViewModel extends AndroidViewModel {
      *
      * @param packageName The package name of this app.
      */
-    public void addIntroBonusIfAvailable(@NonNull final String packageName) {
+    public void setIntroFinished(@NonNull final String packageName) {
         if (mSharedPrefsHandler.isIntroBonusEligible()) {
             mSharedPrefsHandler.setIntroBonusGranted();
             mAppUsageDao.addAppUsage(packageName, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
             mStepCountDao.addStepCount(STEP_BONUS);
         }
+        mSharedPrefsHandler.setFirstStart(false);
     }
 }

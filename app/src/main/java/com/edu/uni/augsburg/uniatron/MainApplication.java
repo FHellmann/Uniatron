@@ -1,8 +1,6 @@
 package com.edu.uni.augsburg.uniatron;
 
 import android.app.Application;
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.edu.uni.augsburg.uniatron.domain.QueryProvider;
@@ -20,70 +18,36 @@ import com.orhanobut.logger.Logger;
  *
  * @author Fabio Hellmann
  */
-public class MainApplication extends Application {
-    private SharedPreferencesHandler mSharedPreferencesHandler;
+public class MainApplication extends Application implements AppContext {
+    private AppPreferences mPreferences;
     private QueryProvider mQueryProvider;
 
-    /**
-     * Get an instance of the main application.
-     *
-     * @param context The context.
-     * @return The main application.
-     */
-    public static MainApplication getInstance(@NonNull final Context context) {
-        return (MainApplication) context.getApplicationContext();
+    @Override
+    public AppPreferences getPreferences() {
+        return mPreferences;
     }
 
-    /**
-     * Get the SharedPreferencesHandler.
-     *
-     * @return The SharedPreferencesHandler.
-     */
-    public SharedPreferencesHandler getSharedPreferencesHandler() {
-        return mSharedPreferencesHandler;
-    }
-
-    /**
-     * Get the app usage dao.
-     *
-     * @return The app usage dao.
-     */
+    @Override
     public AppUsageDao getAppUsageDao() {
         return AppUsageDao.create(mQueryProvider);
     }
 
-    /**
-     * Get the emotion dao.
-     *
-     * @return The emotion dao.
-     */
+    @Override
     public EmotionDao getEmotionDao() {
         return EmotionDao.create(mQueryProvider);
     }
 
-    /**
-     * Get the step count dao.
-     *
-     * @return The step count dao.
-     */
+    @Override
     public StepCountDao getStepCountDao() {
         return StepCountDao.create(mQueryProvider);
     }
 
-    /**
-     * Get the summary dao.
-     *
-     * @return The summary dao.
-     */
+    @Override
     public SummaryDao getSummaryDao() {
         return SummaryDao.create(mQueryProvider);
     }
 
-    /**
-     * Get the time credit dao.
-     *
-     * @return The time credit dao.
-     */
+    @Override
     public TimeCreditDao getTimeCreditDao() {
         return TimeCreditDao.create(mQueryProvider);
     }
@@ -98,7 +62,7 @@ public class MainApplication extends Application {
             }
         });
         mQueryProvider = QueryProvider.create(this);
-        mSharedPreferencesHandler = new SharedPreferencesHandler(this);
+        mPreferences = new SharedPreferencesHandler(this);
         NotificationChannels.setupChannels(this);
     }
 }

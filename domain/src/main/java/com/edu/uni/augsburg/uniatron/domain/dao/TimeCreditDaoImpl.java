@@ -62,6 +62,11 @@ class TimeCreditDaoImpl implements TimeCreditDao {
         }
 
         @Override
+        public boolean isActive() {
+            return getLeftTime().isPresent();
+        }
+
+        @Override
         public Optional<Long> getLeftTime() {
             return mActive ? Optional.of(mTimeLeft) : Optional.empty();
         }

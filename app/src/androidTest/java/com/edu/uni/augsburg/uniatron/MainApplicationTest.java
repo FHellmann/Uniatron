@@ -24,31 +24,31 @@ public class MainApplicationTest {
 
     @Test
     public void getSharedPreferencesHandler() {
-        assertThat(MainApplication.getInstance(mContext).getSharedPreferencesHandler(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getPreferences(), is(notNullValue()));
     }
 
     @Test
     public void getAppUsageDao() {
-        assertThat(MainApplication.getInstance(mContext).getAppUsageDao(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getAppUsageDao(), is(notNullValue()));
     }
 
     @Test
     public void getEmotionDao() {
-        assertThat(MainApplication.getInstance(mContext).getEmotionDao(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getEmotionDao(), is(notNullValue()));
     }
 
     @Test
     public void getStepCountDao() {
-        assertThat(MainApplication.getInstance(mContext).getStepCountDao(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getStepCountDao(), is(notNullValue()));
     }
 
     @Test
     public void getSummaryDao() {
-        assertThat(MainApplication.getInstance(mContext).getSummaryDao(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getSummaryDao(), is(notNullValue()));
     }
 
     @Test
     public void getTimeCreditDao() {
-        assertThat(MainApplication.getInstance(mContext).getTimeCreditDao(), is(notNullValue()));
+        assertThat(AppContext.getInstance(mContext).getTimeCreditDao(), is(notNullValue()));
     }
 }
