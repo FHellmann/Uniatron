@@ -84,7 +84,7 @@ public class OnBoardingActivity extends ExtendedMaterialIntroActivity {
         return new SlideFragmentBuilder()
                 .title(getString(R.string.app_name))
                 .description(getString(R.string.onboarding_intro_description))
-                .image(R.drawable.ic_emoticon_happy_selected)
+                .image(R.mipmap.ic_launcher_foreground)
                 .backgroundColor(R.color.primaryColor)
                 .buttonsColor(android.R.color.transparent)
                 .build();

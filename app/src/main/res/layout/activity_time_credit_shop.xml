@@ -73,44 +73,44 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_angry" />
+                    style="@style/RadioButton.Emotion.Angry" />
 
                 <RadioButton
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_sad" />
+                    style="@style/RadioButton.Emotion.Sad" />
 
                 <RadioButton
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_neutral" />
+                    style="@style/RadioButton.Emotion.Neutral" />
 
                 <RadioButton
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_happy" />
+                    style="@style/RadioButton.Emotion.Happy" />
 
                 <RadioButton
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:foreground="@drawable/selector_emoticon_fantastic" />
+                    style="@style/RadioButton.Emotion.Fantastic" />
             </RadioGroup>
 
             <TextView
