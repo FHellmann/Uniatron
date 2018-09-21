@@ -9,13 +9,15 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primaryColor">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="?attr/actionBarSize"
+            android:orientation="horizontal"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <android.support.design.button.MaterialButton
                 android:id="@+id/prevDateButton"
