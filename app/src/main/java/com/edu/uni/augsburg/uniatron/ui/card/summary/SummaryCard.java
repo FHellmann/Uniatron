@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.edu.uni.augsburg.uniatron.R;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Emotions;
 import com.edu.uni.augsburg.uniatron.domain.dao.model.Summary;
+import com.edu.uni.augsburg.uniatron.ui.card.BaseCardViewHolder;
 import com.edu.uni.augsburg.uniatron.ui.card.CardPriority;
 import com.edu.uni.augsburg.uniatron.ui.card.CardUtil;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewHolder;
@@ -27,10 +28,11 @@ import butterknife.ButterKnife;
  *
  * @author Fabio Hellmann
  */
-public class SummaryCard implements CardViewHolder {
+public class SummaryCard extends BaseCardViewHolder {
     private Summary mSummary;
 
     SummaryCard(@NonNull final Summary summary) {
+        super();
         mSummary = summary;
     }
 
@@ -86,15 +88,15 @@ public class SummaryCard implements CardViewHolder {
     private int getEmoticonDrawable(@NonNull final Emotions emotion) {
         switch (emotion) {
             case ANGRY:
-                return R.drawable.ic_emoticon_angry_selected;
+                return R.drawable.ic_sentiment_very_dissatisfied_black_48dp;
             case SADNESS:
-                return R.drawable.ic_emoticon_sad_selected;
+                return R.drawable.ic_sentiment_dissatisfied_black_48dp;
             case HAPPINESS:
-                return R.drawable.ic_emoticon_happy_selected;
+                return R.drawable.ic_sentiment_satisfied_black_48dp;
             case FANTASTIC:
-                return R.drawable.ic_emoticon_fantastic_selected;
+                return R.drawable.ic_sentiment_very_satisfied_black_48dp;
             default:
-                return R.drawable.ic_emoticon_neutral_selected;
+                return R.drawable.ic_sentiment_neutral_black_48dp;
         }
     }
 

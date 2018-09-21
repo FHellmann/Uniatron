@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Don't warn for Java8 lambda expressions
+-dontwarn java.lang.invoke.**

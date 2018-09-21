@@ -14,9 +14,9 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
+import com.edu.uni.augsburg.uniatron.AppPreferences;
 import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
-import com.orhanobut.logger.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.Set;
 public class SettingViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<InstalledApp>> mInstalledApps;
     private final MutableLiveData<List<InstalledApp>> mObservable = new MutableLiveData<>();
-    private final SharedPreferencesHandler mHandler;
+    private final AppPreferences mHandler;
 
     /**
      * Ctr.
@@ -41,7 +41,7 @@ public class SettingViewModel extends AndroidViewModel {
     public SettingViewModel(@NonNull final Application application) {
         super(application);
 
-        mHandler = MainApplication.getInstance(application).getSharedPreferencesHandler();
+        mHandler = AppContext.getInstance(application).getPreferences();
 
         mInstalledApps = new MediatorLiveData<>();
         mInstalledApps.addSource(mObservable, mInstalledApps::setValue);
@@ -76,12 +76,8 @@ public class SettingViewModel extends AndroidViewModel {
         if (installedApplications == null) {
             return Collections.emptyList();
         } else {
-            final long start = System.currentTimeMillis();
-            // Fetch launchable apps (Performance: ~1200ms)
+            // Fetch apps (Performance: ~1200ms) + concat and sort (Performance: ~100ms)
             final List<InstalledApp> linkedElements = getInstalledAppsData(context, installedApplications);
-            Logger.d("Fetch installed apps (count=" + installedApplications.size() + ") needs "
-                    + (System.currentTimeMillis() - start) + "ms to filter launchable apps (count=" + linkedElements.size() + ")");
-            // Concat with sortBy (Performance: ~100ms)
             return Stream.concat(getSelectedItems(linkedElements, appsBlacklist), getUnselectedItems(linkedElements, appsBlacklist))
                     .collect(Collectors.toList());
         }

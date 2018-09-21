@@ -62,4 +62,6 @@
     <string name="day">Giorno</string>
     <string name="month">Mese</string>
     <string name="year">Anno</string>
+    <string name="onboarding_body_sensor">Accuratezza del tracciamento</string>
+    <string name="onboarding_body_sensor_description">Per una migliore precisione dobbiamo accedere ai sensori del corpo del tuo telefono cellulare</string>
 </resources>

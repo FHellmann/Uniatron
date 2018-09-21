@@ -62,4 +62,6 @@
     <string name="day">Día</string>
     <string name="month">Nes</string>
     <string name="year">Año</string>
+    <string name="onboarding_body_sensor">Precisión de seguimiento de pasos</string>
+    <string name="onboarding_body_sensor_description">Para una mejor precisión, necesitamos acceder a los sensores corporales de su teléfono móvil</string>
 </resources>

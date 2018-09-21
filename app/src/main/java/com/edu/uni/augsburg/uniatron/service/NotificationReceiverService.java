@@ -5,8 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
 
 /**
  * The new added package will be added to the blacklist by this service.
@@ -26,8 +25,7 @@ public class NotificationReceiverService extends Service {
         // Then we can not add the app automatically.
         if (intent != null && intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             final String packageName = intent.getStringExtra(Intent.EXTRA_RETURN_RESULT);
-            final SharedPreferencesHandler preferencesHandler = MainApplication.getInstance(getBaseContext()).getSharedPreferencesHandler();
-            preferencesHandler.addAppToBlacklist(packageName);
+            AppContext.getInstance(getBaseContext()).getPreferences().addAppToBlacklist(packageName);
         }
         return super.onStartCommand(intent, flags, startId);
     }

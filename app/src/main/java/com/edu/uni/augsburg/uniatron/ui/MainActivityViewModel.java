@@ -4,18 +4,15 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.Function;
-import com.edu.uni.augsburg.uniatron.MainApplication;
-import com.edu.uni.augsburg.uniatron.SharedPreferencesHandler;
+import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
 import com.edu.uni.augsburg.uniatron.ui.util.DateFormatter;
-import com.edu.uni.augsburg.uniatron.ui.util.Permissions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,7 +29,6 @@ import java.util.List;
 public class MainActivityViewModel extends AndroidViewModel {
     private final List<CardViewModel> mCardViewModelList;
     private final MediatorLiveData<Calendar> mDateLoaded;
-    private final SharedPreferencesHandler mSharedPrefsHandler;
     private Calendar mMinCalendar;
     private Calendar mCalendar;
     private GroupBy mGroupByStrategy;
@@ -45,8 +41,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull final Application application) {
         super(application);
 
-        final MainApplication instance = MainApplication.getInstance(application);
-        mSharedPrefsHandler = instance.getSharedPreferencesHandler();
+        final AppContext instance = AppContext.getInstance(application);
         instance.getAppUsageDao().getMinDate().observeForever(date -> {
             if (date != null) {
                 final Calendar calendar = GregorianCalendar.getInstance();
@@ -180,25 +175,6 @@ public class MainActivityViewModel extends AndroidViewModel {
     @NonNull
     public LiveData<Calendar> getCurrentDate() {
         return mDateLoaded;
-    }
-
-    /**
-     * Check whether the intro is needed or not.
-     *
-     * @param context The context.
-     * @return {@code true} if the intro is needed, {@code false} otherwise.
-     */
-    public boolean isIntroNeeded(@NonNull final Context context) {
-        return mSharedPrefsHandler.isFirstStart()
-                || Permissions.IGNORE_BATTERY_OPTIMIZATION_SETTINGS.isNotGranted(context)
-                || Permissions.USAGE_ACCESS_SETTINGS.isNotGranted(context);
-    }
-
-    /**
-     * Mark the intro as done.
-     */
-    public void setIntroDone() {
-        mSharedPrefsHandler.setFirstStartDone();
     }
 
     /**

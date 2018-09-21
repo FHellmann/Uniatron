@@ -13,9 +13,7 @@ public interface LearningAid {
      *
      * @return {@code true} if the learning aid is active, {@code false} otherwise.
      */
-    default boolean isActive() {
-        return getLeftTime().isPresent();
-    }
+    boolean isActive();
 
     /**
      * Get the left time for the current learning aid or empty if the

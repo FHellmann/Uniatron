@@ -7,7 +7,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
 import com.edu.uni.augsburg.uniatron.domain.dao.converter.DateConverter;
 import com.edu.uni.augsburg.uniatron.ui.card.CardViewModel;
@@ -36,7 +36,7 @@ public class CoinBagViewModel extends AndroidViewModel implements CardViewModel 
     public CoinBagViewModel(@NonNull final Application application) {
         super(application);
 
-        mStepCountDao = MainApplication.getInstance(application).getStepCountDao();
+        mStepCountDao = AppContext.getInstance(application).getStepCountDao();
         mDateCache = new DateCache<>();
         mRemainingCoins = new MediatorLiveData<>();
     }

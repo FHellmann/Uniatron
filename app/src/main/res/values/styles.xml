@@ -19,4 +19,36 @@
         <item name="android:background">@android:color/darker_gray</item>
     </style>
 
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="android:Widget.Holo.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="RadioButton.Emotion.Fantastic" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/selector_emoticon_fantastic</item>
+    </style>
+
+    <style name="RadioButton.Emotion.Happy" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/selector_emoticon_happy</item>
+    </style>
+
+    <style name="RadioButton.Emotion.Neutral" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/selector_emoticon_neutral</item>
+    </style>
+
+    <style name="RadioButton.Emotion.Sad" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/selector_emoticon_sad</item>
+    </style>
+
+    <style name="RadioButton.Emotion.Angry" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/selector_emoticon_angry</item>
+    </style>
+
 </resources>

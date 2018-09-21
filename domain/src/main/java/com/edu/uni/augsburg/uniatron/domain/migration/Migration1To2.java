@@ -2,10 +2,7 @@ package com.edu.uni.augsburg.uniatron.domain.migration;
 
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.migration.Migration;
-import android.database.SQLException;
 import android.support.annotation.NonNull;
-
-import com.orhanobut.logger.Logger;
 
 /**
  * Migration from version 1 to version 2.
@@ -44,8 +41,6 @@ class Migration1To2 extends Migration {
             database.execSQL("DROP TABLE TimeCreditEntityOld");
 
             database.setTransactionSuccessful();
-        } catch (SQLException e) {
-            Logger.e(e, "Unable to migrate database from " + startVersion + " to " + endVersion);
         } finally {
             database.endTransaction();
         }

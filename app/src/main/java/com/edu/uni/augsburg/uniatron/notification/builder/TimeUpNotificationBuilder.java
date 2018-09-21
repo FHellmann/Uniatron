@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
  * Notification is shown when the time is running out soon.
  */
 public class TimeUpNotificationBuilder implements AppNotificationBuilder {
+    private static final int REQUEST_ID = 238487;
     private final Context mContext;
     private final long mRemainingTime;
-    private final int mRequestId;
 
     /**
      * Build Notification to inform user that times running out.
@@ -31,7 +31,6 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
     public TimeUpNotificationBuilder(@NonNull final Context context, final long remainingTime) {
         this.mContext = context;
         this.mRemainingTime = remainingTime;
-        this.mRequestId = (int) System.currentTimeMillis();
     }
 
     @Override
@@ -44,7 +43,7 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(PendingIntent.getActivity(
                         mContext,
-                        mRequestId,
+                        REQUEST_ID,
                         new Intent(mContext, TimeCreditShopActivity.class),
                         PendingIntent.FLAG_CANCEL_CURRENT))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -56,6 +55,6 @@ public class TimeUpNotificationBuilder implements AppNotificationBuilder {
 
     @Override
     public int getId() {
-        return mRequestId;
+        return REQUEST_ID;
     }
 }

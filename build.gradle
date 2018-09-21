@@ -22,7 +22,7 @@ allprojects {
         maven { url 'https://dl.bintray.com/rvalerio/maven' }
     }
 
-    project.version = '1.0.0-BETA1'
+    project.version = '1.0.0'
 }
 
 task clean(type: Delete) {

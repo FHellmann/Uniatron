@@ -3,7 +3,7 @@ package com.edu.uni.augsburg.uniatron.service.handler;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.edu.uni.augsburg.uniatron.MainApplication;
+import com.edu.uni.augsburg.uniatron.AppContext;
 import com.edu.uni.augsburg.uniatron.domain.dao.StepCountDao;
 
 /**
@@ -22,7 +22,7 @@ public class StepCountModel {
      * @param context The context.
      */
     StepCountModel(@NonNull final Context context) {
-        mStepCountDao = MainApplication.getInstance(context).getStepCountDao();
+        mStepCountDao = AppContext.getInstance(context).getStepCountDao();
     }
 
     /**
